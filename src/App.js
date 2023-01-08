@@ -1,24 +1,62 @@
-import logo from './logo.svg';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link }  from "react-router-dom";
+//import { Button } from 'semantic-ui-react';
+import BunBang from "./BunnyBang"
+import Salt from "./Salty"
+import Salt_Sim from "./Salty_Sim"
+import Salt_Sim_2 from "./Salty_Sim_2"
+
 import './App.css';
 
-function App() {
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+
+<Router>
+
+<div className="Nav-bar">
+        <div className="App-header">
+          
+        
+          <h2>The World of Salt</h2>
+          <nav className="navbar navbar-expand-lg navbar-light bg-light">
+
+            <Link to={'/Salt'} className="nav-link"> 
+            <button> <p>Salt Thoughts</p></button>
+            </Link>
+
+            <Link to={'/BunnyBang'} className="nav-link">
+            <button> <p>BunBang!</p></button>
+            </Link>
+
+            <Link to={'/Salt_Sim'} className="nav-link">
+            <button> <p>Click The Salt Flow</p></button>
+            </Link>
+
+            <p>
+            <Link to={'/Salt_Sim_2'} className="nav-link">
+            <button> <p>Watch The Salt Flow</p></button>
+            </Link>
+            </p>
+          </nav>
+          </div>
+          </div>
+
+
+          
+<Routes>
+    <Route path="/Salt" element={<Salt />} /> 
+    <Route path="/BunnyBang" element={<BunBang />} /> 
+    <Route path="/Salt_Sim" element={<Salt_Sim />} /> 
+    <Route path="/Salt_Sim_2" element={<Salt_Sim_2 />} /> 
+</Routes>
+
+</Router>
+
+          
+
+    
   );
 }
 
