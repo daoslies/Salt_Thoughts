@@ -352,7 +352,6 @@ class Neuron {
     //const [neuron, setNeuron] = useState(self);
 
     console.log('weolcome style: ', self)
-    console.log('weolcome style this: ', this)
     return (
       <img
         src={neuron_im}
@@ -447,6 +446,7 @@ class Network {
 
     this.maxLayers = 10 + 2;
     this.maxLayerArray = Array(this.maxLayers).fill(5);
+    this.currentFinalLayerIndex = 0;
 
     this.initializeInputOutputNeurons();
 
@@ -531,7 +531,7 @@ class Network {
       const inputNeuron = new Neuron(
         `input-${i}`,
         50,
-        50 + i * 50,
+        1200 + i * 400,
         `Input Neuron ${i}`,
         0,
         i,
@@ -539,14 +539,15 @@ class Network {
       );
       this.inputNeurons.push(inputNeuron);
     }
-  
+    //position_x: 300 + outerIndex * 400,
+    //position_y: 2200 - 400 * innerIndex,
     // Initialize the output neurons
     this.outputNeurons = [];
     for (let i = 0; i < this.outputLayers; i++) {
       const outputNeuron = new Neuron(
         `output-${i}`,
-        950,
-        50 + i * 50,
+        500,
+        1200 + i * 400,
         `Output Neuron ${i}`,
         this.maxLayers - 1,
         i,
@@ -567,11 +568,22 @@ class Network {
     const newOutputWelcomeList = this.outputNeurons.map(neuron => neuron.Welcome({self: neuron}));
     
     // Assign the new arrays to the input_welcome_list and neural_welcome_list variables
-    this.input_welcome_list.unshift(...newInputWelcomeList);
+    this.input_welcome_list.push(...newInputWelcomeList);
     this.output_welcome_list.push(...newOutputWelcomeList);
-    
-    this.neural_welcome_list.unshift(...this.input_welcome_list);
-    this.neural_welcome_list.push(...this.output_welcome_list);
+
+    console.log('initialiseing ', 'input: ', this.input_welcome_list, 'output: ', this.output_welcome_list)
+    console.log('welcomeList(pre-setting): ', this.neural_welcome_list) 
+    this.neural_welcome_list = [] //Clearing out the neural_welcome_list here
+    const newNeuralWelcomeList = this.neural_welcome_list.concat(this.input_welcome_list, this.output_welcome_list);
+
+    this.neural_welcome_list = newNeuralWelcomeList;
+
+
+    console.log('welcomeList 11: ', this.neural_welcome_list) 
+    console.log(this.neural_welcome_list[0])
+    console.log(this.neural_welcome_list[1])
+    console.log(this.neural_welcome_list[2])
+    console.log(this.neural_welcome_list[3])
   }
   
 
@@ -585,29 +597,32 @@ updateHtmlRender(layers, layerArray) {
 
   console.log('layaz: ', layers, layerArray)
 
+
+  console.log('welcomeList 22: ', this.neural_welcome_list) 
+  console.log(this.neural_welcome_list[0])
+  console.log(this.neural_welcome_list[1])
+  console.log(this.neural_welcome_list[2])
+  console.log(this.neural_welcome_list[3])
   //this.neural_welcome_list = this.state.htmlRender
 
-  //this.neural_welcome_list = this.neural_welcome_list.filter(element => typeof element !== 'number');
-  var filteredArray = this.neural_welcome_list.filter(element =>
-    typeof element === 'object' && 'type' in element && element.type === 'img'
-  );
 
-  this.neural_welcome_list = filteredArray;
+const nullLayerArray = layerArray[1].map(num => Array(num).fill(null));
 
-  console.log('Original Ns: ', this.neural_welcome_list)
+const propslist = [];
 
-  var propslist = []
-
-  // Create new neurons and add them to the array
-  for (var i = 0; i < layers; i++) {
-    if (layerArray[i]) {
-      for (var j = 0; j < layerArray[i]; j++) {
-
-        var neur_props = { name : "Update_Neur" + i + "_" + j, position_x :  100 + i * 400, position_y : 1800 - 400 * j, layer: i, index: j}
-        propslist.push(neur_props)
-      }
-  }
-}
+nullLayerArray.forEach((innerArray, outerIndex) => {
+innerArray.forEach((_, innerIndex) => {
+const neurProps = {
+name: 'Update_Neur' + outerIndex + '_' + innerIndex,
+position_x: 400 + outerIndex * 400,
+position_y: 2200 - 400 * innerIndex,
+layer: outerIndex,
+index: innerIndex
+};
+propslist.push(neurProps);
+});
+});
+  
 if (layers === 0) {propslist=[]};
 
   console.log('propsList: ', propslist)
@@ -617,14 +632,16 @@ if (layers === 0) {propslist=[]};
 // Filter the neural_welcome_list to only include neurons that are not in the propslist
   old_neurons = this.neural_welcome_list.filter(existingNeuron => {
     // check if the neuron has a type of 'input' or 'output'
-    if (existingNeuron.type === 'input' || existingNeuron.type === 'output') {
+    if (existingNeuron.props.neuron.type === 'input' || existingNeuron.props.neuron.type === 'output') {
         return false;
-    }
+    } 
     return !propslist.some(neuron_props => {
         return neuron_props.name === existingNeuron.props.neuron.name;
     });
   });
 
+
+console.log('olds', old_neurons)
 // Apply clean-up functions to the old neurons
 old_neurons.forEach(neuron => {
   //const wireToRemove = Composite.filter(engine.world, {
@@ -650,13 +667,13 @@ this.neural_welcome_list.splice(
   old_neurons.length
 );
 
-
-filteredArray = this.neural_welcome_list.filter(element =>
+/*
+var filteredArray = this.neural_welcome_list.filter(element =>
   typeof element === 'object' && 'type' in element && element.type === 'img'
 );
 
 this.neural_welcome_list = filteredArray;
-
+*/
 try {
   var new_neurons = propslist.filter(props => {
     return !this.neural_welcome_list.some(neur => {
@@ -667,6 +684,7 @@ try {
   
   
   console.log('New Ns (Props): ', new_neurons)
+
 
 
   if (new_neurons !== []) {
@@ -687,25 +705,6 @@ try {
   console.error(error);
 }
 
-/*
-if (this.neural_welcome_list[0]) {
-
-console.log('00000000000', this.neural_welcome_list[0].props.neuron)
-console.log(this.getNeuronIds())
-
-console.log(this.neural_welcome_list[0].props.neuron.getWeightAndBias(this.neural_welcome_list[1].props.neuron, network))
-for (let i = 0; i < this.neural_welcome_list.length; i++) {
-  for (let j = 0; j < this.neural_welcome_list.length; j++) {
-    if (i !== j) {
-      console.log(`Weight and bias from neuron ${i} to neuron ${j}:`, this.neural_welcome_list[i].props.neuron.getWeightAndBias(this.neural_welcome_list[j].props.neuron, network));
-    }
-  }
-}
-}
-
-*/
-
-
 
 ////// We're looking at this bit above just here
 
@@ -716,20 +715,56 @@ const hiddenLayerArray = layerArray[1]
 
 console.log('Layer:array ', layerArray)
 
-const expected_neuron_total = hiddenLayerArray.reduce((prev, next) => prev + next, 0) + network.inputLayers + network.outputLayers;
+const expected_neuron_total = Number(network.inputLayers) + hiddenLayerArray.reduce((prev, next) => prev + Number(next), 0)  + Number(network.outputLayers);
 
 console.log('Neuron_total: ', expected_neuron_total)
 const start = this.neural_welcome_list.length - expected_neuron_total
+
 
 if (start > 0) {
 this.neural_welcome_list.splice(expected_neuron_total, start)
 }
 
-filteredArray = this.neural_welcome_list.filter(element =>
+var filteredArray = this.neural_welcome_list.filter(element =>
   typeof element === 'object' && 'type' in element && element.type === 'img'
 );
 
 this.neural_welcome_list = filteredArray;
+
+console.log('hidden_layer_array', hiddenLayerArray)
+var finalLayerIndex = 0
+//if (!hiddenLayerArray.includes(0)) {indexCheck = hiddenLayerArray.reverse().findIndex(layer => layer !== 0)}
+//const finalLayerIndex = hiddenLayerArray.length - 1 - indexCheck;
+console.log('Final Layers indices: ', this.currentFinalLayerIndex, finalLayerIndex)
+
+hiddenLayerArray.forEach((item, idx) => {
+  if (item !== 0) {
+    finalLayerIndex = idx;
+  }
+});
+
+
+finalLayerIndex = finalLayerIndex + 1
+
+if (hiddenLayerArray.every(item => item === 0 || item === null || item === "")) {finalLayerIndex = 0};
+
+
+if (this.currentFinalLayerIndex !== finalLayerIndex) {
+
+console.log('NUMBER OF OUTPUT NEURONS: ', this.output_welcome_list)
+for (let i = 0; i < this.output_welcome_list.length; i++) {
+  
+  console.log('The neur: ', this.output_welcome_list[i])
+  this.output_welcome_list[i].props.neuron.wire.position.x = 400 + (finalLayerIndex) * 400;
+
+  const newStyle = Object.assign({}, this.output_welcome_list[i].props.style, { left: `${300 + finalLayerIndex * 400}px` });
+  const newProps = {...this.output_welcome_list[i].props, style: newStyle};
+  this.output_welcome_list[i] = {...this.output_welcome_list[i], props: newProps};
+
+  console.log(' Checking OUTPUTS post position: ' , this.output_welcome_list[i].props.neuron.wire.position.x)
+} }
+
+this.currentFinalLayerIndex = finalLayerIndex;
 
  // Check if the input neurons are already in the neural_welcome_list
  if (!this.input_welcome_list.some(neuron => this.neural_welcome_list.includes(neuron))) {
@@ -737,11 +772,15 @@ this.neural_welcome_list = filteredArray;
   this.neural_welcome_list.unshift(...this.input_welcome_list);
 }
 
-// Check if the output neurons are already in the neural_welcome_list
-if (!this.output_welcome_list.some(neuron => this.neural_welcome_list.includes(neuron))) {
+if (!this.output_welcome_list.some(neuron => {
+  return this.neural_welcome_list.some(existingNeuron => {
+    return neuron.props.neuron.name === existingNeuron.props.neuron.name;
+  });
+})) {
   // Add the output neurons to the end of the neural_welcome_list
   this.neural_welcome_list.push(...this.output_welcome_list);
 }
+
 
 
 this.setState({htmlRender: this.neural_welcome_list});
@@ -821,10 +860,14 @@ function Salt_Sim() {
   
   function verSlideTrigger(index, value) 
   {
-    const newLayerArray = layerArray
-    newLayerArray[1][index] = value; // modify the copied array
-    setlayerArray(newLayerArray); // update the state with the new array
-    console.log('Layerarray: ', layerArray)
+  // Create a copy of the layerArray state
+  const newLayerArray = [...layerArray];
+
+  // Modify the copied array
+  newLayerArray[1][index] = value;
+
+  // Update the state with the new array
+  setlayerArray(newLayerArray);
   }
   
 
@@ -851,15 +894,15 @@ function updateVerSliders() {
       key={index}
       id ={'slide' + index}
       style={{ position: "absolute", left: `${position+55}px`, top: '250px', height: 36 }}
-      aria-label="Small steps"
+      getAriaLabel={() => 'Small steps'}
       orientation="vertical"
-      defaultValue={layerArray[index]}
+      defaultValue={layerArray[1][index]}
       step={1}
       min={0}
       max={5}
       marks
       valueLabelDisplay="auto"
-      onChange={(_, value) => {verSlideTrigger(index, value)} }
+      onChange={(event, value) => {verSlideTrigger(index, value)} }
     />
   ));
 
@@ -871,6 +914,8 @@ function updateVerSliders() {
 
   vertSlides = vertSlides.slice(0,numLayers)
   //alert('vertSldies: ',vertSlides.length)
+
+  console.log('The vertical Slider', vertSlides)
 
   setverArray(vertSlides)
 
@@ -948,24 +993,24 @@ function updateVerSliders() {
 
 
       function getNextLayerNeurons(currentNeuron, neurons, network) {
-  const nextLayerNeurons = getFirstAvailableLayer(currentNeuron.props.neuron.layer, neurons);
-  if (nextLayerNeurons.length > 0) {
-    // Check if there are weights and biases between the current neuron and the next layer neurons
-    currentNeuron = currentNeuron.props.neuron;
-    nextLayerNeurons.forEach(neuron => {
-      neuron = neuron.props.neuron;
-      if (!network.weights[`${currentNeuron.id}-${neuron.id}`]) {
-        // Generate weights and biases if they do not exist
-        network.setWeightInit(currentNeuron.id, neuron.id, network.randomNormal());
-        network.setBiasInit(neuron.id, network.randomNormal());
-        //console.log('HEHHRE', currentNeuron, neuron)
-        //console.log(network.weights)
-        //alert()
+        const nextLayerNeurons = getFirstAvailableLayer(currentNeuron.props.neuron.layer, neurons);
+        if (nextLayerNeurons.length > 0) {
+          // Check if there are weights and biases between the current neuron and the next layer neurons
+          currentNeuron = currentNeuron.props.neuron;
+          nextLayerNeurons.forEach(neuron => {
+            neuron = neuron.props.neuron;
+            if (!network.weights[`${currentNeuron.id}-${neuron.id}`]) {
+              // Generate weights and biases if they do not exist
+              network.setWeightInit(currentNeuron.id, neuron.id, network.randomNormal());
+              network.setBiasInit(neuron.id, network.randomNormal());
+              //console.log('HEHHRE', currentNeuron, neuron)
+              //console.log(network.weights)
+              //alert()
+            }
+          });
+        }
+        return nextLayerNeurons;
       }
-    });
-  }
-  return nextLayerNeurons;
-}
 
 
 
