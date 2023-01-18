@@ -34,11 +34,9 @@ const App = () => {
             <button> <p>Click The Salt Flow</p></button>
             </Link>
 
-            <p>
             <Link to={'/Salt_Sim_2'} className="nav-link">
             <button> <p>Watch The Salt Flow</p></button>
             </Link>
-            </p>
           </nav>
           </div>
           </div>

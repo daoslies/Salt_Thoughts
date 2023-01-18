@@ -1,11 +1,7 @@
 
 
-import neuron_im from './Neuron.png';
-import salt_1_im from './Salt_Pics/Salt_1.png';
-import salt_2_im from './Salt_Pics/Salt_2.png';
-import salt_3_im from './Salt_Pics/Salt_3.png';
-import salt_4_im from './Salt_Pics/Salt_4.png';
-import salt_5_im from './Salt_Pics/Salt_5.png';
+
+
 
 import './App.css';
 import React, { useEffect } from 'react';
@@ -21,9 +17,15 @@ import { createRoot } from 'react-dom/client'
 //This means that the information contained in the embedding will be a compromise between the detailed information in the input and output data, and the more abstract and general representation of the relationship between the input and output data that is learned by the model.
 
 
+import ToggleSwitch from './ToggleSwitch';
+
+import { createD3Visualization, generateVisualizationData } from './D3_Visualization';
 
 
+import Salt from './Salt';
+import Neuron from './Neuron';
 
+//import * as d3 from 'd3';
 
 import Matter, { Events } from 'matter-js';
 import Slider from '@mui/material/Slider';
@@ -37,12 +39,7 @@ Matter.Common.setDecomp(require('poly-decomp'))
 
 
 
-var ImageArray = new Array();
-ImageArray[0] = salt_1_im;
-ImageArray[1] = salt_2_im;
-ImageArray[2] = salt_3_im;
-ImageArray[3] = salt_4_im;
-ImageArray[4] = salt_5_im;
+
 
 // module aliases
 var Engine = Matter.Engine,
@@ -137,21 +134,22 @@ Events.on(engine, 'beforeUpdate', function() {
     }
 });
 
-
+/*
 class Salt {
 
-  constructor(name) {
+  constructor(name, outputSaltCountCallback, initialNeuron) {
 
     this.name = name;
-    /* [this.position, this.setPosition] = useState({
-      x: 0,
-      y: 0
-    }); */
+    
 
-    this.currentNeuron = null;
+    this.outputSaltCountCallback = outputSaltCountCallback;
+
+    this.initNeuron = initialNeuron;
+    this.currentNeuron = null; 
     this.previousNeuron = null; 
 
-    this.position_x = 0;
+    this.position_x = this.initNeuron.wire.position.x - 75;
+    this.position_y = this.initNeuron.wire.position.y;
 
     this.htmlID = this.name + 'ID'
     var num = Math.floor( Math.random() * 5);
@@ -159,14 +157,14 @@ class Salt {
 
     this.saltStyle = {
       position: "absolute",
-      height: '50px',
-      width: '50px',
+      height: '20px',
+      width: '20px',
       left: this.position_x + "px",
       top: this.position_y + "px",
 
     };
     
-    this.wire = Bodies.circle(300, 100, 10);
+    this.wire = Bodies.circle(this.position_x, this.position_y, 10);
     this.wire.mass += 1.5
 
     Composite.add(engine.world, this.wire);
@@ -179,31 +177,44 @@ class Salt {
       console.log('AreweHeading: ', self,nextLayerNeurons,network)
       if (this.currentNeuron) {
 
-        //alert('is it alerts')
         const curr_neuron = self.currentNeuron.props.neuron;
-        const saltCount = curr_neuron.saltCount;
-        const activations = curr_neuron.calculateActivation(nextLayerNeurons, saltCount, network);
-        console.log('activates: ', activations)
-        // Calculate the total force to apply to the salt based on the activations of the next layer neurons
+        var force = { x: 0, y: 0 };
         const forceScale = 0.0000005;
-        let force = { x: 0, y: 0 };
-        for (let i = 0; i < nextLayerNeurons.length; i++) {
-          const neuron = nextLayerNeurons[i].props.neuron;
-          const activation = activations[i];
-          if (neuron && activation) {
-          const force_x = activation * forceScale * (neuron.wire.position.x - this.wire.position.x);
-          const force_y = activation * forceScale * (neuron.wire.position.y - this.wire.position.y);
-          force.x -= force_x;
-          force.y -= force_y;
 
-          //alert('neural force!')
-        }
-        }
-    
-        // Use the force to determine the direction in which the salt should move
-        self.wire.force.x -= force.x; 
-        self.wire.force.y -= force.y;
-      }
+        if (curr_neuron.type === 'output') {
+            // code for making the salt move towards the current neuron's position
+            const force_x = 10 * forceScale * (curr_neuron.wire.position.x - this.wire.position.x)
+            const force_y = 10 * forceScale * (curr_neuron.wire.position.y - this.wire.position.y)
+
+            force.x -= force_x;
+            force.y -= force_y;
+
+            self.wire.frictionAir = 5;
+            self.wire.mass = 10;
+      
+          } else {
+          // code for calculating activations and force based on nextLayerNeurons
+          const saltCount = curr_neuron.saltCount;
+          const activations = curr_neuron.calculateActivation(nextLayerNeurons, saltCount, network);
+          console.log('activates: ', activations)
+          // Calculate the total force to apply to the salt based on the activations of the next layer neurons
+          
+          for (let i = 0; i < nextLayerNeurons.length; i++) {
+            const neuron = nextLayerNeurons[i].props.neuron;
+            const activation = activations[i];
+            if (neuron && activation) {
+              const force_x = activation * forceScale * (neuron.wire.position.x - this.wire.position.x);
+              const force_y = activation * forceScale * (neuron.wire.position.y - this.wire.position.y);
+              force.x -= force_x;
+              force.y -= force_y;
+            }}}
+
+      // Use the force to determine the direction in which the salt should move
+      self.wire.force.x -= force.x; 
+      self.wire.force.y -= force.y;
+          
+            }
+      
     };
     
 
@@ -221,7 +232,7 @@ class Salt {
     
     this.updateCurrentNeuron = function updateCurrentNeuron(self) {
       // Set a collision threshold distance in pixels
-      const collisionThreshold = 100;
+      const collisionThreshold = 50;
     
       // Check if the salt is within the collision threshold distance of any neuron
       const collidesWithNeuron = network.neural_welcome_list.find(neuron => {
@@ -235,53 +246,20 @@ class Salt {
         this.previousNeuron = this.currentNeuron;
         this.currentNeuron = collidesWithNeuron;
         this.currentNeuron.props.neuron.addSalt();
+
+        if (this.currentNeuron.props.neuron.type === "output") {
+          this.outputSaltCountCallback();
+        }
+
+        if (this.previousNeuron.props.neuron.type === "output") {
+          this.outputSaltCountCallback();
+        }
+
+        
         //console.log('collisions: ', this, this.currentNeuron)
 
       }
     }
-    
-    
-    
-    
-
-    /*
-    this.update_pos = function update_pos(self) {
-
-      self.position_x = this.wire.position.x;
-      self.position_y = this.wire.position.y;
-
-      var self_obj = document.getElementById(self.htmlID);
-
-
-      //alert(self_obj.style)
-      self_obj.style.left = self.position_x + "px";
-      self_obj.style.top = self.position_y  + "px";
-
-      // Check if the salt has entered a new neuron
-      const collidesWithNeuron = network.neural_welcome_list.find(neuron => {
-        return Matter.Collision.collides(self.wire, neuron.props.neuron.wire) != null;
-      });
-
-      // If the salt has entered a new neuron, update the currentNeuron property
-      if (collidesWithNeuron && this.currentNeuron !== collidesWithNeuron) {
-        this.currentNeuron = collidesWithNeuron;
-      }
-
-      // Calculate the activation for the salt based on the weights and biases of the current neuron
-      console.log('heree!')
-      console.log('acrivbation: ', this.currentNeuron)
-      const activation = this.currentNeuron.props.neuron.calculateActivation(self);
-
-      // Determine the force to apply to the salt based on the activation
-      const forceScale = 0.5;
-      const force = { x: activation * forceScale, y: activation * forceScale };
-
-      // Apply the force to the salt's wire object
-      Matter.Body.applyForce(self.wire, self.wire.position, force);
-  
-    } */
-    
-
   }
 
   
@@ -294,6 +272,7 @@ class Salt {
 
 };
 
+*/
 
 class SaltBag {
   constructor() {
@@ -308,7 +287,7 @@ class SaltBag {
   }
 }
 
-
+/*
 class Neuron {
   constructor(name, pos_x, pos_y, id, layer, index, type) {
     this.name = name;
@@ -325,17 +304,17 @@ class Neuron {
     this.state = {
       imgStyle: {
         position: "absolute",
-        height: '200px',
-        width: '200px',
-        left: this.init_pos.x - 75 + "px",
-        top: this.init_pos.y - 75 + "px",
+        height: '50px',
+        width: '50px',
+        left: this.init_pos.x - 25 + "px",
+        top: this.init_pos.y - 25 + "px",
         opacity: 0.8,
         textalign: "center"
       }
     };
 
     
-    this.wire = Bodies.circle(this.init_pos.x, this.init_pos.y, 50, {
+    this.wire = Bodies.circle(this.init_pos.x, this.init_pos.y, 25, {
       isStatic: true
     });
     this.wire.collisionFilter = {
@@ -344,7 +323,7 @@ class Neuron {
       'mask': 0,
     };
     Composite.add(engine.world, this.wire);
-  }
+  } 
 
   Welcome({self}) {
     function neur_click() {alert(self.img.style)}
@@ -352,6 +331,27 @@ class Neuron {
     //const [neuron, setNeuron] = useState(self);
 
     console.log('weolcome style: ', self)
+    
+    
+    if (self.type === 'output') {
+      
+      return (
+        <img
+          src={neuron_im}
+          neuron={self}
+          className="App-logo"
+          id={self.htmlID}
+          key={self.htmlID}
+          alt="Neuron"
+          style={self.state.imgStyle}
+          onClick={neur_click}
+       />
+
+        );
+
+    }
+
+
     return (
       <img
         src={neuron_im}
@@ -362,19 +362,19 @@ class Neuron {
         alt="Neuron"
         style={self.state.imgStyle}
         onClick={neur_click}
-      />
-    );
+      /> 
+      );
   }
 
   getWeightAndBias(toNeuron, network) {
     
-    console.log('in get weightandbias', this.id, toNeuron.id)
+    //console.log('in get weightandbias', this.id, toNeuron.id)
 
-    console.log('the dictionary key: ', `${this.id}-${toNeuron.id}`)
-    console.log('The fUll weight list: ', network.weights)
-    console.log(network.weights[`${this.id}-${toNeuron.id}`])
-    console.log(network.weights['0-0-1-0'])
-    console.log('bias time', network.biases)
+    //console.log('the dictionary key: ', `${this.id}-${toNeuron.id}`)
+    //console.log('The fUll weight list: ', network.weights)
+    //console.log(network.weights[`${this.id}-${toNeuron.id}`])
+    //console.log(network.weights['0-0-1-0'])
+    //console.log('bias time', network.biases)
     const weight = network.weights[`${this.id}-${toNeuron.id}`];
     const bias = network.biases[toNeuron.id];
     return { weight, bias };
@@ -407,23 +407,7 @@ class Neuron {
   
 }
 
-
-
-/////////////////////////////////////////////////////////////////////////
-
-// AHHHHHHHHH
-
-
-
- /// Ok hello Oli. You are currently faffing with trying to get the slider to work and change the number of neurons.
-
- // You have just had a breakthrough and your various functions are now returning a list of the img divs rather than the class item.
-
- // This is call as the image divs are the things you actually want to influence.
-
- // But you need the class as well to know what to do the divs.
-/////////////////////////////////////////////////////////////////////////
-
+*/
 
 
 
@@ -461,6 +445,36 @@ class Network {
 
     return <div>{self.saltBag.saltList}{self.state.htmlRender}
     </div>;
+  }
+
+  OutputSaltCounts({self}) {
+    const outputNeurons = self.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
+    console.log(outputNeurons)
+    //alert('outputsalt trigggered')
+    return (
+
+      <div>
+        {outputNeurons.map((outputNeuron, index) => {
+          const neuronPos = outputNeuron.props.style;
+          //console.log(neuronPos)
+          const saltCountStyle = {
+            position: 'absolute',
+            left: parseInt(neuronPos.left) + 50 + 'px', // Position the text to the right of the neuron image
+            top: parseInt(neuronPos.top) + 5 + 'px'
+          };
+          //console.log(neuronPos)
+          //console.log(saltCountStyle)
+          //alert('yes we stopping')
+          return <span style={saltCountStyle}> {outputNeuron.props.neuron.saltCount} </span>
+        })}
+      </div>
+    );
+  }
+
+
+  updateoutputSaltCounts({self}) {
+
+
   }
 
   setState(newState) {
@@ -523,16 +537,47 @@ class Network {
         }
       }
     }
+
+// Make sure all the inputs and outputs have weights and biases //////////HERE
+
+for (let i = 0; i < this.input_welcome_list.length; i++) {
+  var currentNeuron = this.input_welcome_list[i];
+  currentNeuron = currentNeuron.props.neuron;
+  const nextLayerNeurons = this.output_welcome_list;
+  
+  console.log('nextlayers', nextLayerNeurons)
+  if (nextLayerNeurons.length > 0) {
+    // Check if there are weights and biases between the current neuron and the next layer neurons
+    nextLayerNeurons.forEach(neuron => {
+      neuron = neuron.props.neuron;
+      const key = `${currentNeuron.layer}-${currentNeuron.index}-${neuron.layer}-${neuron.index}`;
+      if (!network.weights[key]) {
+        // Generate weights and biases if they do not exist
+        network.setWeight(currentNeuron, neuron, network.randomNormal());
+        network.setBias(currentNeuron, network.randomNormal());
+      
+      
+      }
+    });
   }
+}
+
+console.log('weights post init: ', this.weights)
+
+    
+  }
+
+
   initializeInputOutputNeurons() {
     // Initialize the input neurons
     this.inputNeurons = [];
     for (let i = 0; i < this.inputLayers; i++) {
       const inputNeuron = new Neuron(
         `input-${i}`,
-        50,
-        1200 + i * 400,
-        `Input Neuron ${i}`,
+        engine,
+        100,
+        300 + i * 100,
+        `0-${i}`, 
         0,
         i,
         'input'
@@ -546,9 +591,10 @@ class Network {
     for (let i = 0; i < this.outputLayers; i++) {
       const outputNeuron = new Neuron(
         `output-${i}`,
-        500,
-        1200 + i * 400,
-        `Output Neuron ${i}`,
+        engine,
+        300,
+        200 + i * 300,
+        `${this.maxLayers-1}-${i}`,
         this.maxLayers - 1,
         i,
         'output'
@@ -571,19 +617,13 @@ class Network {
     this.input_welcome_list.push(...newInputWelcomeList);
     this.output_welcome_list.push(...newOutputWelcomeList);
 
-    console.log('initialiseing ', 'input: ', this.input_welcome_list, 'output: ', this.output_welcome_list)
-    console.log('welcomeList(pre-setting): ', this.neural_welcome_list) 
     this.neural_welcome_list = [] //Clearing out the neural_welcome_list here
     const newNeuralWelcomeList = this.neural_welcome_list.concat(this.input_welcome_list, this.output_welcome_list);
 
     this.neural_welcome_list = newNeuralWelcomeList;
 
 
-    console.log('welcomeList 11: ', this.neural_welcome_list) 
-    console.log(this.neural_welcome_list[0])
-    console.log(this.neural_welcome_list[1])
-    console.log(this.neural_welcome_list[2])
-    console.log(this.neural_welcome_list[3])
+    
   }
   
 
@@ -598,14 +638,6 @@ updateHtmlRender(layers, layerArray) {
   console.log('layaz: ', layers, layerArray)
 
 
-  console.log('welcomeList 22: ', this.neural_welcome_list) 
-  console.log(this.neural_welcome_list[0])
-  console.log(this.neural_welcome_list[1])
-  console.log(this.neural_welcome_list[2])
-  console.log(this.neural_welcome_list[3])
-  //this.neural_welcome_list = this.state.htmlRender
-
-
 const nullLayerArray = layerArray[1].map(num => Array(num).fill(null));
 
 const propslist = [];
@@ -614,8 +646,8 @@ nullLayerArray.forEach((innerArray, outerIndex) => {
 innerArray.forEach((_, innerIndex) => {
 const neurProps = {
 name: 'Update_Neur' + outerIndex + '_' + innerIndex,
-position_x: 400 + outerIndex * 400,
-position_y: 2200 - 400 * innerIndex,
+position_x: 300 + outerIndex * 150,
+position_y: 500 - 100 * innerIndex,
 layer: outerIndex,
 index: innerIndex
 };
@@ -691,7 +723,7 @@ try {
   this.neural_welcome_list.push(
       ...new_neurons.map(neur_props => {
         console.log(neur_props)
-      var neur = new Neuron(neur_props.name, neur_props.position_x, neur_props.position_y, neur_props.layer + '-' + neur_props.index, neur_props.layer, neur_props.index, 'hidden');
+      var neur = new Neuron(neur_props.name, engine, neur_props.position_x, neur_props.position_y, neur_props.layer + '-' + neur_props.index, neur_props.layer, neur_props.index, 'hidden');
       console.log(neur)
       var Welcome_in = neur.Welcome({self: neur});
       return Welcome_in;
@@ -755,13 +787,14 @@ console.log('NUMBER OF OUTPUT NEURONS: ', this.output_welcome_list)
 for (let i = 0; i < this.output_welcome_list.length; i++) {
   
   console.log('The neur: ', this.output_welcome_list[i])
-  this.output_welcome_list[i].props.neuron.wire.position.x = 400 + (finalLayerIndex) * 400;
+  this.output_welcome_list[i].props.neuron.wire.position.x = 300 + (finalLayerIndex * 150);
 
-  const newStyle = Object.assign({}, this.output_welcome_list[i].props.style, { left: `${300 + finalLayerIndex * 400}px` });
+  const newStyle = Object.assign({}, this.output_welcome_list[i].props.style, { left: `${300 + (finalLayerIndex * 150)}px` });
   const newProps = {...this.output_welcome_list[i].props, style: newStyle};
   this.output_welcome_list[i] = {...this.output_welcome_list[i], props: newProps};
 
-  console.log(' Checking OUTPUTS post position: ' , this.output_welcome_list[i].props.neuron.wire.position.x)
+  console.log(' Checking OUTPUTS post position WIIIRE: ' , this.output_welcome_list[i].props.neuron.wire.position.x)
+  console.log(' Checking OUTPUTS post position IIMG: ' , this.output_welcome_list[i].props.style.left)
 } }
 
 this.currentFinalLayerIndex = finalLayerIndex;
@@ -789,14 +822,40 @@ this.setState({htmlRender: this.neural_welcome_list});
 
 
 
-updateSaltRender(numSalts, saltList) {
+updateSaltRender(numSalts, saltList, outputSaltCountCallback, inputAndOrState) {
   if (numSalts > saltList.length) {
+
+    
   // Create new salt objects and render them
   const newSaltRenderList = [];
+  var initNeuron = null;
+
   for (let i = saltList.length; i < numSalts; i++) {
-  let salt = new Salt("Salty_" + i);
-  newSaltRenderList.push(<salt.Welcome self={salt} key={i} />);
+
+  //Check whether we're on an 'and' or an 'or' input
+
+  if (inputAndOrState === true) {
+    const probability = 0.5;
+    const randomNum = Math.random();
+    if (randomNum <= probability) {
+      // Place the salt in the first input neuron
+      initNeuron = this.input_welcome_list[0].props.neuron;
+    } else {
+      // Place the salt in the second input neuron
+      initNeuron = this.input_welcome_list[1].props.neuron;
+    }
+  } else if (inputAndOrState === false) {
+
+    // Place the salt in a specific input neuron
+    initNeuron = this.input_welcome_list[0].props.neuron;
+
   }
+
+  let salt = new Salt("Salty_" + i, engine, outputSaltCountCallback, initNeuron);
+  newSaltRenderList.push(<salt.Welcome self={salt} key={i} />);
+
+
+}
   // Concatenate the new salt render list with the existing salt list
   this.saltBag.setSaltList(this.saltBag.saltList.concat(newSaltRenderList));
   } else if (numSalts < saltList.length) {
@@ -804,8 +863,6 @@ updateSaltRender(numSalts, saltList) {
   this.saltBag.setSaltList(this.saltBag.saltList.splice(numSalts, saltList.length - numSalts));
   }
 }
-
-
 }
 
 
@@ -845,15 +902,44 @@ function Salt_Sim() {
   const [numSalts, setnumSalts] = useState(0);
   const [saltList, setsaltList] = useState([]);
 
+  const [outputSaltCount, setoutputSaltCount] = useState(<network.OutputSaltCounts self = {network} />);
+
+  const [inputAndOrState, setInputAndOrState] = useState(false);
+  const [outputAndOrState, setOutputAndOrState] = useState(false);
+
+
+  const handleInputAndOrStateChange = (inputAndOrState) => {
+    setInputAndOrState(inputAndOrState)
+  }
+  const handleOutputAndOrStateChange = (outputAndOrState) => {
+    setOutputAndOrState(outputAndOrState)
+  }
+
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////
+const outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
+//const outputSaltCounts = outputNeurons.map(neuron => neuron.saltCount);
+
+  const outputSaltCountCallback = useCallback(() => {
+    setoutputSaltCount(<network.OutputSaltCounts self = {network} />)
+  }, []);
+
+////////////////////////////////////// //////////////////////////////////////
+/////////////////////////////////
  
   const updateHtmlRenderCallback = useCallback(() => {
     network.updateHtmlRender(numLayers, layerArray); 
     setnetState(<network.Welcome self={network} />)
+    setoutputSaltCount(<network.OutputSaltCounts self = {network} />)
+    //alert('here')
+    const visualizationData = generateVisualizationData(network);
+    createD3Visualization(visualizationData.connections, visualizationData.nodes, visualizationData.links);
+
   }, [numLayers, layerArray]);
 
 
   const updateSaltRenderCallback = useCallback(() => {
-    network.updateSaltRender(numSalts, saltList); 
+    network.updateSaltRender(numSalts, saltList, outputSaltCountCallback, inputAndOrState); 
     setnetState(<network.Welcome self={network} />)
   }, [numSalts, saltList]);
   
@@ -884,8 +970,10 @@ function updateVerSliders() {
       setverArray([]);
       
   const horizontalSliderWidth = horSliderRef.current.getBoundingClientRect().width
+  const horizontalSliderLeft = horSliderRef.current.getBoundingClientRect().left;
+
   const numMarks = 10;
-  const markPositions = [...Array(numMarks)].map((_, index) => horizontalSliderWidth / numMarks * index);
+  const markPositions = [...Array(numMarks)].map((_, index) => (horizontalSliderWidth / (numMarks)) * (index + 1));
   
 
 
@@ -893,7 +981,7 @@ function updateVerSliders() {
     <Slider
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${position+55}px`, top: '250px', height: 36 }}
+      style={{ position: "absolute", left: `${(position*0.98)+horizontalSliderLeft}px`, top: '70%', height: 36 }}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -925,7 +1013,7 @@ function updateVerSliders() {
   }
 
 
-  
+              
 
   return ( null );
 
@@ -960,12 +1048,13 @@ function updateVerSliders() {
       
 
       function updateSaltPositions(saltList, neurons, network) {
+        
         try {
           // code that might throw an error
 
           saltList.forEach((salt, index) => {
             // Update the current and previous neurons for the salt
-            salt.props.self.updateCurrentNeuron(salt.props.self);
+            salt.props.self.updateCurrentNeuron(salt.props.self, network);
 
             // Calculate the next layer neurons for the salt
             if (neurons && salt.props.self.currentNeuron) {
@@ -977,9 +1066,11 @@ function updateVerSliders() {
             }
 
             // Update the position of the salt
-            salt.props.self.update_pos(salt.props.self);
+            salt.props.self.update_pos(salt.props.self, network);
+  
           });
         } catch (error) {
+          //alert('Update salt pos: ', error)
           console.error(error);
         }
         requestAnimationFrame(() => updateSaltPositions(saltList, neurons, network));
@@ -1026,109 +1117,6 @@ function updateVerSliders() {
         return [];
       }
 
-      /*
-      function updateSaltPositions(saltList, neurons, network) {
-
-        try {
-          // code that might throw an error
-        
-        saltList.forEach((salt, index) => {
-          // Update the current and previous neurons for the salt
-          salt.props.self.updateCurrentNeuron(salt.props.self);
-      
-          // Calculate the next layer neurons for the salt
-          if (neurons && salt.props.self.currentNeuron) {
-            const nextLayerNeurons = neurons.filter(neuron => neuron.props.neuron.layer === salt.props.self.currentNeuron.props.neuron.layer + 1);
-          // Pass the next layer neurons and salt count to the head_towards function
-          salt.props.self.head_towards(salt.props.self, nextLayerNeurons, network); }
-      
-          // Update the position of the salt
-          salt.props.self.update_pos(salt.props.self);
-
-          
-        });
-
-      } catch (error) {
-        console.error(error);
-      }
-        requestAnimationFrame(() => updateSaltPositions(saltList, neurons, network));
-      }
-
-      updateSaltPositions(saltList, network.neural_welcome_list, network);
-
-      useEffect(() => {
-        setsaltList(network.saltBag.saltList);
-      }, [network.saltBag.saltList]);
-      
-      */
-      
-      /*
-      function updateSaltPositions(saltList) {
-        saltList.forEach(salt => {
-          network.state.htmlRender.forEach(neuron => {
-            salt.props.self.head_towards(salt.props.self, neuron.props.neuron);
-          });
-          salt.props.self.update_pos(salt.props.self);
-        });
-        requestAnimationFrame(() => updateSaltPositions(saltList));
-      }  */
-      /*
-      function updateSaltPositions(saltList, neurons, network) {
-        // Calculate the salt count for each neuron
-        const saltCount = neurons.map(neuron => {
-        const collidesWithNeuron = saltList.filter(salt => {
-        return Matter.Query.point(neuron.props.neuron.wire, salt.wire.position).length > 0;
-        });
-        return collidesWithNeuron.length;
-        });
-        
-        saltList.forEach((salt, index) => {
-        // Pass the salt count for the current neuron to the head_towards function
-        salt.props.self.head_towards(salt.props.self, neuron.props.neuron, neurons, saltCount, network);
-        salt.props.self.update_pos(salt.props.self);
-        });
-        requestAnimationFrame(() => updateSaltPositions(saltList, neurons, network));
-        }
-      
-      updateSaltPositions(saltList);   ///////////// put in the args
-
-      useEffect(() => {
-        setsaltList(network.saltBag.saltList);
-      }, [network.saltBag.saltList]);
-      */
-    /*
-    async function check() {
-
-       
-
-      setsaltList(network.saltBag.saltList)
-
-        saltList.forEach(salt => {
-          network.state.htmlRender.forEach(neuron => {
-            salt.props.self.head_towards(salt.props.self, neuron.props.neuron);
-          });
-          salt.props.self.update_pos(salt.props.self);
-        });
-      
-       }
-    
-    useEffect(() => {
-      
-      if (start === "True") {
-      check();
-                          }
-     }, []);
-
-
-    
-    setInterval(check, 10);  
-     */
-    /*
-    useEffect(() => {
-      setInterval(network.updateHtmlRender, 150);
-    }, [network.updateHtmlRender]);
-    */
-
 
     
     useEffect(() => {
@@ -1162,15 +1150,12 @@ function updateVerSliders() {
   
       
   
-      <div className="App">
-
-      <aside className ="ButtonMenu" id='buttons' >
-  
-        <h1> Translation is Liquid</h1>
-        <div id ='quickcheck'>s</div>
-
-
+        <div className="container" id="container">
+          {<div className = "network-viz" id="network-viz"> HERE</div>
+          }   
+      <div className ="ButtonMenu" id='buttons' style={{margin: '0', padding: '0px'}} >
         
+      <h1 > Translation is Liquid</h1>
    
 
         <button onClick={physics}>Start this jam</button> 
@@ -1181,13 +1166,16 @@ function updateVerSliders() {
         
         <p>Salt Count: {numSalts}</p>
 
-        {/*} <salt_1.Welcome self={salt_1} />
-        <salt_2.Welcome self={salt_2} />
-        <salt_3.Welcome self={salt_3} /> */}
-
-        <div> Seperator </div>
+      
         {netState}
+        {outputSaltCount}
+
         
+        
+
+        <ToggleSwitch onInputAndOrStateChange={handleInputAndOrStateChange} 
+        onOutputAndOrStateChange={handleOutputAndOrStateChange} />
+
         
         
 
@@ -1196,6 +1184,7 @@ function updateVerSliders() {
           ref={horSliderRef}
           padding={'30px'}
           margin={'30px'}
+          style={{width: '90%'}}
           defaultValue={2}
           step={1}
           min={0}
@@ -1206,11 +1195,8 @@ function updateVerSliders() {
         />
         
           {verArray}
-
-      </aside>
-  
-  
-      {/*}  <header className="App-header">
+          
+                {/*}  <header className="App-header">
   
   
           <img src="https://media.discordapp.net/attachments/743175969807794178/1040724536011788398/crossbun.png" className="App-logo" alt="logo" />
@@ -1224,7 +1210,12 @@ function updateVerSliders() {
   
   
         </header>*/ }
+
       </div>
+      </div>
+
+
+
       );
   }
   
