@@ -52,9 +52,8 @@ class Salt {
       this.head_towards = function head_towards(self, nextLayerNeurons, network) {
         // Calculate the activations for the salt based on the weights and biases of the current neuron
         
-        console.log('AreweHeading: ', self,nextLayerNeurons,network)
+        console.log('AreweHeading: ', self, nextLayerNeurons, network)
         if (this.currentNeuron) {
-  
           const curr_neuron = self.currentNeuron.props.neuron;
           var force = { x: 0, y: 0 };
           const forceScale = 0.0000005;

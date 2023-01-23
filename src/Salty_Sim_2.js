@@ -122,8 +122,8 @@ Events.on(engine, 'beforeUpdate', function() {
                 var direction_x = body_x - target_x;
                 var direction_y = body_y - target_y;
 
-                var force_x = direction_x * Math.min(0.5, (1/(distance**2))) * 0.5;
-                var force_y = direction_y * Math.min(0.5, (1/(distance**2))) * 0.5;
+                var force_x = direction_x * Math.min(0.5, (1/(distance**2.25))) * 0.1;
+                var force_y = direction_y * Math.min(0.5, (1/(distance**2.25))) * 0.1;
 
                 body.force.x -= force_x;
                 body.force.y -= force_y;
@@ -430,6 +430,9 @@ class Network {
 
     this.maxLayers = 10 + 2;
     this.maxLayerArray = Array(this.maxLayers).fill(5);
+
+    //this.maxLayerArray[0] = this.inputLayers; /////////////////// CAn we set the first 2 layers 2 zero? look at how many nodes there are in the first layer and check the console log for network.maxlayerarray,
+    this.maxLayerArray[this.maxLayerArray.length - 1] = this.outputLayers;
     this.currentFinalLayerIndex = 0;
 
     this.initializeInputOutputNeurons();
@@ -501,20 +504,6 @@ class Network {
     this.biases[toNeuron.id] = value;
   }
 
-  /*
-
-  getNeuronIds() {
-    const neuronIds = [];
-    for (let i = 0; i < this.maxLayers; i++) {
-      for (let j = 0; j < this.maxLayerArray[i]; j++) {
-        neuronIds.push(`${i}-${j}`);
-      }
-    }
-    return neuronIds;
-  }
-
-  */
-
   randomNormal() {
     // Generate a random number with a normal distribution
     let u = 0, v = 0;
@@ -577,8 +566,8 @@ console.log('weights post init: ', this.weights)
         engine,
         100,
         300 + i * 100,
-        `0-${i}`, 
-        0,
+        `i-${i}`, 
+        'i',
         i,
         'input'
       );
@@ -645,7 +634,7 @@ const propslist = [];
 nullLayerArray.forEach((innerArray, outerIndex) => {
 innerArray.forEach((_, innerIndex) => {
 const neurProps = {
-name: 'Update_Neur' + outerIndex + '_' + innerIndex,
+name: 'Update_Neur' + outerIndex + '_' + (innerIndex + 1),
 position_x: 300 + outerIndex * 150,
 position_y: 500 - 100 * innerIndex,
 layer: outerIndex,
@@ -907,6 +896,8 @@ function Salt_Sim() {
   const [inputAndOrState, setInputAndOrState] = useState(false);
   const [outputAndOrState, setOutputAndOrState] = useState(false);
 
+  const [vizData, setvizData] = useState({});
+
 
   const handleInputAndOrStateChange = (inputAndOrState) => {
     setInputAndOrState(inputAndOrState)
@@ -917,7 +908,7 @@ function Salt_Sim() {
 
 //////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////
-const outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
+//const outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
 //const outputSaltCounts = outputNeurons.map(neuron => neuron.saltCount);
 
   const outputSaltCountCallback = useCallback(() => {
@@ -928,14 +919,29 @@ const outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.
 /////////////////////////////////
  
   const updateHtmlRenderCallback = useCallback(() => {
+    // Neurons
     network.updateHtmlRender(numLayers, layerArray); 
     setnetState(<network.Welcome self={network} />)
     setoutputSaltCount(<network.OutputSaltCounts self = {network} />)
-    //alert('here')
+ 
+    
+    //Connection visualisation stuff
     const visualizationData = generateVisualizationData(network);
-    createD3Visualization(visualizationData.connections, visualizationData.nodes, visualizationData.links);
+    createD3Visualization(network, visualizationData.validConnections, visualizationData.nodes, visualizationData.links);
+    setvizData(visualizationData)
+    console.log('full visualization', visualizationData)
+    console.log('jus vis', vizData)
+    
 
   }, [numLayers, layerArray]);
+
+  const updateConnectionsCallback = useCallback(() => {
+
+    network.neural_welcome_list.forEach(img => {
+      let neuron = img.props.neuron;
+        neuron.vizData = vizData;
+    });
+  })
 
 
   const updateSaltRenderCallback = useCallback(() => {
@@ -981,7 +987,7 @@ function updateVerSliders() {
     <Slider
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${(position*0.98)+horizontalSliderLeft}px`, top: '70%', height: 36 }}
+      style={{ position: "absolute", left: `${(position*0.98)+horizontalSliderLeft}px`, top: '70%', height: 75 }}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -1091,21 +1097,24 @@ function updateVerSliders() {
           nextLayerNeurons.forEach(neuron => {
             neuron = neuron.props.neuron;
             if (!network.weights[`${currentNeuron.id}-${neuron.id}`]) {
-              // Generate weights and biases if they do not exist
+              // Generate weights if they do not exist
               network.setWeightInit(currentNeuron.id, neuron.id, network.randomNormal());
+            }
+            if (!network.biases[neuron.id]) {
+              // Generate biases if they do not exist
               network.setBiasInit(neuron.id, network.randomNormal());
-              //console.log('HEHHRE', currentNeuron, neuron)
-              //console.log(network.weights)
-              //alert()
             }
           });
         }
+        console.log(nextLayerNeurons)
+        //alert('next layer neurs ', nextLayerNeurons)
         return nextLayerNeurons;
       }
 
 
 
       function getFirstAvailableLayer(currentLayer, neurons) {
+        if (currentLayer === 'i') {currentLayer = -1}
         for (let i = currentLayer + 1; i < network.maxLayerArray.length; i++) {
           const layerNeurons = neurons.filter(neuron => neuron.props.neuron.layer === i);
           if (layerNeurons.length > 0) {
@@ -1122,21 +1131,17 @@ function updateVerSliders() {
     useEffect(() => {
       // Call the sliderLoad() function after the horizontal slider has been rendered:
       updateVerSliders();
-      //updateHtmlRenderCallback()
-         
     }, [numLayers, layerArray]);
-
 
 
     
     useEffect(() => {
-      //updateVerSliders();
       updateHtmlRenderCallback()
-
-      //network.updateHtmlRender(numLayers, layerArray); 
-      //setnetState(<network.Welcome self={network} />)
-         
     }, [verArray]);
+
+    useEffect(() => {
+      updateConnectionsCallback()
+    }, [vizData])
 
     useEffect(() => {
       updateSaltRenderCallback();
