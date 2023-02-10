@@ -26,7 +26,7 @@ class Salt {
       this.currentNeuron = null; 
       this.previousNeuron = null; 
   
-      this.position_x = this.initNeuron.wire.position.x - 75;
+      this.position_x = this.initNeuron.wire.position.x -75;
       this.position_y = this.initNeuron.wire.position.y;
   
       this.htmlID = this.name + 'ID'
@@ -48,15 +48,37 @@ class Salt {
       Composite.add(this.engine.world, this.wire);
   
       //salt.props.self.head_towards(salt.props.self, nextLayerNeurons, network);
-  
+      
+      this.head_init = function head_init(self, network) {
+          var force = { x: 0, y: 0 };
+          const forceScale_main = 0.0000007;
+          var forceScale = forceScale_main
+
+          // code for making the salt move towards the initial_neuron if no current neuron has been set
+          const force_x = 10 * forceScale * (this.initNeuron.wire.position.x - this.wire.position.x)
+          const force_y = 10 * forceScale * (this.initNeuron.wire.position.y - this.wire.position.y)
+
+          force.x -= force_x;
+          force.y -= force_y; 
+
+          self.wire.force.x -= force.x; 
+          self.wire.force.y -= force.y;
+      }
+
+
       this.head_towards = function head_towards(self, nextLayerNeurons, network) {
         // Calculate the activations for the salt based on the weights and biases of the current neuron
         
-        console.log('AreweHeading: ', self, nextLayerNeurons, network)
+        //console.log('AreweHeading: ', self, nextLayerNeurons, network)
+      
         if (this.currentNeuron) {
-          const curr_neuron = self.currentNeuron.props.neuron;
+
           var force = { x: 0, y: 0 };
-          const forceScale = 0.0000005;
+          const forceScale_main = 0.0000007;
+          var forceScale = forceScale_main
+
+          const curr_neuron = self.currentNeuron.props.neuron;
+
   
           if (curr_neuron.type === 'output') {
               // code for making the salt move towards the current neuron's position
@@ -73,12 +95,18 @@ class Salt {
             // code for calculating activations and force based on nextLayerNeurons
             const saltCount = curr_neuron.saltCount;
             const activations = curr_neuron.calculateActivation(nextLayerNeurons, saltCount, network);
-            console.log('activates: ', activations)
+            var max_active_index = [].reduce.call(activations, (m, c, i, arr) => c > arr[m] ? i : m, 0);
+            //console.log('activates: ', activations)
             // Calculate the total force to apply to the salt based on the activations of the next layer neurons
-            
             for (let i = 0; i < nextLayerNeurons.length; i++) {
               const neuron = nextLayerNeurons[i].props.neuron;
               const activation = activations[i];
+              forceScale = forceScale_main;
+              
+              if (neuron.layer === network.maxLayerArray.length-1 && i === max_active_index ) {
+                  forceScale = forceScale * 5;
+                  //alert()
+                }
               if (neuron && activation) {
                 const force_x = activation * forceScale * (neuron.wire.position.x - this.wire.position.x);
                 const force_y = activation * forceScale * (neuron.wire.position.y - this.wire.position.y);
@@ -91,6 +119,8 @@ class Salt {
         self.wire.force.y -= force.y;
             
               }
+
+
       };
       
   
@@ -125,10 +155,11 @@ class Salt {
           if (this.currentNeuron.props.neuron.type === "output") {
             this.outputSaltCountCallback();
           }
-  
+          
+          if (this.previousNeuron) {
           if (this.previousNeuron.props.neuron.type === "output") {
             this.outputSaltCountCallback();
-          }
+          }}
   
           
           //console.log('collisions: ', this, this.currentNeuron)

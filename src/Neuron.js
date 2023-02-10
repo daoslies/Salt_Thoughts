@@ -23,14 +23,15 @@ class Neuron {
       this.type = type;
   
       this.saltCount = 0;  // Initialize saltCount to 0
+      this.everSalt = 0;
       
       this.state = {
         imgStyle: {
           position: "absolute",
-          height: '50px',
-          width: '50px',
-          left: this.init_pos.x - 25 + "px",
-          top: this.init_pos.y + "px",
+          height: '75px',
+          width: '75px',
+          left: this.init_pos.x - 40 + "px",
+          top: this.init_pos.y - 15 + "px",
           opacity: 0.8,
           textalign: "center"
         }
@@ -38,18 +39,31 @@ class Neuron {
   
       
       this.wire = Bodies.circle(this.init_pos.x, this.init_pos.y, 25, {
-        isStatic: true
+        isStatic: true,
+        neuron_type: this.type,
+        neuron_id: this.id,
+        collisionFilter: {         
+          'group': -1,
+          'category': 2,
+          'mask': 0,}
       });
+      /*
+      if (this.type === 'output') {
+        this.wire.position.x -= 200;
+      }
+      
       this.wire.collisionFilter = {
         'group': -1,
         'category': 2,
         'mask': 0,
       };
+*/
+      //alert(this.wire)
       Composite.add(this.engine.world, this.wire);
     } 
   
     Welcome({self}) {
-      function neur_click() {}
+      function neur_click() {alert(self.id)}
       //const [imgStyle, setImgStyle] = useState(self.neuronStyle);
       //const [neuron, setNeuron] = useState(self);
       function neur_over() {
@@ -71,7 +85,8 @@ class Neuron {
           .filter(function(d) {
             return connectedConnections.some(con => con.key === d.key);
           });
-        connections.style("stroke", d => d.colour);
+        connections.style("stroke", d => d.colour)
+        .attr("stroke-width", d => d.width);
           }
 
         function neur_away() {
@@ -134,11 +149,8 @@ class Neuron {
     //alert('checl')
     for (let i = 0; i < nextLayerNeurons.length; i++) {
       let neuron = nextLayerNeurons[i].props.neuron;
-      let weightedSum = 0;
-      console.log('checkity check on the ewight and bias cacl: ', this, neuron)
       const { weight, bias } = this.getWeightAndBias(neuron, network);
-      weightedSum += (weight * saltCount) + bias;
-      let activation = 1 / (1 + Math.exp(-weightedSum));
+      let activation = 1 / (1 + Math.exp(-((weight * saltCount) + bias)));
       activations.push(activation);
     }
     return activations;
@@ -147,6 +159,7 @@ class Neuron {
     // Method to increment saltCount
     addSalt() {
       this.saltCount++;
+      this.everSalt++;
     }
   
     // Method to decrement saltCount

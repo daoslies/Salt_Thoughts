@@ -78,7 +78,7 @@ console.log('SVG2: ', svg)
 //svg.remove()
 console.log('Link: ', link)
 
-const sigmoid = x => 1 / (1 + Math.exp(-x));
+//const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 
 link.enter().append("line")
@@ -283,6 +283,38 @@ export function generateVisualizationData(network) {
       
 
       if (sourceNeuron && targetNeuron) {
+
+          // Initialize the connections property for the source neuron if it doesn't exist
+          if (!sourceNeuron.props.neuron.connections) {
+            sourceNeuron.props.neuron.connections = [];
+          }
+
+          // Initialize the connections property for the target neuron if it doesn't exist
+          if (!targetNeuron.props.neuron.connections) {
+            targetNeuron.props.neuron.connections = [];
+          }
+
+
+        // Check if the connection already exists
+        const sourceExists = sourceNeuron.props.neuron.connections.some(c => c.targetNeuronId === targetNeuron.props.neuron.id);
+        const targetExists = targetNeuron.props.neuron.connections.some(c => c.sourceNeuronId === sourceNeuron.props.neuron.id);
+
+        // If the connection doesn't exist, add it
+        if (!sourceExists) {
+          sourceNeuron.props.neuron.connections.push({
+            targetNeuronId: targetNeuron.props.neuron.id,
+            weight: weight,
+            bias: bias
+          });
+        }
+
+        if (!targetExists) {
+          targetNeuron.props.neuron.connections.push({
+            sourceNeuronId: sourceNeuron.props.neuron.id,
+            weight: weight,
+            bias: bias
+          });
+        }
           // Add the connection data to the connections array
 
           const sigmoid = x => 1 / (1 + Math.exp(-x));
@@ -293,8 +325,8 @@ export function generateVisualizationData(network) {
               target: targetNeuron.props.neuron.wire,
               weight: weight,
               bias: bias,
-              colour: d3.interpolateRdYlBu(sigmoid(-((weight + bias) * 10))),
-              width: Math.abs((weight + bias) * 10)
+              colour: d3.interpolateRdYlBu(sigmoid(-((((weight + bias) * 10 ))))),
+              width: sigmoid((weight*5+bias) * 10) * (bias * 10) //((weight + bias) **2) * 10  // ((sigmoid((weight + bias) * 10) + 0.1 ) **0.9) * 20 //sigmoid((weight*5+bias) * 10) * (bias * 10)  ////
           });
 
           links.push({
