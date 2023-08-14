@@ -62,7 +62,9 @@ function toggleClickedClass(e) {
 
 // Custom hook
 function useNavbar() {
-  const [navbarExpanded, setNavbarExpanded] = useState(true);
+  const [navbarExpanded, setNavbarExpanded] = useState(false);
+  
+  console.log('NavBarQuestion 3 - custom hook: ', navbarExpanded)
   
   return [navbarExpanded, setNavbarExpanded];
 }
@@ -120,6 +122,7 @@ const App = () => {
   const simRouteRef = useRef(null);
 
   useEffect(() => {
+    
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * push_me_images.length);
       setPushMeImageIndex(randomIndex);
@@ -129,6 +132,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+
     
   }, []);
 
@@ -219,46 +223,8 @@ return (
     <div className="App-header">
 
     <div className="Absolute-test" >
-
       
     <h2 background-color="#282c3400" className="salt-text">The World of Salt</h2>
-
-
-
-
-
-{/* 
-<Link 
-
-to={'/Salt'} className={selected === 'book' ? 'selected' : 'nav-link'} 
-onClick={() => setNavbarExpanded(!navbarExpanded)}>
-
-<button className="book-button"> <p>Salt Thoughts</p></button>
-
-<img className="book-button" src={audio_port_img} id="audio_port_img" alt="port" />
-
-
-</Link>
-
-<Link to={'/Audiobook'} className={selected === 'audiobook' ? 'selected' : 'nav-link'} onClick={() => setNavbarExpanded(!navbarExpanded)}>
-
-
-
-<button className="audio-button"> <p>Audio!</p></button>
-
-<img className="audio-button" src={audio_port_img} id="audio_port_img" alt="port" />
-
-</Link>
-
-<Link to={'/Salt_Sim_3'} className={selected === 'simulation' ? 'selected' : 'nav-link'} onClick={() => setNavbarExpanded(!navbarExpanded)}>
-
-<button className="flower-button"> <p>Salt Flower</p></button>
-
-<img className="flower-button" src={audio_port_img} id="audio_port_img" alt="port" />
-
-</Link>
-*/}
-
 
     </div>
 
@@ -342,7 +308,7 @@ onClick={() => setNavbarExpanded(!navbarExpanded)}>
             '--ty': navbarExpanded ? '0px' : '-65vh' 
           }}  />
 
-    <Wire bookRouteRef={bookRouteRef} audioRouteRef={audioRouteRef} simRouteRef={simRouteRef} />  {/* wire lives in svg-container, below. */}
+    <Wire bookRouteRef={bookRouteRef} audioRouteRef={audioRouteRef} simRouteRef={simRouteRef} navBarState={navbarExpanded} />  {/* wire lives in svg-container, below. */}
 
     <EmbeddingRep></EmbeddingRep>
 

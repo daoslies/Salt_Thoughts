@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createContext } from 'react'; 
+import React, { useState, useEffect, useRef, useCallback, createContext } from 'react'; 
 import { BrowserRouter as Router, Routes, Route, Link }  from "react-router-dom";
 import ReactDOM from 'react-dom';
 import Matter from 'matter-js';
@@ -38,6 +38,7 @@ jackImageArray[4] = jack_5_img;
 function Wire(props) {
 
   const [navbarExpanded, setNavbarExpanded] = useNavbar();
+  //var navbarExpanded = props.navBarState;
 
   const [bookRef_, setBookRef_] = useState([]);
   const [audioRef_, setAudioRef_] = useState([]);
@@ -53,15 +54,23 @@ function Wire(props) {
   const isPluggedRef = useRef(false);
   const pluggedPortRef = useRef(null)
 
-   const portButtonHoverRef = useRef(false)
+  const portButtonHoverRef = useRef(false)
 
   useEffect(() => {
+
+    console.log('PROPS: ', props)
+
     
+
+    //console.log('NavBarQuestion Props: ', props.navBarState)
+    setNavbarExpanded(props.navBarState);
+    //navbarExpanded = props.navBarState;
     setBookRef_(props.bookRouteRef.current);
     setAudioRef_(props.audioRouteRef.current);
     setSimRef_(props.simRouteRef.current);
+    //setNavbarExpanded(props.navBarState)
 
-  }, []);
+  }, [props]);
 
 
   const bookElement = bookRef_;
@@ -133,9 +142,9 @@ function Wire(props) {
     }
 
   }
-
+  console.log('NavBarQuestion2: ', navbarExpanded)
   if (!plugButtonTime && navbarExpanded) {   //// Question marks on && navbarExpanded
-
+      
       try {
         
         bookElement.classList.add('hidden')
@@ -227,16 +236,14 @@ if (!plugButtonTime) {
   let blue_light_button_check = false;
 
 
-  useEffect(() => { 
 
-  
 
-  Matter.Events.on(engine, 'afterUpdate', () => {
 
-    const points = wireBodies.map(b => b.position);
+  const wireRenderUpdate = useCallback((points, svg) => {
+    
 
-    //console.log('Points: ', points)
-    const svg = d3.select('#svg-container');
+    console.log('NavBarQuestion: - inside the after update ', navbarExpanded, props)
+
     //svg.selectAll('line').remove();   
     //console.log('2nd w0ire', wireBodies)
     svg.selectAll('line') 
@@ -264,9 +271,12 @@ if (!plugButtonTime) {
 
     if (isPluggedRef.current) {
 
+      
+
     
 
       if (!plug_rect) {
+
 
           plug_rect = Matter.Bodies.rectangle(pluggedPortRef.current.portX, pluggedPortRef.current.portY, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
            
@@ -356,16 +366,43 @@ if (!plugButtonTime) {
 
       }
     }
-
-    
-    
-    
-
       
-  });
+  
+  }, [navbarExpanded])
+
+
+
+
+
+  useEffect(() => { 
+
+  //setNavbarExpanded(props.navBarState);
 
   
-}, []);
+  console.log('PROPS2: ', props)
+
+  setNavbarExpanded(props.navBarState);
+  //navbarExpanded = props.navBarState
+  //console.log('NavBarQuestion Props: ', props.navBarState)
+
+  console.log('NavBarQuestion: - Top of the use effect ', navbarExpanded)
+
+  
+  const points = wireBodies.map(b => b.position);
+
+  //console.log('Points: ', points)
+  const svg = d3.select('#svg-container');
+
+  Matter.Events.on(engine, 'afterUpdate', () => {
+    wireRenderUpdate(points, svg); 
+  })
+
+  
+}, [wireRenderUpdate]);
+
+
+
+
 
 // 2. Create world and world options
 const world = engine.world;
@@ -559,15 +596,37 @@ var render = Matter.Render.create({
           
           const vhRatio = viewportHeight / 100; // 100vh = viewportHeight pixels
           const vwRatio = viewportWidth / 100; // 100vw = viewportWidth pixels
-        
           
+          
+          // Get book button element
+          const bookBtn = document.querySelector('.book-button');
+
+          const audioBtn = document.querySelector('.audio-button');
+
+          const flowerBtn = document.querySelector('.flower-button');
+
+          // Get current --tx value 
+          var tx_book = parseInt(bookBtn.style.getPropertyValue('--tx'));
+          var ty_book = parseInt(bookBtn.style.getPropertyValue('--ty'));
+
+          var tx_audio = parseInt(audioBtn.style.getPropertyValue('--tx'));
+          var ty_audio = parseInt(audioBtn.style.getPropertyValue('--ty'));
+
+          var tx_flower = parseInt(flowerBtn.style.getPropertyValue('--tx'));
+          var ty_flower = parseInt(flowerBtn.style.getPropertyValue('--ty'));
+
           var ports = {
-            port_1: {port: 1, portX: 305, portY: 265}, 
-            port_2: {port: 2, portX: 825, portY: 260},
-            port_3: {port: 3, portX: 555, portY: 565}
+            port_1: {port: 1, portX: 305 + tx_book, portY: 265 + ty_book }, 
+            port_2: {port: 2, portX: 825 + tx_audio, portY: 260 + ty_audio},
+            port_3: {port: 3, portX: 555 + tx_flower, portY: 565 + ty_flower}
           };
 
-          if (!navbarExpanded) {
+          console.log('Ports: ', ports['port_1'], isPluggedRef)
+          
+          if (navbarExpanded) {
+            //alert('NavBar')
+            
+            
             ports = {
               port_1: {port: 1, portX: 305 - (13 * vwRatio) , portY: 265 - (25 * vhRatio)},
               port_2: {port: 2, portX: 825, portY: 260},
@@ -577,7 +636,7 @@ var render = Matter.Render.create({
           }
 
           else {
-
+            
             ports = {
               port_1: {port: 1, portX: 305, portY: 265}, 
               port_2: {port: 2, portX: 825, portY: 260},
