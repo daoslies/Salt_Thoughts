@@ -33,18 +33,108 @@
   }
 }
 
+{/*
+  
+  position: absolute;*/}
 
+.text-test {
 
-.App-header {
-  background-color: #282c34;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+  font-size: 25px;
+
+  user-select: none;  
+  
+  {
+    /* you maybe need to put in a load of browser specific versions of user-select: none
+    
+    https://stackoverflow.com/questions/69430/is-there-a-way-to-make-text-unselectable-on-an-html-page
+    
+      flex-direction: column;
   align-items: center;
   justify-content: center;
+    
+    */
+  }
+
+}
+
+.Absolute-test {
+
+  position: absolute;
+
+  height: 100vh;
+  width: 100vw;
+
+}
+
+.salt-text {
+
+  position: absolute;
+
+  left: 600px;
+
+}
+
+.svg-container {
+
+  z-index: 0;
+
+  width: 100vw;
+  height: 100vh; 
+
+}
+
+.book-button {
+
+  position: absolute;
+  
+  transform: translateX(var(--tx)) translateY(var(--ty)); 
+  transition: transform 0.5s ease; 
+
+  left: 250px;
+  top: 200px;
+
+} 
+
+.audio-button {
+
+  position: absolute;
+
+  transform: translateX(var(--tx)) translateY(var(--ty)); 
+  transition: transform 0.5s ease; 
+
+
+  left: 750px;
+  top: 200px;
+
+}
+
+.flower-button {
+
+  position: absolute;
+
+  transform: translateX(var(--tx)) translateY(var(--ty)); 
+  transition: transform 0.5s ease; 
+
+
+  left: 500px;
+  top: 500px;
+
+}
+
+.hidden {
+  visibility: hidden; 
+}
+
+.App-header {
+
+  background-color: #282c3400;
+  width: 100vw;
+  display: flex;
   font-size: calc(10px + 2vmin);
   color: white;
-  overflow: hidden;
+  /*overflow: hidden;*/
+
+  
 }
 
 .ButtonMenu {
@@ -73,20 +163,78 @@
   background-color: #282c34;
 }
 
-
-
-.Nav-bar {
+.chapter-content {
   background-color: #282c34;
   width: 100vw;
-  height: 20vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: rgb(248, 233, 185);
-  overflow: hidden;
+  overflow: auto;
+  padding: 250px; /* Add padding to create space from the edges */
+  box-sizing: border-box; /* Include padding in width and height calculations */
+  max-height: 80vh;
 }
+
+
+.chapter-content p {
+  margin: 50px; /* Reset default margin for paragraphs within .chapter-content */
+}
+
+
+.Nav-bar {
+  background-color: #282c34;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: rgb(248, 233, 185);
+  /* overflow: hidden; */
+}
+
+
+
+
+.Nav-bar-enter {
+  height: 100vh;
+}
+
+.Nav-bar-enter-active {
+  height: 20vh;
+  transition: height 500ms ease-in; 
+}
+
+.Nav-bar-exit {
+  height: 20vh; 
+}
+
+.Nav-bar-exit-active {
+  height: 100vh;
+  transition: height 500ms ease-out; 
+}
+
+
+
+.Nav-bar button {
+  cursor: pointer;
+}
+
+.nav-button {
+  cursor: pointer;
+}
+
+
+
+.nav-button.clicked {
+  background-color: #ff0000;
+}
+
 
 .Smol-writing {
   font-size: calc(20px);

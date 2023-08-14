@@ -172,20 +172,30 @@ function getExpectedOutputs(inputAndOrState, outputAndOrState, numSalts) {
     }
     */
 
+
+
     hiddenNeurons.forEach(hiddenNeuron => {
 
       console.log('Current Neuron: ', hiddenNeuron.props.neuron.id)
 
       hiddenNeuron.props.neuron.connections.forEach(conex_object => { 
 
+ 
+
         const finalHiddenNeuronId = conex_object.targetNeuronId;
+        if (finalHiddenNeuronId) {
         const source = hiddenNeuron.props.neuron.id;
         const target = finalHiddenNeuronId;
         const targetNeuron = network.neural_welcome_list.filter(neuron => neuron.props.neuron.id == finalHiddenNeuronId);
 
         network.weights[`${source}-${target}`] += learningRate * weightLossGradients[`${source}-${target}`] * targetNeuron.everSalt;
-
-        
+        alert(targetNeuron.everSalt)
+        alert()
+        const connection = hiddenNeuron.props.neuron.connections.find(c => c.targetNeuronId === finalHiddenNeuronId);
+        if (connection) {
+          connection.weight = network.weights[`${source}-${target}`];
+        }
+      }
 
       })})
     /*
@@ -220,7 +230,7 @@ function getExpectedOutputs(inputAndOrState, outputAndOrState, numSalts) {
 
 function backpropagation(network, numSalts, inputAndOrState, outputAndOrState, learningRate) {
 
-
+    alert()
 
     const outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
     const outputSalts = outputNeurons.map(img => img.props.neuron.everSalt);
@@ -243,7 +253,7 @@ function backpropagation(network, numSalts, inputAndOrState, outputAndOrState, l
     let weightLossGradients = Grads.weightLossGradients;
     
     console.log('Weight grads: ', weightLossGradients)
-    //alert()
+
     updateWeightsAndBiases(network, Gradients, weightLossGradients, outputNeurons,
        learningRate) 
     

@@ -5,12 +5,12 @@ import { drag } from 'd3-drag';
 
 let svg = null;
 
-export function createD3Visualization(network, connections, nodes, links) {
+export function createD3Visualization(network, connections, nodes, links, graphTime) {
 
 
-console.log('Connections: ', connections)
-console.log('Nodes: ', nodes)
-console.log('Links:  ', links)
+//console.log('Connections: ', connections)
+//console.log('Nodes: ', nodes)
+//console.log('Links:  ', links)
 
 const parentDiv = document.querySelector("#buttons");
 var width = parentDiv.getBoundingClientRect().width;
@@ -32,32 +32,7 @@ var height = parentDiv.getBoundingClientRect().height;
   //const nodesCopy = [...nodes];
   //console.log(nodesCopy)
   simulation.nodes(nodes).on("tick", ticked);
-  /*
-  //simulation.nodes(nodes).on("tick", ticked);
-  var validLinks = links.filter(link => {
-    if (!link.source || !link.target) {
-      return false;
-    }
   
-    const sourceInNodes = nodes.some(node => node.layer === link.source.layer && node.index === link.source.index);
-    const targetInNodes = nodes.some(node => node.layer === link.target.layer && node.index === link.target.index);
-    return sourceInNodes && targetInNodes;
-  });
-  
-  console.log('Valid links: ', validLinks);
-  //validLinks = validLinks.filter(link => link.target);
-  //console.log('Valid links with target: ', validLinks);
-  */
-
-
-//simulation.force("link").links(validLinks);
-//.attr("class", "links")
-console.log('SVG1: ', svg)
-/*
-const link = svg.append("g")
-  .selectAll("line")
-  .data(validConnections);
-*/
 let linkGroup = svg.select("g.links");
 if(linkGroup.empty()) {
   linkGroup = svg.append("g")
@@ -73,10 +48,10 @@ const link = linkGroup.selectAll("line")
 
 link.exit().remove();
 
-console.log('SVG2: ', svg)
+//console.log('SVG2: ', svg)
 //link.exit();//.remove();
 //svg.remove()
-console.log('Link: ', link)
+//console.log('Link: ', link)
 
 //const sigmoid = x => 1 / (1 + Math.exp(-x));
 
@@ -145,15 +120,52 @@ network.neural_welcome_list.forEach(neuron => {
 
   console.log('nodes: ', nodes)
 
+  // colouringg based on the graph
+
+  if (graphTime) {
+
+  const classLabels = ['setosa', 'versicolor', 'virginica'];
+  const outputNeuronIds = ['11-0', '11-1', '11-2'];
+  const colorScale = d3.scaleOrdinal()
+    .domain(classLabels)
+    .range(['#FF1F9F', '#39FFFF', '#FF8900']); 
+  
+  node.enter().append("circle")
+  .style("pointer-events", "all")
+  .attr("r", 33)
+  .attr("fill", d => {
+    if (d.neuron_type === 'input') {
+      return '#fbb4ae';
+    } else if (d.neuron_type === 'output') {
+      const neuronIdParts = d.neuron_id.split('-');
+      const outputLayerIndex = parseInt(neuronIdParts[0]) - 1;
+      const outputNeuronIndex = parseInt(neuronIdParts[1]);
+      const correspondingClassLabel = classLabels[outputNeuronIndex];
+      return colorScale(correspondingClassLabel);
+    } else {
+      return '#000000';
+    }})
+    .attr("opacity", d => {
+      if (d.neuron_type === "output" && outputNeuronIds.includes(d.neuron_id)) {
+        return 1;
+      } else {
+        return 0;
+      }
+    })
+    .merge(node)
+    .attr("cx", d => d.position.x)
+    .attr("cy", d => d.position.y);
+
+    node.append("title")
+    .text(d => d.id);
+
+  }
+  /*
+  
   node.enter().append("circle")
     .style("pointer-events", "all")
-    .attr("r", 10)
-    .attr("fill", d => d.type === 'input' ? '#fbb4ae' : d.type === 'output' ? '#b3cde3' : '#ccebc5')
-    /*.call(drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended)) */
-    
+    .attr("r", 50)
+    .attr("fill", d => d.neuron_type === 'input' ? '#fbb4ae' : d.neuron_type === 'output' ? '#b3cde3' : '#ccebc5')    
     .merge(node)
     .attr("cx", d => d.position.x)
     .attr("cy", d => d.position.y)
@@ -162,7 +174,7 @@ network.neural_welcome_list.forEach(neuron => {
       "mouseout":  function() { alert('away') }, 
       "click":  function() { alert('clicl') }, 
     })
-    
+    */
 
     /*
     .on("mouseover", () => {
@@ -180,8 +192,7 @@ network.neural_welcome_list.forEach(neuron => {
 
 
   // Add labels to the nodes
-  node.append("title")
-      .text(d => d.id);
+
 
   // Create the ticked function
 function ticked() {
@@ -223,11 +234,11 @@ export function generateVisualizationData(network) {
   var nodes = [];
   const links = [];
   //alert('a')
-  console.log(network)
+  
   
 
   const activeLayers = Array.from(new Set(network.neural_welcome_list.map(n => n.props.neuron.layer)));
-  console.log(activeLayers);
+  //console.log(activeLayers);
 
   let possibleConnections = {};
 
@@ -239,7 +250,7 @@ export function generateVisualizationData(network) {
   }
 
 
-  console.log('Possible connects: ', possibleConnections)
+  //console.log('Possible connects: ', possibleConnections)
 
   
   for (let [key, connection] of Object.entries(possibleConnections)) {
@@ -255,31 +266,41 @@ export function generateVisualizationData(network) {
       for (let j = 0; j < targetNeurons.length; j++) {
         // Create the weight key for this connection
     const weightKey = `${connection.source}-${i}-${connection.target}-${j}`;
-    console.log('Connection: ', connection)
-    console.log('WeightKeys: ', weightKey)
+    //console.log('Connection: ', connection)
+    
+    //console.log('WeightKeys: ', weightKey)
 
     if (!network.weights[weightKey]) {
         // Generate a new weight for this connection if it does not exist
         network.setWeightInit(`${connection.source}-${i}`, `${connection.target}-${j}`, network.randomNormal());
     }
+
+
+
+
+    /////// DOING A TEST we are swapping biases from targets to source  (+ again b-low)
+    // I,e, `${connection.target}-${j}` -- > `${connection.source}-${j}`
     
-    if (!network.biases[`${connection.target}-${j}`]) {
+    if (!network.biases[`${connection.target}-${i}`]) {
       // Generate a new bias for this connection if it does not exist
-      network.setBiasInit(`${connection.target}-${j}`, network.randomNormal());   
+      network.setBiasInit(`${connection.target}-${i}`, network.randomNormalBias());   
       /// SHould bias be target or source???
   }
 
+
+      /// doing a test swapping bias target 2 source `${connection.source}-${j}`
+
       // If the weight already exists, retrieve it from the network
       const weight = network.weights[weightKey];
-      const bias = network.biases[`${connection.target}-${j}`];
+      const bias = network.biases[`${connection.target}-${i}`];
 
       // Find the source and target neurons for this connection
       
       const sourceNeuron = network.neural_welcome_list.find(n => n.props.neuron.id === `${connection.source}-${i}`);
       const targetNeuron = network.neural_welcome_list.find(n => n.props.neuron.id === `${connection.target}-${j}`);
 
-      console.log('Source for weighting: ', sourceNeuron)
-      console.log('Target for weighting: ', targetNeuron)
+      //console.log('Source for weighting: ', sourceNeuron)
+      //console.log('Target for weighting: ', targetNeuron)
       
 
       if (sourceNeuron && targetNeuron) {
@@ -319,14 +340,26 @@ export function generateVisualizationData(network) {
 
           const sigmoid = x => 1 / (1 + Math.exp(-x));
 
+          const colorScale = d3.scaleSequential()
+            .interpolator(d3.interpolateRdYlBu)
+            .domain([-2, 2]); // assumes weight and bias values are normalized between -1 and 1
+
+          const widthScale = d3.scaleLinear()
+            .range([0.001, 1]) // set the range of line widths
+            .domain([0, 2]); // assumes weight and bias values are normalized between -1 and 1
+
+          const color = colorScale(-(weight + bias));
+          const width = widthScale(Math.abs(weight) + Math.abs(bias));
+
+
           connections.push({
               key: weightKey,
               source: sourceNeuron.props.neuron.wire,
               target: targetNeuron.props.neuron.wire,
               weight: weight,
               bias: bias,
-              colour: d3.interpolateRdYlBu(sigmoid(-((((weight + bias) * 10 ))))),
-              width: sigmoid((weight*5+bias) * 10) * (bias * 10) //((weight + bias) **2) * 10  // ((sigmoid((weight + bias) * 10) + 0.1 ) **0.9) * 20 //sigmoid((weight*5+bias) * 10) * (bias * 10)  ////
+              colour: color,  //d3.interpolateRdYlBu(-sigmoid((weight*5 + bias))),
+              width: width   //sigmoid(weight*5+bias) * 10 //* (bias * 10) //((weight + bias) **2) * 10  // ((sigmoid((weight + bias) * 10) + 0.1 ) **0.9) * 20 //sigmoid((weight*5+bias) * 10) * (bias * 10)  ////
           });
 
           links.push({
@@ -356,8 +389,8 @@ export function generateVisualizationData(network) {
       const targetInNodes = nodes.some(node => node.layer === link.target.layer && node.index === link.target.index);
       return sourceInNodes && targetInNodes;
     });
-
-    console.log('Valid Connections: ', validConnections);
+ 
+    //console.log('Valid Connections: ', validConnections);
 
   
 

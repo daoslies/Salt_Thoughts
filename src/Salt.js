@@ -15,7 +15,7 @@ ImageArray[4] = salt_5_im;
 
 class Salt {
 
-    constructor(name, engine, outputSaltCountCallback, initialNeuron) {
+    constructor(name, engine, outputSaltCountCallback, initialNeuron, output_x) {
   
       this.name = name;
       this.engine = engine;
@@ -25,9 +25,13 @@ class Salt {
       this.initNeuron = initialNeuron;
       this.currentNeuron = null; 
       this.previousNeuron = null; 
+
+      this.stopCount = 0;
   
       this.position_x = this.initNeuron.wire.position.x -75;
       this.position_y = this.initNeuron.wire.position.y;
+
+      this.output_x = output_x;
   
       this.htmlID = this.name + 'ID'
       var num = Math.floor( Math.random() * 5);
@@ -63,6 +67,9 @@ class Salt {
 
           self.wire.force.x -= force.x; 
           self.wire.force.y -= force.y;
+
+          
+
       }
 
 
@@ -106,13 +113,48 @@ class Salt {
               if (neuron.layer === network.maxLayerArray.length-1 && i === max_active_index ) {
                   forceScale = forceScale * 5;
                   //alert()
+
+                  // Is this for providing extra force at the final connection?
                 }
               if (neuron && activation) {
                 const force_x = activation * forceScale * (neuron.wire.position.x - this.wire.position.x);
                 const force_y = activation * forceScale * (neuron.wire.position.y - this.wire.position.y);
                 force.x -= force_x;
                 force.y -= force_y;
-              }}}
+              }}
+              
+
+              //Nudge if stopped 
+              
+              const nudgeThreshold = 0.000005;
+              if (-nudgeThreshold < force.x && force.x < nudgeThreshold 
+                && -nudgeThreshold < force.y && force.y < nudgeThreshold) {
+                  //Count how many stops it has been still for, if greater than 10, gizzit a nudge
+                  self.stopCount += 1;
+
+                  if (self.stopCount > 350) {
+                      if (output_x.wire.position.x && this.wire.position.x) {
+                          const nudgeforce = output_x.wire.position.x - this.wire.position.x;
+                          const absNudgeforce = Math.abs(nudgeforce);
+                          const forceMagnitude = Math.pow(absNudgeforce, 0.05) * 0.1;
+
+                          if (!isNaN(forceMagnitude) && forceMagnitude !== 0 && isFinite(forceMagnitude)) {
+                              const forceDirection = Math.sign(nudgeforce);
+                              force.x -= forceMagnitude * forceDirection;
+
+                              const forceDirectionY = Math.sign(output_x.wire.position.y - this.wire.position.y);
+
+                              const randomYForce = (Math.random() * 2) - 1;
+                              force.y -= forceDirectionY * Math.abs(randomYForce) * 0.1;
+
+                              self.stopCount = 0;
+                          }
+                      }
+                  }
+              }
+
+            
+            }
   
         // Use the force to determine the direction in which the salt should move
         self.wire.force.x -= force.x; 
@@ -125,29 +167,48 @@ class Salt {
       
   
       this.update_pos = function update_pos(self, network) {
+        
         // Update the position of the salt on the page
         self.position_x = this.wire.position.x;
         self.position_y = this.wire.position.y;
         var self_obj = document.getElementById(self.htmlID);
-        self_obj.style.left = self.position_x + "px";
-        self_obj.style.top = self.position_y  + "px";
-        // Check if the salt has entered a new neuron and update the currentNeuron if necessary
-        this.updateCurrentNeuron(self, network);
+
+        try {
+          if (self_obj.style) {
+            self_obj.style.left = self.position_x + "px";
+            self_obj.style.top = self.position_y  + "px";
+            // Check if the salt has entered a new neuron and update the currentNeuron if necessary
+            this.updateCurrentNeuron(self, network);
+          }
+        } catch (error) {
+          //pass
+        }
       };
       
       this.updateCurrentNeuron = function updateCurrentNeuron(self, network) {
         // Set a collision threshold distance in pixels
-        const collisionThreshold = 50;
+        const collisionThreshold = 75;
       
         // Check if the salt is within the collision threshold distance of any neuron
         const collidesWithNeuron = network.neural_welcome_list.find(neuron => {
           return Matter.Vector.magnitude(Matter.Vector.sub(self.wire.position, neuron.props.neuron.wire.position)) < collisionThreshold;
         });
+
+        //console.log('Currentneuron Check: ', this.currentNeuron)
+        if (this.currentNeuron){
+        if (collidesWithNeuron && this.currentNeuron.props.neuron.type !== 'input') {self.stopCount = 0;}}
+
+        //console.log('Collides!', collidesWithNeuron)
       
         // If the salt is within the collision threshold distance of a neuron, update the currentNeuron property
         if (collidesWithNeuron && this.currentNeuron !== collidesWithNeuron) {
+
+          //reset nudging critera
+          self.stopCount = 0;
+          
           if (this.previousNeuron) {
           this.previousNeuron.props.neuron.removeSalt(); }
+
           this.previousNeuron = this.currentNeuron;
           this.currentNeuron = collidesWithNeuron;
           this.currentNeuron.props.neuron.addSalt();
@@ -155,12 +216,14 @@ class Salt {
           if (this.currentNeuron.props.neuron.type === "output") {
             this.outputSaltCountCallback();
           }
+
+          
           
           if (this.previousNeuron) {
           if (this.previousNeuron.props.neuron.type === "output") {
             this.outputSaltCountCallback();
           }}
-  
+          
           
           //console.log('collisions: ', this, this.currentNeuron)
   
@@ -171,9 +234,15 @@ class Salt {
     
   
     Welcome({self}) {
+
+      const handleClick = () => {
+        // Handle the click event here
+        console.log("The salt object was clicked!", self);
+      };
+
       //const key = `${self.name}-${Date.now()}`; // Generate a unique key using the salt's name and a timestamp
       return <img src={ImageArray[Math.floor(Math.random() * 5)]} 
-              className="App-logo" id={self.htmlID} alt="salt"  style = {self.saltStyle} />;
+              className="App-logo" id={self.htmlID} alt="salt"  style = {self.saltStyle} onClick={handleClick} />;
     }
   
   };
