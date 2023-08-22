@@ -62,7 +62,7 @@ function toggleClickedClass(e) {
 
 // Custom hook
 function useNavbar() {
-  const [navbarExpanded, setNavbarExpanded] = useState(true);
+  const [navbarExpanded, setNavbarExpanded] = useState(false);
   
   return [navbarExpanded, setNavbarExpanded];
 }
@@ -201,7 +201,7 @@ return (
 <Router>
 
 <CSSTransition 
-  //in={!navbarExpanded} 
+  in={!navbarExpanded} 
   timeout={1000} 
   classNames='Nav-bar'
   onEntered={() => {
@@ -213,12 +213,12 @@ return (
 >
 
 
-<div className="Nav-bar">
+<div className="Nav-bar" style={{border:"3px solid red"}}>
 
 
-    <div className="App-header">
+    <div className="App-header" style={{border:"3px solid blue"}}>
 
-    <div className="Absolute-test" >
+    <div className="Absolute-test" style={{border:"3px solid green"}} >
 
       
     <h2 background-color="#282c3400" className="salt-text">The World of Salt</h2>
@@ -323,11 +323,11 @@ onClick={() => setNavbarExpanded(!navbarExpanded)}>
 
     */}
 
-    <img className="book-button" src={audio_port_img} 
+    <img  className="book-button" src={audio_port_img} 
           style={{
             '--tx': navbarExpanded ? '0px' : '-13vw',
-            '--ty': navbarExpanded ? '0px' : '-25vh'
-
+            '--ty': navbarExpanded ? '0px' : '-25vh',
+            border:"3px solid pink"
           }}  />
 
     <img className="audio-button" src={audio_port_img} 

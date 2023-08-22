@@ -121,7 +121,7 @@ useEffect(() => {
       .attr('cx', dot.x + x_offset)
       .attr('cy', dot.y + y_offset)
       .attr('r', dotSize)
-      .style('fill', 'green') 
+      .style('fill', '#56CBF9') 
       .style('opacity', dot.opacity);
   });
 
@@ -141,9 +141,9 @@ useEffect(() => {
     .attr('class', 'particle')
     .attr('cx', particle.x)
     .attr('cy', particle.y)
-    .attr('r', dotSize + 2) 
+    .attr('r', dotSize - 3 + 2) 
     .style('fill', 'black')
-    .style('opacity', particle.opacity + 0.2);
+    .style('opacity', particle.opacity + 0.4);
 
     svg.append('circle')
     .attr('id', `${particle.id}`)
@@ -151,8 +151,8 @@ useEffect(() => {
     .attr('class', 'particle')
     .attr('cx', particle.x)
     .attr('cy', particle.y)
-    .attr('r', 5) 
-    .style('fill', 'green') 
+    .attr('r', dotSize - 3) 
+    .style('fill', '#56CBF9') 
     .style('opacity', particle.opacity);
 
     /////// Laser

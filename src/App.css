@@ -88,7 +88,7 @@
   position: absolute;
   
   transform: translateX(var(--tx)) translateY(var(--ty)); 
-  transition: transform 0.5s ease; 
+  transition: transform 2s ease; 
 
   left: 250px;
   top: 200px;
@@ -100,7 +100,7 @@
   position: absolute;
 
   transform: translateX(var(--tx)) translateY(var(--ty)); 
-  transition: transform 0.5s ease; 
+  transition: transform 2s ease; 
 
 
   left: 750px;
@@ -113,7 +113,7 @@
   position: absolute;
 
   transform: translateX(var(--tx)) translateY(var(--ty)); 
-  transition: transform 0.5s ease; 
+  transition: transform 2s ease; 
 
 
   left: 500px;
@@ -160,11 +160,11 @@
 .container {
   position: absolute;
   z-index: 0;
-  background-color: #282c34;
+  background-color: #051c4b;
 }
 
 .chapter-content {
-  background-color: #282c34;
+  background-color: #051c4b;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -172,7 +172,8 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: rgb(248, 233, 185);
+  font-family:"Calibri", sans-serif;
+  color: #e0d959;
   overflow: auto;
   padding: 250px; /* Add padding to create space from the edges */
   box-sizing: border-box; /* Include padding in width and height calculations */
@@ -186,7 +187,7 @@
 
 
 .Nav-bar {
-  background-color: #282c34;
+  background-color: #876743;
   width: 100vw;
   height: 100vh;
   display: flex;
