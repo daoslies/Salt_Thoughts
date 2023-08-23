@@ -342,7 +342,7 @@ onClick={() => setNavbarExpanded(!navbarExpanded)}>
             '--ty': navbarExpanded ? '0px' : '-65vh' 
           }}  />
 
-    <Wire bookRouteRef={bookRouteRef} audioRouteRef={audioRouteRef} simRouteRef={simRouteRef} />  {/* wire lives in svg-container, below. */}
+    <Wire bookRouteRef={bookRouteRef} audioRouteRef={audioRouteRef} simRouteRef={simRouteRef} navbarExpanded={navbarExpanded} />  {/* wire lives in svg-container, below. */}
 
     <EmbeddingRep></EmbeddingRep>
 
