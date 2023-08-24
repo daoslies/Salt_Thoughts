@@ -1,0 +1,18 @@
+KKKKK
+
+What are we doing:
+
+
+  - Ports in front of plug  -- Done, but potentially there is hidden faff
+
+  - Clearing out all that tween shit  -- I think done
+
+  - realigning plugs and port holes.
+
+  - creating the new routes div.
+
+  - Make an about page
+
+  - Center everything properly
+
+  - Make it so the plug plugs in if the plug is touching anywhere on the port img.

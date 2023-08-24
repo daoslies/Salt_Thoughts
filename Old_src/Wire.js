@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef, createContext } from 'react';
 import Matter from 'matter-js';
 import * as d3 from 'd3';
 
-import "./Menu.css";
 
 import audio_port_img from './Salt_Pics/audio_port.png';
 
@@ -33,14 +32,34 @@ jackImageArray[4] = jack_5_img;
 
 
 
-function Wire() {
+function Wire(props) {
 
-  const navbarExpanded = true; // props.navbarExpanded;
+  const navbarExpanded = props.navbarExpanded;
   const [bookRef_, setBookRef_] = useState([]);
   const [audioRef_, setAudioRef_] = useState([]);
   const [simRef_, setSimRef_] = useState([]);
   
   const [plugButtonTime, setPlugButtonTime] = useState(false);
+
+  const portAnimTweenRef = useRef({
+    hasStarted: false,
+    startTime: null,
+    progress: 0,
+    start_tx_book: 0,
+    start_ty_book: 0,
+    start_tx_audio: 0,
+    start_ty_audio: 0,
+    start_tx_flower: 0,
+    start_ty_flower: 0,
+    current_tx_book: null,
+    current_ty_book: null,
+    current_tx_audio: null,
+    current_ty_audio: null,
+    current_tx_flower: null,
+    current_ty_flower: null
+  }); 
+
+  const [portButtonHover, setportButtonHover] = useState(false);
 
 //Can maybe remove the plugbuttontime state as we are using the pluggedportref ref
 
@@ -50,16 +69,11 @@ function Wire() {
 
   const portButtonHoverRef = useRef(false);
 
-  
-  //const bookRouteRef = useRef(null);
-  //const audioRouteRef = useRef(null);
-  //const simRouteRef = useRef(null);
-
   useEffect(() => {
     
-    //setBookRef_(bookRouteRef);
-    //setAudioRef_(audioRouteRef);
-    //setSimRef_(simRouteRef);
+    setBookRef_(props.bookRouteRef.current);
+    setAudioRef_(props.audioRouteRef.current);
+    setSimRef_(props.simRouteRef.current);
 
     //var navbarExpanded = props.navbarExpanded;
 
@@ -136,7 +150,7 @@ function Wire() {
 
   }
 
-  if ((!plugButtonTime && navbarExpanded)) {   //// Question marks on && navbarExpanded
+  if ((!plugButtonTime && navbarExpanded) || portAnimTweenRef.hasStarted ) {   //// Question marks on && navbarExpanded
 
       try {
         
@@ -173,20 +187,19 @@ function Wire() {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/*
+
   const enginex = React.useRef(null);
   enginex.current = Matter.Engine.create();
 
   var engine = enginex.current; 
-*/
 
-  var engine = Matter.Engine.create();
   
-  const wire_start_pos_x = 560 + 88;
+  const wire_start_pos_x = 560 + 70;
   const wire_start_pos_y = 325 - 85 - 60;
   
   const [wireBodies, setWireBodies] = useState([]);
 
+  //const [mouseRect, setmouseRect] = useState([]);
   // 1. Create physics engine
   const blueLightRef = useRef(null);
 
@@ -233,6 +246,8 @@ function Wire() {
 
           plug_rect = Matter.Bodies.rectangle(pluggedPortRef.current.portX, pluggedPortRef.current.portY, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
           
+          portAnimTweenRef.current['plug_rect'] = plug_rect; 
+          console.log('Here: ', portAnimTweenRef.current)
           Matter.World.add(world, plug_rect); 
 
           
@@ -246,7 +261,7 @@ function Wire() {
             }); 
     
             Matter.World.add(world, plugCon); 
-          }
+            portAnimTweenRef.current['plug_con'] = plugCon; }
     
           }
 
@@ -295,14 +310,23 @@ function Wire() {
 
       if (plug_rect) {
 
+        if (!portAnimTweenRef.current.hasStarted) {
+
+
         if (wireBodies.length > 0) {
         Matter.World.remove(world, plugCon);
         plugCon = null;
+        portAnimTweenRef.current.plug_con = plugCon;
+        //alert()
         }
 
         Matter.World.remove(world, plug_rect);  
         plug_rect = null;
+        portAnimTweenRef.current.plug_rect = plug_rect;
+
         console.log('World: ', world)
+
+      }
 
       }
     }
@@ -317,8 +341,6 @@ function Wire() {
 
   });
 
-  /// Potentially you should add a cleanup function here 24/08/2023
-
   
 }, []);
 
@@ -326,11 +348,13 @@ function Wire() {
 const world = engine.world;
 world.gravity.y = 0;
 
-/*var render = Matter.Render.create({
+var render = Matter.Render.create({
     element: document.body,
     engine: engine
   });     
-*/
+
+
+
   
   // 4. Create chain of circle bodies for wire 
   
@@ -359,6 +383,8 @@ world.gravity.y = 0;
   }}
   
    
+  //console.log('wireBOdies', wireBodies)
+  
   
   // Connect bodies with constraints
   for (let i = 0; i < wireBodies.length - 1; i++) {
@@ -375,10 +401,10 @@ world.gravity.y = 0;
     
     
     
-    //var mouse_area = document.getElementById('svg-container')
+    var mouse_area = document.getElementById('svg-container')
 
     // add mouse control
-    //var mouse = Matter.Mouse.create(mouse_area);
+    var mouse = Matter.Mouse.create(mouse_area);
 
 
 
@@ -390,10 +416,13 @@ world.gravity.y = 0;
       
       if (!pluggedPortRef.current || !portButtonHoverRef.current) {
 
-      if (!mouse_rect) {
+      if (!mouse_rect && !portAnimTweenRef.current.hasStarted) {
       mouse_rect = Matter.Bodies.rectangle(event.clientX, event.clientY, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
+       
+      //setmouseRect(mouse_rect)
       
       Matter.World.add(world, mouse_rect); 
+      //mouse.setStatic(mouse, true);
       
       if (wireBodies.length > 0) {
         mouseCon = Matter.Constraint.create({ 
@@ -436,18 +465,33 @@ world.gravity.y = 0;
         
     document.addEventListener('mousemove', (event) => {
 
+      //mouse_rect.position.x = mouse.position.x;
+      //mouse_rect.position.y = mouse.position.y;
       if (mouse_rect) {
       mouse_rect.position.x = event.clientX;
       mouse_rect.position.y = event.clientY;
       }
       
+      //Matter.Body.applyForce(mouse_rect, mouse_rect.position, {
+      //  x: mouse_rect.position.x - event.clientX,
+      //   y: mouse_rect.position.y - event.clientY
+      // });
     });
     
         
         
 
+        // Jack plug
+
+        //const [jackImageIndex, setJackImageIndex] = useState(0);
+       
+
+
         const renderJack = (lastPoint, portX, portY, dist) => {
 
+
+          // Get last wire point
+          //const lastPoint = wireBodies[wireBodies.length - 1].position; 
         
           // Calculate orientation angle
           let angle = Math.atan2(portY - lastPoint.y, portX - lastPoint.x) * (180 / Math.PI);
@@ -464,7 +508,8 @@ world.gravity.y = 0;
             posx = portX-100;
             posy = portY-150;
             angle = 0;
-
+            //rot_origx = portX-100;
+            //rot_origy = portY-150;
           }
 
 
@@ -479,17 +524,236 @@ world.gravity.y = 0;
           .attr('height', 200) 
           .attr('class', 'jack-image')
 
+          /*<image 
+              href={jackImageArray[jackImageIndex]} 
+              x={lastPoint.x}
+              y={lastPoint.y}
+              width={50} // image width
+              height={50} // image height
+              transform={`rotate(${angle}, ${lastPoint.x}, ${lastPoint.y})`} 
+            /> */
+        
+          return (
+            <></>
+          );
         }
 
+
+          function animTweeningForPorts(t_book, t_audio, t_flower) {
+
+
+            const tweenState = portAnimTweenRef.current;  
+
+            console.log('Plug Rect: ', tweenState)
+
+            if (tweenState.current_tx_book == null) {
+              portAnimTweenRef.current = { 
+                ...tweenState,
+                current_tx_book: t_book.x,
+                current_ty_book: t_book.y,
+                current_tx_audio: t_audio.x,
+                current_ty_audio: t_audio.y,
+                current_tx_flower: t_flower.x,
+                current_ty_flower: t_flower.y
+            }
+
+            //console.log('TweenState1: ', portAnimTweenRef.current)
+          }
+  
+            else if (!tweenState.hasStarted) {
+  
+              if (portAnimTweenRef.current.plug_con) {
+                portAnimTweenRef.current.plug_con.stiffness = 1;
+                }
+
+              portAnimTweenRef.current = { 
+                ...tweenState,
+                hasStarted: true,
+                startTime: Date.now(),
+                current_tx_book: t_book.x,
+                current_ty_book: t_book.y,
+                current_tx_audio: t_audio.x,
+                current_ty_audio: t_audio.y,
+                current_tx_flower: t_flower.x,
+                current_ty_flower: t_flower.y,
+                start_tx_book: t_book.x,
+                start_ty_book: t_book.y,
+                start_tx_audio: t_audio.x,
+                start_ty_audio: t_audio.y,
+                start_tx_flower: t_flower.x,
+                start_ty_flower: t_flower.y,
+              }
+  
+            
+            //console.log('TweenState2: ', tweenState)
+            //alert(portAnimTweenState.hasStarted)
+  
+            }
+  
+            else {
+  
+              //console.log('TweenState3: ', tweenState)
+              
+              var currentTime = Date.now();
+  
+              const duration = 2000; 
+              //alert('curr: ' + currentTime + ' start: ' + tweenState.startTime)
+              //alert(currentTime - tweenState.startTime)
+              //alert('procheck: ' + (currentTime - tweenState.startTime) / duration)
+              var progress = Math.min((currentTime - tweenState.startTime) / duration, 1);
+              //alert(progress)
+
+              function ease(t) {
+                var P0 = 0;
+                var P1 = 0.1;
+                var P2 = 0.25;
+                var P3 = 1;
+                
+                var ease_output = 
+                    (1 - t) ** 3 * P0 +
+                    3 * (1 - t) ** 2 * t * P1 +
+                    3 * (1 - t) * t ** 2 * P2 +
+                    t ** 3 * P3;
+            
+                return Math.min(ease_output,1);
+            }
+            
+
+              console.log('progress1: ', progress)
+              progress = ease(progress);
+              console.log('progress2: ', progress)
+
+              if (progress >= 1) {          
+                
+                if (portAnimTweenRef.current.plug_con) {
+                portAnimTweenRef.current.plug_con.stiffness = 0.5;
+                }
+
+                portAnimTweenRef.current = { 
+                ...tweenState,
+                    hasStarted: false,
+              }}
+            
+              // Interpolate
+              const currentTxBook = tweenState.start_tx_book + 
+                                    (t_book.x - tweenState.start_tx_book) * progress;
+              const currentTyBook = tweenState.start_tx_book + 
+                                    (t_book.x - tweenState.start_tx_book) * progress;
+  
+              t_book = {'x' : currentTxBook, 'y' : currentTyBook}
+  
+              const currentTxAudio = tweenState.start_tx_audio + 
+                                    (t_audio.x - tweenState.start_tx_audio) * progress;
+              const currentTyAudio = tweenState.start_ty_audio + 
+                                    (t_audio.y - tweenState.start_ty_audio) * progress;
+  
+              t_audio = {'x' : currentTxAudio, 'y' : currentTyAudio}
+  
+              const currentTxFlower = tweenState.start_ty_flower + 
+                                    (t_flower.y - tweenState.start_ty_flower) * progress;
+              const currentTyFlower = tweenState.start_ty_flower + 
+                                    (t_flower.y - tweenState.start_ty_flower) * progress;
+  
+              t_flower = {'x' : currentTxFlower, 'y' : currentTyFlower} 
+
+
+
+              ///ahh is 3 in the morning and you aren't getting anywhere.
+
+              //The below are the key consoles to look out for.
+              //The numbers change in one direction, but not the other.
+              // The animation is not smooth.
+              // Something fukky is going on.
+
+              // AHGHGHHAHGhghghhg
+
+              // good luck
+              // 15/08/2023
+
+
+              //tweenState.plug_rect.position.x += t_book.x;
+              //tweenState.plug_rect.position.y += t_book.y;
+
+
+              //console.log(tweenState.start_ty_book, progress)
+              //console.log(t_book.x)
+              //console.log(tweenState.start_ty_book)
+              //console.log(t_book.y - tweenState.start_ty_book)
+              //console.log((t_book.y - tweenState.start_ty_book) * progress)
+            
+
+              //console.log('pluggedportref: ', pluggedPortRef.current)
+              
+              if (portAnimTweenRef.current.plug_rect) {
+
+                portAnimTweenRef.current.plug_rect.position.x = pluggedPortRef.current.portX;
+                portAnimTweenRef.current.plug_rect.position.y = pluggedPortRef.current.portY;
+                
+                wireBodies[wireBodies.length - 1].position.x = pluggedPortRef.current.portX;
+                wireBodies[wireBodies.length - 1].position.y = pluggedPortRef.current.portY;
+            
+              }
+            }
+
+            
+  
+            var outputs = {'book' : t_book, 'audio' : t_audio, 'flower' : t_flower }
+  
+            return outputs
+              
+            }
+  
+          
+  
+  
   
           function calculateDistanceToPort(lastPoint) {
   
-
+  
+            const viewportHeight = window.innerHeight; // viewport height in pixels
+            const viewportWidth = window.innerWidth; // viewport width in pixels
+            
+            const vhRatio = viewportHeight / 100; // 100vh = viewportHeight pixels
+            const vwRatio = viewportWidth / 100; // 100vw = viewportWidth pixels
+            
+            
+            // Get book button element
+            const bookBtn = document.querySelector('.book-button');
+  
+            const audioBtn = document.querySelector('.audio-button');
+  
+            const flowerBtn = document.querySelector('.flower-button');
+  
+            // Get current --tx value 
+            var tx_book = parseInt(bookBtn.style.getPropertyValue('--tx')) * vwRatio;
+            var ty_book = parseInt(bookBtn.style.getPropertyValue('--ty')) * vhRatio;
+  
+            var t_book = {'x' : tx_book, 'y' : ty_book}
+  
+            var tx_audio = parseInt(audioBtn.style.getPropertyValue('--tx')) * vwRatio;
+            var ty_audio = parseInt(audioBtn.style.getPropertyValue('--ty')) * vhRatio;
+  
+            var t_audio = {'x' : tx_audio, 'y' : ty_audio}
+  
+            var tx_flower = parseInt(flowerBtn.style.getPropertyValue('--tx')) * vwRatio;
+            var ty_flower = parseInt(flowerBtn.style.getPropertyValue('--ty')) * vhRatio;
+  
+            var t_flower = {'x' : tx_flower, 'y' : ty_flower}
+  
+            if (portAnimTweenRef.current.current_tx_book !== t_book.x || portAnimTweenRef.current.hasStarted) {
+  
+              var outputs = animTweeningForPorts(t_book, t_audio, t_flower);
+  
+              t_book = outputs.book; 
+              t_audio = outputs.audio;
+              t_flower = outputs.flower; 
+                                        
+            } 
   
             var ports = {
-              port_1: {port: 1, portX: 305, portY: 265 }, 
-              port_2: {port: 2, portX: 825, portY: 260 },
-              port_3: {port: 3, portX: 555, portY: 565 }
+              port_1: {port: 1, portX: 305 + t_book.x, portY: 265 + t_book.y }, 
+              port_2: {port: 2, portX: 825 + t_audio.x, portY: 260 + t_audio.y },
+              port_3: {port: 3, portX: 555 + t_flower.x, portY: 565 + t_flower.y }
             };
           
             
@@ -497,8 +761,19 @@ world.gravity.y = 0;
           let closestDistance = Infinity;
           let closestPort = null;
           let dist = null;
-          
+
           function portDistanceCheck(dist, port, closestDistance) {
+
+
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // sO MABS we can just access the css transition vlaues directly:
+
+            //https://stackoverflow.com/questions/8920934/get-current-css-property-value-during-a-transition-in-javascript
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
 
             // Check if closest
             if(dist < closestDistance) {
@@ -524,7 +799,6 @@ world.gravity.y = 0;
 
             }
 
-
           // Loop through ports
           for (const portName in ports) {
 
@@ -538,15 +812,15 @@ world.gravity.y = 0;
             //console.log('Port Dist: ', dist, port.portX, port.portY, lastPoint.x, lastPoint.y)
            
 
+            if (!portAnimTweenRef.current.hasStarted) { // if we aren't currently tweening the anim
+              
               var closestArray = portDistanceCheck(dist, port, closestDistance)
 
               closestPort = closestArray[0]
               closestDistance = closestArray[1]
 
-
-              /*   // I think this bit was maybe something to do with tweening.
-
-              // Not 100% sure, but taking it out doesn't... apppear... to brake anything.
+          }
+            else {
 
               if (pluggedPortRef.current.port == port.port) {
                 //alert('ref'+pluggedPortRef.current.port)
@@ -558,12 +832,39 @@ world.gravity.y = 0;
                 isPluggedRef.current = true;
                 pluggedPortRef.current = port;
                 window.dispatchEvent(new CustomEvent('wirePluggedIn', {detail: {port: pluggedPortRef.current}}))  
-              } */
-              
+              }
+              }
             }
+
+
            
 
 
+
+            ////// Here is where you should be looking.
+
+            //If you remove the isPluggedRef.current = false then the plug will stay plugged. 
+            // But we want it removable. That is relatively key.
+
+            // check the console logs filtered by 'Plugs'. unsure. Maybe somat to do with the for loop. 
+            // DOne/.
+
+            // TIme 2 level.
+
+            // With nay.
+
+            // Who is super kewl.
+
+            // And has just finished their hand in.
+
+            // cus they a 
+
+            // BALLER
+
+            // Oh gosh and maybe the plugged stuff should be in the loop. It was earlier and the plugged true
+            // behaviour was correct. But now that we're out of the for loop that isn't even working at all.
+            // kk
+            // stop now. XOXOXOXOXO
             
             
           // Return closest port info
@@ -599,7 +900,7 @@ world.gravity.y = 0;
   
   useEffect(() => {
   
-    //Matter.Render.run(render);
+    Matter.Render.run(render);
 
   
     // create runner
@@ -624,14 +925,21 @@ world.gravity.y = 0;
 
           <img className="book-button" src={audio_port_img} 
                 style={{
+                  '--tx': navbarExpanded ? '0px' : '-13vw',
+                  '--ty': navbarExpanded ? '0px' : '-25vh'
+
                 }}  />
 
           <img className="audio-button" src={audio_port_img} 
                 style={{
+                  '--tx': navbarExpanded ? '0px' : '-28vw',
+                  '--ty': navbarExpanded ? '0px' : '-25vh'
                 }}  /> 
 
           <img className="flower-button" src={audio_port_img} 
                 style={{
+                  '--tx': navbarExpanded ? '0px' : '35vw',
+                  '--ty': navbarExpanded ? '0px' : '-65vh' 
                 }}  />
 
         </div>
@@ -641,38 +949,3 @@ world.gravity.y = 0;
 }
 
 export default Wire;
-
-
-
-
-            // TIme 2 level.
-
-            // With nay.
-
-            // Who is super kewl.
-
-            // And has just finished their hand in.
-
-            // cus they a 
-
-            // BALLER
-
-            // Oh gosh and maybe the plugged stuff should be in the loop. It was earlier and the plugged true
-            // behaviour was correct. But now that we're out of the for loop that isn't even working at all.
-            // kk
-            // stop now. XOXOXOXOXO
-
-
-
-  
-              ///ahh is 3 in the morning and you aren't getting anywhere.
-
-              //The below are the key consoles to look out for.
-              //The numbers change in one direction, but not the other.
-              // The animation is not smooth.
-              // Something fukky is going on.
-
-              // AHGHGHHAHGhghghhg
-
-              // good luck
-              // 15/08/2023

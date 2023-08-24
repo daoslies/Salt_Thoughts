@@ -1,0 +1,129 @@
+.menu-child {
+    position: absolute;
+    top: 155.56rem;
+    left: 21.39rem;
+    width: 40.57rem;
+    height: 351.56rem;
+    display: none;
+  }
+  .book-button,
+  .audio-button,
+  .flower-button {
+    position: absolute;
+    margin: 0 !important;
+    top: 9.81rem;
+    left: 11.06rem;
+    background-color: var(--color-mediumslateblue);
+    width: 16rem;
+    height: 7.25rem;
+    
+  }
+  .audio-button,
+  .flower-button {
+    left: 56.69rem;
+    
+  }
+
+  .flower-button {
+    width: 500xp;
+    top: 32rem;   /*//26.88rem;*/
+    left: 33.88rem;
+  
+  }
+
+  .port-div {
+    position: relative;
+    display: flex;
+  }
+
+  .rectangle-parent,
+  .your-thoughts-are {
+    position: absolute;
+    width: 83.75rem;
+    display: flex;
+  }
+  .your-thoughts-are {
+
+    top: -3rem;
+    display: flex;
+    width: 83.75rem;
+    height: 7.25rem;
+    flex-direction: column;
+    justify-content: center;
+    color: #E2E7EE;
+    
+    text-align: center;
+    font-family: Inter;
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 4.93125rem; /* 246.563% */
+    letter-spacing: 0.65625rem;
+    text-transform: uppercase;
+    /*border:  5px solid red; */
+  }
+  .rectangle-parent {
+    top: 2.94rem;
+    left: 3.13rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .div-child {
+    flex: 1;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    height: 3.56rem;
+  }
+  .about {
+    position: absolute;
+    top: -1rem;
+    left: -1.91rem;
+    letter-spacing: 10.5px;
+    line-height: 1.4rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    width: 9.94rem;
+    height: 2rem;
+  }
+  .ulw-node-2b555a4d-effa-944e- {
+    flex: 1;
+    position: relative;
+    height: 2.31rem;
+  }
+  .footer {
+    position: absolute;
+    top: 36.69rem;
+    left: 3.13rem;
+    border-top: 1px solid var(--color-darkslategray-100);
+    box-sizing: border-box;
+    width: 83.75rem;
+    display: flex;
+    flex-direction: row;
+    padding: 2.25rem 0;
+    padding-bottom: 0;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 67.69rem;
+    text-align: left;
+  }
+  .menu {
+    background: rgb(16, 33, 110);
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    text-align: center;
+    font-size: var(--font-size-13xl);
+    color: var(--color-gainsboro-100);
+    font-family: var(--desktop-menu);
+  }
+
+
+  .svg-container {
+
+    z-index: 5;
+  }
+  

@@ -1201,7 +1201,7 @@ function updateVerSliders() {
       }, [network.saltBag.saltList]);
 
 
-      function getNextLayerNeurons(currentNeuron, neurons, network) {
+     function getNextLayerNeurons(currentNeuron, neurons, network) {
         const nextLayerNeurons = getFirstAvailableLayer(currentNeuron.props.neuron.layer, neurons);
         if (nextLayerNeurons.length > 0) {
           // Check if there are weights and biases between the current neuron and the next layer neurons
@@ -1220,7 +1220,7 @@ function updateVerSliders() {
         }
 
         return nextLayerNeurons;
-      }
+      } 
 
 
 
