@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef, createContext } from 'react'; 
+import { BrowserRouter as Router, Routes, Route, Link, Outlet, useLocation, useNavigate }  from "react-router-dom";
 
 import Matter from 'matter-js';
 import * as d3 from 'd3';
 
 import "./Menu.css";
+
+import Book from "./Book"
+import Salt_Sim_3 from "./Salty_Sim_3"
 
 import audio_port_img from './Salt_Pics/audio_port.png';
 
@@ -15,12 +19,26 @@ import jack_3_img from './Salt_Pics/jack_3.png';
 import jack_4_img from './Salt_Pics/jack_4.png';
 import jack_5_img from './Salt_Pics/jack_5.png';
 
+import push_me_img_1 from './Salt_Pics/PushMe1.png';
+import push_me_img_2 from './Salt_Pics/PushMe2.png';
+import push_me_img_3 from './Salt_Pics/PushMe3.png';
+import push_me_img_4 from './Salt_Pics/PushMe4.png';
+import EmbeddingRep from './Embedding_Representation';
+import zIndex from '@mui/material/styles/zIndex';
+
 var jackImageArray = new Array();
 jackImageArray[0] = jack_1_img;
 jackImageArray[1] = jack_2_img;
 jackImageArray[2] = jack_3_img;
 jackImageArray[3] = jack_4_img;
 jackImageArray[4] = jack_5_img;
+
+const push_me_images = [
+  push_me_img_1,
+  push_me_img_2,
+  push_me_img_3,
+  push_me_img_4
+];
 
 
 
@@ -34,6 +52,8 @@ jackImageArray[4] = jack_5_img;
 
 
 function Wire() {
+
+  const [routeTime, setRouteTime] = useState(false);
 
   const navbarExpanded = true; // props.navbarExpanded;
   const [bookRef_, setBookRef_] = useState([]);
@@ -51,15 +71,15 @@ function Wire() {
   const portButtonHoverRef = useRef(false);
 
   
-  //const bookRouteRef = useRef(null);
-  //const audioRouteRef = useRef(null);
-  //const simRouteRef = useRef(null);
+  const bookRouteRef = useRef(null);
+  const audioRouteRef = useRef(null);
+  const simRouteRef = useRef(null);
 
   useEffect(() => {
     
-    //setBookRef_(bookRouteRef);
-    //setAudioRef_(audioRouteRef);
-    //setSimRef_(simRouteRef);
+    setBookRef_(bookRouteRef);
+    setAudioRef_(audioRouteRef);
+    setSimRef_(simRouteRef);
 
     //var navbarExpanded = props.navbarExpanded;
 
@@ -70,39 +90,136 @@ function Wire() {
   const audioElement = audioRef_;
   const simElement = simRef_;
 
-  try {
+  const [pushMeimageIndex, setPushMeImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * push_me_images.length);
+      setPushMeImageIndex(randomIndex);
+    }, 165);
+
+    return () => clearInterval(interval);
+  }, []);
+
+
+
+  /*
+  const svg = d3.select('#svg-container');
+
+
+
+  const routeButtons = {}
+  
+  routeButtons.book = (  
+  
+    <Link 
+
+    to={'/Salt'}  id="book-link" onClick={() => setRouteTime(!routeTime)}>
+
+    {RouteButton(bookElement, 450, 270, pushMeimageIndex)}
+
+    </Link>
+  
+  )
+
+  routeButtons.audio = (  
+
+    <Link 
     
-    bookElement.addEventListener('mouseenter', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = true;
+    to={'/Audiobook'} id="audio-link" onClick={() => setRouteTime(!routeTime)}>
 
-    });
-  
-    audioElement.addEventListener('mouseenter', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = true;
-    });
-  
-    simElement.addEventListener('mouseenter', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = true;
+    {RouteButton(audioElement, 935, 270, pushMeimageIndex)}
+    
+    </Link>   
 
-    });
+  )
 
-    bookElement.addEventListener('mouseleave', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = false;
-    });
+  routeButtons.flower = (
+
+    <Link 
+    
+    to={'/Salt_Sim_3'} id="sim-link" onClick={() => setRouteTime(!routeTime)}>
+
+    {RouteButton(simElement, 690, 570, pushMeimageIndex)}
+
+    </Link>
   
-    audioElement.addEventListener('mouseleave', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = false;
-    });
+  ) */
+
+
+  /*
   
-    simElement.addEventListener('mouseleave', (event) => {
-      //setportButtonHover(true)
-      portButtonHoverRef.current = false;
-    });
+  useEffect(() => {
+
+    const handleHover = () => {
+      setIsPortButtonHovering('yyyy')
+      console.log('Hovering!');
+    };
+    
+    const handleLeave = () => {
+      setIsPortButtonHovering('xxxx')
+    };
+  
+    const bookButton = document.getElementById("book-button");
+    const audioButton = document.getElementById("audio-button");
+    const flowerButton = document.getElementById("flower-button");
+
+    console.log('Hover listeners Applied (maybe)')
+  
+    bookButton.addEventListener('mouseenter', handleHover);
+    bookButton.addEventListener('mouseleave', handleLeave);
+  
+    audioButton.addEventListener('mouseenter', handleHover);
+    audioButton.addEventListener('mouseleave', handleLeave);
+  
+    flowerButton.addEventListener('mouseenter', handleHover);
+    flowerButton.addEventListener('mouseleave', handleLeave);
+  
+    return () => {
+      bookButton.removeEventListener('mouseenter', handleHover);
+      bookButton.removeEventListener('mouseleave', handleLeave);
+      
+      audioButton.removeEventListener('mouseenter', handleHover);
+      audioButton.removeEventListener('mouseleave', handleLeave);
+  
+      flowerButton.removeEventListener('mouseenter', handleHover);
+      flowerButton.removeEventListener('mouseleave', handleLeave);
+    }
+  
+  }, []);
+
+
+*/
+
+  try {
+    /*
+  const handleHover = () => {
+    portButtonHoverRef.current = true;
+    console.log('Hovering!');
+  };
+  
+  const handleLeave = () => {
+    portButtonHoverRef.current = false;
+  };
+
+  bookButton = document.getElementById("book-button");
+  audioButton = document.getElementById("audio-button");
+  flowerButton = document.getElementById("flower-button");
+
+  //console.log('Hover listeners Applied (maybe)')
+
+  bookButton.addEventListener('mouseenter', handleHover);
+  bookButton.addEventListener('mouseleave', handleLeave);
+
+  audioButton.addEventListener('mouseenter', handleHover);
+  audioButton.addEventListener('mouseleave', handleLeave);
+
+  flowerButton.addEventListener('mouseenter', handleHover);
+  flowerButton.addEventListener('mouseleave', handleLeave);
+
+   
+
+    */
 
   } catch (error) {
     
@@ -115,22 +232,28 @@ function Wire() {
 
     if (pluggedPortRef.current.port == 1) {
 
-      bookElement.classList.remove('hidden');
-      bookElement.style.pointerEvents = 'auto';
+      var bookButton = document.getElementById("book-button")
+
+      bookButton.classList.remove('hidden');
+      bookButton.style.pointerEvents = 'auto';
 
     }
 
     if (pluggedPortRef.current.port == 2) {
 
-      audioElement.classList.remove('hidden');
-      audioElement.style.pointerEvents = 'auto';
-      
+      var audioButton = document.getElementById("audio-button")
+
+      audioButton.classList.remove('hidden');
+      audioButton.style.pointerEvents = 'auto';
+
     }
 
     if (pluggedPortRef.current.port == 3) {
 
-      simElement.classList.remove('hidden');
-      simElement.style.pointerEvents = 'auto';
+      var flowerButton = document.getElementById("flower-button")
+
+      flowerButton.classList.remove('hidden');
+      flowerButton.style.pointerEvents = 'auto';
       
     }
 
@@ -139,15 +262,19 @@ function Wire() {
   if ((!plugButtonTime && navbarExpanded)) {   //// Question marks on && navbarExpanded
 
       try {
+
+        var bookButton = document.getElementById("book-button")
+        var audioButton = document.getElementById("audio-button")
+        var flowerButton = document.getElementById("flower-button")
         
-        bookElement.classList.add('hidden')
-        bookElement.style.pointerEvents = 'none';
+        bookButton.classList.add('hidden')
+        bookButton.style.pointerEvents = 'none';
 
-        audioElement.classList.add('hidden')
-        audioElement.style.pointerEvents = 'none';
+        audioButton.classList.add('hidden')
+        audioButton.style.pointerEvents = 'none';
 
-        simElement.classList.add('hidden')
-        simElement.style.pointerEvents = 'none';
+        flowerButton.classList.add('hidden')
+        flowerButton.style.pointerEvents = 'none';
 
       } catch (error) {
         
@@ -195,6 +322,9 @@ function Wire() {
   let blue_light_counter = 0;
   let blue_light_button_check = false;
 
+
+
+
     // Animation frame
   function onAnimationFrame_MatterEvents() {
 
@@ -219,9 +349,6 @@ function Wire() {
     svg.selectAll('.jack-image').remove(); 
 
     checkDistance(points[points.length - 1])
-
-
-
 
     //Lock in that plug if we're plugged in.
 
@@ -261,7 +388,7 @@ function Wire() {
         
         svg.append('image')
         .attr('href', blue_light_img)  //[jackImageIndex])
-        .attr('x', pluggedPortRef.current.portX+75) 
+        .attr('x', pluggedPortRef.current.portX+66) 
         .attr('y', pluggedPortRef.current.portY-22)
         .attr('width', 51)
         .attr('height', 42) 
@@ -309,13 +436,18 @@ function Wire() {
   }
 
   useEffect(() => { 
+    
+  const onAfterUpdate = () => {
+         // Trigger visual update (It's the bit above)
+        requestAnimationFrame(onAnimationFrame_MatterEvents); 
+  };
 
-  Matter.Events.on(engine, 'afterUpdate', () => {
+  Matter.Events.on(engine, 'afterUpdate', onAfterUpdate);
 
-      // Trigger visual update (It's the bit above)
-  requestAnimationFrame(onAnimationFrame_MatterEvents); 
-
-  });
+  /*return () => {
+    // Cleanup function
+    Matter.Events.off(engine, 'afterUpdate', onAfterUpdate);
+  }*/
 
   /// Potentially you should add a cleanup function here 24/08/2023
 
@@ -399,7 +531,7 @@ world.gravity.y = 0;
         mouseCon = Matter.Constraint.create({ 
           bodyA: mouse_rect, 
           bodyB: wireBodies[wireBodies.length - 1],  
-          stiffness: 0.05,
+          stiffness: 0.25,
           length: 0 
         }); 
 
@@ -483,15 +615,35 @@ world.gravity.y = 0;
 
   
           function calculateDistanceToPort(lastPoint) {
-  
 
-  
+
+            function getPosition(el) {
+              const styles = getComputedStyle(el);
+              
+              return {
+                top: parseFloat(styles.top),
+                left: parseFloat(styles.left)
+              };
+            }
+            
+            const bookPos = getPosition(document.querySelector('.book-port'));
+            const audioPos = getPosition(document.querySelector('.audio-port'));
+            const flowerPos = getPosition(document.querySelector('.flower-port'));
+
+            var ports = {
+              port_1: {port: 1, portX: bookPos.left + 65, portY: bookPos.top + 65 }, 
+              port_2: {port: 2, portX: audioPos.left + 65, portY: audioPos.top + 65 },
+              port_3: {port: 3, portX: flowerPos.left + 65, portY: flowerPos.top + 65 }
+            };
+
+
+            /*
             var ports = {
               port_1: {port: 1, portX: 305, portY: 265 }, 
               port_2: {port: 2, portX: 825, portY: 260 },
               port_3: {port: 3, portX: 555, portY: 565 }
             };
-          
+            */
             
                
           let closestDistance = Infinity;
@@ -549,8 +701,7 @@ world.gravity.y = 0;
               // Not 100% sure, but taking it out doesn't... apppear... to brake anything.
 
               if (pluggedPortRef.current.port == port.port) {
-                //alert('ref'+pluggedPortRef.current.port)
-                //alert('ref'+port.port)
+
 
                 closestPort = port; 
                 closestDistance = 0;
@@ -613,28 +764,208 @@ world.gravity.y = 0;
   }, []);
 
 
+
+
+
+  
+  function RouteButton(Route, left, top, pushMeimageIndex) {
+    return (
+         <img className='route-button hidden' 
+         id={Route} 
+         src={push_me_images[pushMeimageIndex]} 
+         onMouseEnter={() => portButtonHoverRef.current = true}
+         onMouseLeave={() => portButtonHoverRef.current = false}
+         style={{
+          zIndex: 50,
+          position: 'absolute',
+          left: left,
+          top: top,
+          
+        }} />
+    );
+  }
+
+
+  const [positions, setPositions] = useState({
+    book: {left: '100', top: '100'},
+    audio: {left: '100', top: '100'},
+    flower: {left: '100', top: '100'}
+  });
+
+  
+  // Port selectors
+  const PORTS = {
+    book: '.book-port',
+    audio: '.audio-port', 
+    flower: '.flower-port'
+  };
+
+  function getPosition(selector) {
+    const el = document.querySelector(selector);
+    const styles = getComputedStyle(el);
+
+    return {
+      left: parseFloat(styles.left),
+      top: parseFloat(styles.top) 
+    };
+  }
+
+  
   useEffect(() => {
+    // Get positions
+    const bookPos = getPosition(PORTS.book);
+    const audioPos = getPosition(PORTS.audio);
+    const flowerPos = getPosition(PORTS.flower);
 
-  }, []);
+    // Set in state  
+    setPositions({
+      book: bookPos,
+      audio: audioPos,
+      flower: flowerPos
+    });
 
-    
+  }, [PORTS]);
+
+
+
+  function Layout() {
+
+    // the potential is there for putting Layout in its own file
+
+    const location = useLocation(); //is used in the return for router stuf... is it even tho? I think has been remove
+    const navigate = useNavigate();
+
+    if(!routeTime) return null;
+
 
     return ( 
-        <div>
 
-          <img className="book-button" src={audio_port_img} 
-                style={{
-                }}  />
+      <div className="nested-view" 
+      
+      style={{
+        position: 'relative',
+        top: '12vh', 
+        left: '10vw',
+        width: '80vw',
+        height: '80vh', 
+        zIndex: "100",
+        border: '3px solid red'
+      }}
+      
+      flex="1" >
+      
 
-          <img className="audio-button" src={audio_port_img} 
-                style={{
-                }}  /> 
+      <button 
+      
+      style={{
+        position: 'absolute',
+        right: '20px',
+        top:'20px',
+        zIndex: "101",  //zindex and pointer were to try and make the button click and it still dunt
+        pointerEvents: "auto",
+      }}
 
-          <img className="flower-button" src={audio_port_img} 
-                style={{
-                }}  />
+      flex="1"
+      
+      onMouseDown={() => {setRouteTime(false); navigate('/')}}>
 
+        X
+
+      </button>
+
+
+      <Outlet/>
+
+
+      </div>
+    
+
+    )}
+
+
+
+
+    return ( 
+
+
+<div className="port-container">
+
+  <Router>
+
+  <div className="colour-test" />
+
+    <Routes> 
+
+      <Route path="/" element={   
+      
+        <div className="flex-container">
+        
+          <div className="wire">  
+            
+      
+
+            <img className="book-port" src={audio_port_img} 
+                    style={{
+                    }}  />     
+      
+            <Link to={'Salt'}  id="book-link" 
+            
+            onClick={() => setRouteTime(!routeTime)} >
+      
+            {RouteButton('book-button', positions.book.left+187, positions.book.top+35, pushMeimageIndex)}
+      
+            </Link>
+                  
+                  
+      
+            <img className="audio-port" src={audio_port_img} 
+                  style={{
+                  }}  /> 
+      
+            <Link to={'Audiobook'} id="audio-link" 
+            
+            onClick={() => setRouteTime(!routeTime)}>
+      
+            {RouteButton('audio-button', positions.audio.left+187, positions.audio.top+35, pushMeimageIndex)}
+            
+            </Link>   
+      
+      
+      
+            <img className="flower-port" src={audio_port_img} 
+                  style={{
+                  }}  />
+            
+            <Link to={'Salt_Sim_3'} id="sim-link" 
+            
+            onClick={() => setRouteTime(!routeTime)}>
+      
+            {RouteButton('flower-button', positions.flower.left+187, positions.flower.top+35, pushMeimageIndex)}
+      
+            </Link>
+      
+      
+          </div> 
+          
+          <Layout/>
+        
         </div>
+
+      }>
+
+      <Route path="Salt" element={<Book/>} /> 
+      
+      <Route path="Salt_Sim_3" element={<Salt_Sim_3/>} /> 
+
+        
+      </Route> 
+
+      
+    </Routes>
+
+  </Router>
+
+</div>
      )
 
     
@@ -643,7 +974,7 @@ world.gravity.y = 0;
 export default Wire;
 
 
-
+{/*<Route path="/Audiobook" element={<Audiobook />} /> */}
 
             // TIme 2 level.
 

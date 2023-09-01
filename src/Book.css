@@ -1,119 +1,33 @@
-.book-child {
-    position: absolute;
-    top: 155.56rem;
-    left: 21.39rem;
-    width: 40.57rem;
-    height: 351.56rem;
-    display: none;
-  }
-  .frame-child6,
-  .frame-child7 {
-    position: relative;
-    background-color: var(--color-mediumslateblue);
-    width: 16rem;
-    height: 7.25rem;
-    cursor: pointer;
-    z-index: 0;
-  }
-  .frame-child7 {
-    z-index: 1;
-  }
-  .your-thoughts-are3 {
-    position: relative;
-    letter-spacing: 10.5px;
-    line-height: 4.93rem;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    width: 30rem;
-    height: 7.25rem;
-    flex-shrink: 0;
-    z-index: 2;
-  }
-  .frame-child8 {
-    position: absolute;
-    margin: 0 !important;
-    top: 0;
-    left: 67.75rem;
-    background-color: var(--color-mediumslateblue);
-    width: 16rem;
-    height: 7.25rem;
-    cursor: pointer;
-    z-index: 3;
-  }
-  .book-item,
-  .frame-div {
-    position: absolute;
-    left: 3.13rem;
-    width: 83.75rem;
-  }
-  .frame-div {
-    top: 2.94rem;
-    height: 11.31rem;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: var(--gap-13xl);
-  }
-  .book-item {
-    top: 11.31rem;
-    background-color: var(--color-gainsboro-200);
-    height: 26.56rem;
-  }
-  .about3 {
-    position: absolute;
-    top: -1.87rem;
-    left: 2.15rem;
-    letter-spacing: 10.5px;
-    line-height: 1.4rem;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    width: 9.94rem;
-    height: 6.5rem;
-  }
-  .ulw-node-2b555a4d-effa-944e-3 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 11.94rem;
-    height: 2.31rem;
-  }
-  .ulw-node-2b555a4d-effa-944e-frame {
-    position: absolute;
-    top: 2.25rem;
-    left: 71.81rem;
-    width: 11.94rem;
-    height: 2.31rem;
-  }
-  .frame-icon {
-    position: absolute;
-    top: 2.25rem;
-    left: 0;
-    width: 4.13rem;
-    height: 3.56rem;
-  }
-  .div4 {
-    position: absolute;
-    top: 36.69rem;
-    left: 3.13rem;
-    border-top: 1px solid var(--color-darkslategray-100);
-    box-sizing: border-box;
-    width: 83.75rem;
-    height: 5.81rem;
-  }
   .book {
     position: relative;
-    background-color: var(--color-gray);
+    background-color: rgb(0, 13, 80);
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     width: 100%;
-    height: 43.13rem;
+    height: 100%;
     overflow: hidden;
-    text-align: left;
-    font-size: var(--font-size-13xl);
+    text-align: center;
+    font-size: calc(10px + 2vmin);
     color: var(--color-gainsboro-100);
     font-family: var(--desktop-menu);
+    border: 3px solid orange;
+  }
+
+  .chapter-text {
+
+    color: rgb(255, 210, 76);
+    margin: 75px;
+    margin-left: 200px;
+    margin-right: 200px;
+    overflow-y: auto;
+    border: 3px solid green;
+    height: 70%;
+
   }
   
+.clickTest {
+  background: rgb(255, 210, 76);
+  height: 50vh;
+  width: 100vw;
+  z-index: 500;
+  border: 3px solid green;
+}

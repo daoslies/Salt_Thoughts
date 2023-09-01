@@ -1,0 +1,38 @@
+.learning-rate-slider-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .slider-container {
+    width: 400px;
+    height: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(21, 45, 82);
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 9999;
+  }
+  
+  .learning-rate-slider {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1;
+  }
+  
+  .learning-rate-slider-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  

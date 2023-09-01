@@ -6,7 +6,7 @@ const Dyanmic_Menu_Elements = () => {
 
   return (
 
-    <div class="port-div">
+    <div className="port-div">
 
         <svg  
             className="svg-container" id="svg-container"

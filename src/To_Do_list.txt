@@ -7,7 +7,9 @@ What are we doing:
 
   - Clearing out all that tween shit  -- I think done
 
-  - realigning plugs and port holes.
+  - realigning plugs and port holes. -- Done ?
+
+  - The buttons - They're there, but atm they don't appear/dissaer, or click
 
   - creating the new routes div.
 
