@@ -9,7 +9,7 @@
     font-size: calc(10px + 2vmin);
     color: var(--color-gainsboro-100);
     font-family: var(--desktop-menu);
-    border: 3px solid orange;
+
   }
 
   .chapter-text {
@@ -19,15 +19,11 @@
     margin-left: 200px;
     margin-right: 200px;
     overflow-y: auto;
-    border: 3px solid green;
-    height: 70%;
+    height: 75%;
+    padding-right: 10px;
+
 
   }
   
-.clickTest {
-  background: rgb(255, 210, 76);
-  height: 50vh;
-  width: 100vw;
-  z-index: 500;
-  border: 3px solid green;
+.book-img {
 }

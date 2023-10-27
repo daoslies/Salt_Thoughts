@@ -4,21 +4,26 @@ import Button from "@mui/material/Button";
 import "./LearningRateSlider.css"; // Import the CSS file
 
 const LearningRateSlider = ({ learningRate, setLearningRate }) => {
+  
   const [isSliderOpen, setIsSliderOpen] = useState(false);
+  const [learningRateButtonColor, setLearningRateButtonColor] = React.useState('primary');
 
-  const handleLearningRateChange = (event, newValue) => {
-    setLearningRate(10 ** newValue);
-  };
 
   const handleSetLearningRateClick = () => {
     setIsSliderOpen(!isSliderOpen);
+    setLearningRateButtonColor(learningRateButtonColor === 'primary' ? 'secondary' : 'primary');
   };
 
   return (
     <div>
-      <Button variant="contained" color="primary" onClick={handleSetLearningRateClick}>
-        {isSliderOpen ? "Close Slider" : "Set Learning Rate"}
+      <Button variant="contained" 
+        color={learningRateButtonColor} 
+        onClick={handleSetLearningRateClick}>
+
+          {isSliderOpen ? "Close Slider" : "Set Learning Rate"}
+
       </Button>
+
       {isSliderOpen && (
         <div className="slider-container">
           <Slider
@@ -38,7 +43,7 @@ const LearningRateSlider = ({ learningRate, setLearningRate }) => {
             />
         </div>
       )}
-      <p style={{ textAlign: "center" }}>Learning rate: {learningRate}</p>
+      <p style={{ textAlign: "center" }}>Learning rate: {learningRate.toFixed(10)}</p>
     </div>
   );
 };

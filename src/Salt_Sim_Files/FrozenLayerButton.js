@@ -19,7 +19,7 @@ function FrozenLayerButton({ layerIndex, x_position, setfrozenLayers }) {
   }
 
   return (
-    <div key={layerIndex} style={{ position: "absolute", left: x_position + 'px' }}>
+    <div key={layerIndex} style={{ position: "absolute", left: x_position + 'px', bottom: '-2vw', transform: 'scale(0.8)'}}>
       <Button
         variant="contained"
         color={isFrozen ? "secondary" : "primary"}

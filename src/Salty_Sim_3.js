@@ -5,19 +5,12 @@ import { useState } from 'react';
 import { useRef } from 'react';
 import { useCallback } from 'react';
 
-import { createElement } from 'react';
-
-import ReactDOM from 'react-dom';
-import { createRoot } from 'react-dom/client'
-
 //This means that the information contained in the embedding will be a compromise between the detailed information in the input and output data, and the more abstract and general representation of the relationship between the input and output data that is learned by the model.
 
 
 import ToggleSwitch from './Salt_Sim_Files/ToggleSwitch';
 
-import SaveLoadButton from './Salt_Sim_Files/SaveLoadButton';
 
-import LearningRateSlider from "./Salt_Sim_Files/LearningRateSlider";
 
 import FrozenLayerButton from './Salt_Sim_Files/FrozenLayerButton';
 
@@ -27,6 +20,9 @@ import { createD3Visualization, generateVisualizationData } from './Salt_Sim_Fil
 
 
 import Salt from './Salt_Sim_Files/Salt';
+import updateSaltPositions from './Salt_Sim_Files/UpdateSaltPositions.worker';
+
+
 import Neuron from './Salt_Sim_Files/Neuron';
 
 import backpropagation from './Salt_Sim_Files/BackProp_Flower';
@@ -34,6 +30,8 @@ import backpropagation from './Salt_Sim_Files/BackProp_Flower';
 import graphing from './Salt_Sim_Files/Dataset_Graph';
 
 import NeuronGraph from './Salt_Sim_Files/Neuron_WB_Graph';
+
+import Network_Menu from './Salt_Sim_Files/NetworkMenu';
 
 
 //import * as d3 from 'd3';
@@ -44,17 +42,30 @@ import Button from '@mui/material/Button';
 import { useSlider } from '@mui/base';
 import { dividerClasses } from '@mui/material';
 
-Matter.Common.setDecomp(require('poly-decomp'))
+import control_panel_img_1 from './Salt_Pics/Control_Panel_1_scaled.png';
+import control_panel_img_2 from './Salt_Pics/Control_Panel_2_scaled.png';
+import control_panel_img_3 from './Salt_Pics/Control_Panel_3_scaled.png';
+
+import play_button_lever_img from './Salt_Pics/Play_button_Lever.png';
+import play_button_back_img_1 from './Salt_Pics/Play_Button_Back_1.png';
+import play_button_back_img_2 from './Salt_Pics/Play_Button_Back_2.png';
 
 
+const control_panel_images = [
+  control_panel_img_1,
+  control_panel_img_2,
+  control_panel_img_3
+];
 
-
-
+const play_button_back_images = [
+  play_button_back_img_1,
+  play_button_back_img_2
+]
 
 
 // module aliases
 var Engine = Matter.Engine,
-    Render = Matter.Render,
+    //Render = Matter.Render,
     Runner = Matter.Runner,
     Bodies = Matter.Bodies,
     Composite = Matter.Composite,
@@ -67,16 +78,21 @@ engine = Engine.create();
 engine.world.gravity.scale = 0;
 engine.neuronGraph = null;
 // create a renderer
-var render = Render.create({
+//var render = null;
+
+/*Render.create({
   element: document.body,
   engine: engine
-});     
+});  */
+
+var runner = Runner.create();  ////////////////////////////////////////// Mabs make this conditional in some way.
 
 var mouse_area = document.getElementById('buttons')
 
  // add mouse control
  var mouse = Mouse.create(mouse_area);
 
+ /*
  Events.on(engine, 'afterUpdate', function() {
     
   
@@ -85,25 +101,31 @@ var mouse_area = document.getElementById('buttons')
      }
  });
  
+*/
 
+let isMouseDown = false;
 
+// chucked these in loose, don't know if they need a cleanup.
+document.addEventListener('mousedown', () => {
+  isMouseDown = true;
+})
 
+document.addEventListener('mouseup', () => {
+  isMouseDown = false;
+})
 
 
 Events.on(engine, 'beforeUpdate', function() {
+
     var bodies = Composite.allBodies(engine.world);
 
-    
-
     var target_x =  mouse.position.x;
-    var target_y =  mouse.position.y - 182;
+    var target_y =  mouse.position.y;
 
 
     for (var i = 0; i < bodies.length; i++) {
         var body = bodies[i];
 
-        //console.log('Checking Bodies' + [i] + '  :  ', body)
-        //console.log('Checking Bodies' + [i] + '  :  ', body.position)
         if (body.isStatic || body.isSleeping)
                 {
                 
@@ -142,8 +164,18 @@ Events.on(engine, 'beforeUpdate', function() {
                 var direction_x = body_x - target_x;
                 var direction_y = body_y - target_y;
 
-                var force_x = direction_x * Math.min(0.5, (1/(distance**2.25))) * 0.05;
-                var force_y = direction_y * Math.min(0.5, (1/(distance**2.25))) * 0.05;
+
+                let scaling_factor;
+                
+                if (isMouseDown) {
+                  scaling_factor = 10;
+                }
+                else {
+                  scaling_factor = 0;
+                }
+
+                var force_x = direction_x * Math.min(10, (1/(distance**2.25))) * scaling_factor;
+                var force_y = direction_y * Math.min(10, (1/(distance**2.25))) * scaling_factor;
 
                 body.force.x -= force_x;
                 body.force.y -= force_y;
@@ -194,6 +226,7 @@ class Network {
     //this.maxLayerArray[0] = this.inputLayers; /////////////////// CAn we set the first 2 layers 2 zero? look at how many nodes there are in the first layer and check the console log for network.maxlayerarray,
     this.maxLayerArray[this.maxLayerArray.length - 1] = this.outputLayers;
     this.currentFinalLayerIndex = 0;
+
 
     this.initializeInputOutputNeurons();
     this.loadData(this);
@@ -281,7 +314,12 @@ class Network {
 
     // Scale the normal value to the range [0, 5]
     //const scaled = (normal + 5) / 2.0; // Transforming to range [0, 1]
-    return (normal * 2) + 2; // Scaling to range [0, 5]
+    return normal * 0.5; // Scaling to range [0, 10] // I think // mayube
+    // No scaling here anymore. We're  now doing that in the activation itself.
+      // And aiming to keep weights and biases between -1 and 1.
+      // no we're now going with 0.5 and - 0.5, because that leads to less activation saturation 
+      // I.e 0 weight, so flat line, and that flat line is purely at the top or bottom
+
   }
 
   
@@ -303,22 +341,41 @@ class Network {
 
 // Make sure all the inputs and outputs have weights and biases //////////HERE
 
+const outputNeurons = this.output_welcome_list;
+
 for (let i = 0; i < this.input_welcome_list.length; i++) {
-  var currentNeuron = this.input_welcome_list[i];
-  currentNeuron = currentNeuron.props.neuron;
-  const nextLayerNeurons = this.output_welcome_list;
+
+  var initNeuron = this.input_welcome_list[i];
+  initNeuron = initNeuron.props.neuron;
+
+
+
+  // Adding in a section to ensure fresh input layer weights and biases on 'load randomly initialised model'
+
+  // add a bias
+
+  
+  // then Something about for i in layer 0 neurons. add a weight
+
+  for (let j = 0; j < this.maxLayerArray[0]; j++) {
+     const toNeuron = `${0}-${j}`;
+     //const key = `${currentNeuron.layer}-${currentNeuron.index}-${toNeuron}`;
+     this.setWeightInit(initNeuron.id, toNeuron, this.randomNormal());
+     this.setBias(initNeuron, network.randomNormalBias());
+  }
+
   
   //console.log('nextlayers', nextLayerNeurons)
-  if (nextLayerNeurons.length > 0) {
-    // Check if there are weights and biases between the current neuron and the next layer neurons
-    nextLayerNeurons.forEach(neuron => {
-      neuron = neuron.props.neuron;
-      const key = `${currentNeuron.layer}-${currentNeuron.index}-${neuron.layer}-${neuron.index}`;
-      if (!network.weights[key]) {
-        // Generate weights and biases if they do not exist
-        network.setWeight(currentNeuron, neuron, network.randomNormal());
-        network.setBias(currentNeuron, network.randomNormalBias());
-      }
+  if (outputNeurons.length > 0) {
+    // Check if there are weights and biases between the current neuron and the output neurons
+    outputNeurons.forEach(neuron => {
+      var outputNeuron = neuron.props.neuron;
+      //key = `${currentNeuron.layer}-${currentNeuron.index}-${neuron.layer}-${neuron.index}`;
+      //if (!network.weights[key]) { ////// Removed this conditional for purposes of loading random model.
+        // Generate weights and biases if they do not exist     // May need to be put back. lets find out.,
+      this.setWeight(initNeuron, outputNeuron, network.randomNormal());
+        
+      //}
     });
   }
 }
@@ -804,6 +861,8 @@ function Salt_Sim() {
   const [gradTrackTime, setgradTrackTime] = useState(false);
   const [currentGradients, setcurrentGradients] = useState({});
 
+  const [loadedModel, setloadedModel] = useState({});
+
   const [vizData, setvizData] = useState({});
   const [neuronGraph, setneuronGraph] = useState(null);
 
@@ -816,10 +875,23 @@ function Salt_Sim() {
 
   const [trainingScore, settrainingScore] = useState(0);
 
-  const [learningRate, setLearningRate] = useState(0.3);
+  const [learningRate, setLearningRate] = useState(0.05);
 
   const [frozenLayers, setFrozenLayers] = useState([]);
   const [freezeButtons, setfreezeButtons] = useState(<div/>);
+
+  const [controlPanelImageIndex, setControlPanelImageIndex] = useState(0);
+  const [controlPanelImageHovered, setControlPanelImageHovered] = useState(false);
+  const [controlPanelImageMouseDown, setControlPanelImageMouseDown] = useState(false);
+
+    useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * control_panel_images.length);
+      setControlPanelImageIndex(randomIndex);
+    }, 230);
+    
+      return () => clearInterval(interval);
+    }, []);
 
 
 
@@ -863,7 +935,7 @@ function Salt_Sim() {
           // If not, create a new FrozenLayerButton and add it to the accumulator
           acc[layer] = (
             <div key={layer}>
-              <FrozenLayerButton layerIndex={layer} x_position={x} setfrozenLayers={setFrozenLayers}/>
+              <FrozenLayerButton layerIndex={layer} x_position={(x * 0.69) - 5} setfrozenLayers={setFrozenLayers}/>
             </div>
           );
         }
@@ -894,7 +966,7 @@ function Salt_Sim() {
     const connections = d3.selectAll(".connection")
     connections.style("stroke", d => d.colour)
     .attr("stroke-width", d => d.width);
-  })
+  }) //Added visData to the dependency 27/09/23
   
 
   const getCurrentTargetCallback = useCallback(() => {
@@ -922,7 +994,7 @@ function Salt_Sim() {
       console.error(error);
     }
     return target
-})
+  })
     
   
 
@@ -937,63 +1009,52 @@ function Salt_Sim() {
     })
 
 
-    const endOfAnEpochCallback = useCallback(() => {
+  const endOfAnEpochCallback = useCallback(() => {
 
-      //
-      outputSaltCountCallback();
+    //
+    outputSaltCountCallback();
 
-      if (epochEnd === true) {
- 
-      ////// Backprop happens here
-      
-      
-      //establish the outcome.
-      
-      //generate a label
-
-      var target = getCurrentTargetCallback();
-
-      //Calculate that loss
-
-      
+    if (epochEnd === true) {
 
 
-      //let learningRate = learningRate // 0.075; //0.0000005;
 
-      backpropagation(network, numSalts, target, learningRate, frozenLayers, setcurrentGradients)  //////////
-      
-
-      //Add to the score for the user
-
-      var outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
-  
-      var outputSaltCounts = outputNeurons.map(img => img.props.neuron.saltCount)
+    var target = getCurrentTargetCallback();
 
 
-      //Argmax
-      var argmax = outputSaltCounts.reduce((maxIndex, currentValue, currentIndex) => {
-        return currentValue > outputSaltCounts[maxIndex] ? currentIndex : maxIndex;
-      }, 0);
+    backpropagation(network, numSalts, target, learningRate, frozenLayers, setcurrentGradients)  //////////
+    
 
-      var trainingScoreZ = trainingScore;
+    //Add to the score for the user
 
-      if (argmax === target) {trainingScoreZ = trainingScoreZ + 1;}
+    var outputNeurons = network.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
 
-      settrainingScore(trainingScoreZ);
-      
-
-      //Store the prediction
-      network.irisData[epochNum].prediction = argmax;
+    var outputSaltCounts = outputNeurons.map(img => img.props.neuron.saltCount)
 
 
-      //////////////////////////////////////////////////////////////////////////
-      
+    //Argmax
+    var argmax = outputSaltCounts.reduce((maxIndex, currentValue, currentIndex) => {
+      return currentValue > outputSaltCounts[maxIndex] ? currentIndex : maxIndex;
+    }, 0);
 
-      //update connection viz
+    var trainingScoreZ = trainingScore;
 
-      const visualizationData = generateVisualizationData(network);
-      createD3Visualization(network, visualizationData.validConnections, visualizationData.nodes, visualizationData.links);
-      setvizData(visualizationData)
+    if (argmax === target) {trainingScoreZ = trainingScoreZ + 1;}
+
+    settrainingScore(trainingScoreZ);
+    
+
+    //Store the prediction
+    network.irisData[epochNum].prediction = argmax;
+
+
+    //////////////////////////////////////////////////////////////////////////
+    
+
+    //update connection viz
+
+    const visualizationData = generateVisualizationData(network);
+    createD3Visualization(network, visualizationData.validConnections, visualizationData.nodes, visualizationData.links);
+    setvizData(visualizationData)
 
      // Come tomorrow we are really properly actually getting on backprop.
 
@@ -1043,7 +1104,7 @@ function Salt_Sim() {
       setsaltList([]);
 
       network.neural_welcome_list.forEach(img => {
-         let neuron = img.props.neuron;
+        let neuron = img.props.neuron;
         neuron.saltCount = 0;
         neuron.everSalt = 0;
       });
@@ -1055,13 +1116,14 @@ function Salt_Sim() {
 
       console.log(network)
     }
-  })
+  }, [epochEnd])   //Added in epochened as a dependency. Slight fear this means it won't update on the correct epoch.
+
 
 
   const updateSaltRenderCallback = useCallback(() => {
     network.updateSaltRender(network, epochNum, setepochNum, numSalts, setnumSalts, saltList, setsaltList, outputSaltCountCallback, inputAndOrState); 
     setnetState(<network.Welcome self={network} />)
-  }, [numSalts, saltList]);
+  }, [saltList]);
   
   
   function verSlideTrigger(index, value) 
@@ -1092,15 +1154,15 @@ function updateVerSliders() {
   const horizontalSliderWidth = horSliderRef.current.getBoundingClientRect().width
   const horizontalSliderLeft = horSliderRef.current.getBoundingClientRect().left;
 
-  const numMarks = 10;
-  const markPositions = [...Array(numMarks)].map((_, index) => (horizontalSliderWidth / (numMarks)) * (index + 1));
+  const numMarks = 8;
+  const markPositions = [...Array(numMarks)].map((_, index) => (horizontalSliderWidth / (numMarks + 1)) * (index ));
 
 
   var vertSlides = markPositions.map((position, index) => (
     <Slider
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${(position*0.98)+horizontalSliderLeft}px`, top: '70%', height: 75 }}
+      style={{ position: "absolute", left: `${((position * 0.0812)) + 12}vw`, bottom: '8vh', height: 75 }}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -1130,109 +1192,146 @@ function updateVerSliders() {
 }
 
 
-    function physics() {
+  function physics() {
 
-        setStart(true);
-        
-        // run the renderer
-        Render.run(render);
+      setStart(true);
 
-        // create runner
-        var runner = Runner.create();
-
-        // run the engine
-        Runner.run(runner, engine);
-
-
-      }
       
 
-      function updateSaltPositions(saltList, neurons, network) {
-        
-        try {
-          // code that might throw an error
-
-          if (Start === true) {
-
-
-          // Trying to delete the dead ones
-          saltList = saltList.filter(salt => salt.props.self.engine);
-          //console.log('Salt CHeck: ', saltList)
-
-          saltList.forEach((salt, index) => {
-            // Update the current and previous neurons for the salt
-            salt.props.self.updateCurrentNeuron(salt.props.self, network);
-
-            // Calculate the next layer neurons for the salt
-            if (neurons && salt.props.self.currentNeuron) {
-              const nextLayerNeurons = getNextLayerNeurons(salt.props.self.currentNeuron, neurons, network);
-              // Pass the next layer neurons and salt count to the head_towards function
-  
-              salt.props.self.head_towards(salt.props.self, nextLayerNeurons, network); 
-              
-            }
-            
-            if (salt.props.self.currentNeuron === null) {
-              salt.props.self.head_init(salt.props.self, network)
-            }
-
-            // Update the position of the salt
-            salt.props.self.update_pos(salt.props.self, network);
-  
-          });
-        }
-        } catch (error) {
-          console.error(error);
-        }
-        requestAnimationFrame(() => updateSaltPositions(saltList, neurons, network));
+      if(!runner) { 
+        runner = Runner.create();
       }
+
+      // run the engine
+      Runner.run(runner, engine);
+
+
+      /*
+      // run the renderer
+      Render.run(render);
+      if(!render) {
+        render = Render.create({}); 
+      }*/
+
+    }
+
+    function physicsOff() {
+
+      setStart(false);
+
+      Runner.stop(runner); /// maybe should be (engine) or (runner, engine)
+      //Render.stop(render);
+      Engine.clear(engine);  // We took this out recently, not 100% sure if we want it or not
+      //World.clear(world);
+    
+      // Remove existing canvas
+      //render.canvas.remove(); 
+      //render.canvas = null;
+    
+      // Reset render properties
+      //render.context = null;
+      //render.textures = {};
+    
+    }
+
+    const togglePhysics = () => {
+
+      if(Start) {
+        physicsOff();
+      } else {
+        physics();
+      }
+    
+    }
+    
+
+    ///// Transfering updatesaltpositions to being performed by a worker.
+
+   // These had previously been two seperate use effects, one using saltList as the dependency
+      // and the other using network.saltbag.saltList
+
+
+    useEffect(() => { 
+      
+      network.saltBag.saltList = network.saltBag.saltList.filter(salt => salt.props.self.engine); 
+
+      var updateSaltPositionsAnimationFrame = updateSaltPositions(saltList, network.neural_welcome_list, network, Start); 
+    
+      return () => cancelAnimationFrame(updateSaltPositionsAnimationFrame)
+    
+    }, [saltList]);
+
+/*
+        // Function to handle messages from the worker
+        const handleMessageFromWorker = (newSaltList) => {
+
+          network.saltBag.saltList = newSaltList
+
+          console.log('SaltWork', newSaltList);
+
+        };
+
+        useEffect(() => {
+
+          setsaltList(network.saltBag.saltList);
+
+        }, [network.saltBag.saltList]);
+
+        // Create worker instance
+        const saltWorker = new Worker(handleMessageFromWorker);
+
+
+
+        
+          // Attach the message handler to the worker
+          //saltWorker.onmessage = handleMessageFromWorker;
+
+          // Function to render and send data to the worker
+          const render = () => {
+            // Filter salt list
+            const filteredSaltList = network.saltBag.saltList.filter(salt => salt.props.self.engine);
+
+            console.log('SaltWork, In the render', filteredSaltList);
+
+            // Send data to worker
+            saltWorker.onmessage(
+              filteredSaltList,
+              network.neural_welcome_list,
+              network,
+              Start,
+            );
+
+            // Draw scene based on saltList
+            // ... (your drawing code here)
+          };
+
+          setInterval(() => render(), 1000/60)
+          // Call the render function when the saltList changes
+
+
+        
+
+        //requestAnimationFrame(() => updateSaltPositions(saltList, neurons, network))
+        
+
+   
 
       network.saltBag.saltList = network.saltBag.saltList.filter(salt => salt.props.self.engine);
 
+      //Originally where updateSaltPositions was called
       updateSaltPositions(saltList, network.neural_welcome_list, network);
 
       useEffect(() => {
         network.saltBag.saltList = network.saltBag.saltList.filter(salt => salt.props.self.engine);
         setsaltList(network.saltBag.saltList);
       }, [network.saltBag.saltList]);
-
-
-     function getNextLayerNeurons(currentNeuron, neurons, network) {
-        const nextLayerNeurons = getFirstAvailableLayer(currentNeuron.props.neuron.layer, neurons);
-        if (nextLayerNeurons.length > 0) {
-          // Check if there are weights and biases between the current neuron and the next layer neurons
-          currentNeuron = currentNeuron.props.neuron;
-          nextLayerNeurons.forEach(neuron => {
-            neuron = neuron.props.neuron;
-            if (!network.weights[`${currentNeuron.id}-${neuron.id}`]) {
-              // Generate weights if they do not exist
-              network.setWeightInit(currentNeuron.id, neuron.id, network.randomNormal());
-            }
-            if (!network.biases[neuron.id]) {
-              // Generate biases if they do not exist
-              network.setBiasInit(neuron.id, network.randomNormalBias());
-            }
-          });
-        }
-
-        return nextLayerNeurons;
-      } 
+  */ 
+      
 
 
 
-      function getFirstAvailableLayer(currentLayer, neurons) {
-        if (currentLayer === 'i') {currentLayer = -1}
-        for (let i = currentLayer + 1; i < network.maxLayerArray.length; i++) {
-          const layerNeurons = neurons.filter(neuron => neuron.props.neuron.layer === i);
-          if (layerNeurons.length > 0) {
-            return layerNeurons;
-          }
-        }
-        // If there are no more layers, return an empty array
-        return [];
-      }
 
-    /// Frozen Layer Button
+    /// Frozen Layer Button                 //// Is this inactive?
 
     function handleFrozenLayerButtonClick(layerIndex) {
       setFrozenLayers((prevState) => {
@@ -1257,7 +1356,7 @@ function updateVerSliders() {
     useEffect(() => {
       updateHtmlRenderCallback()
       updateFrozenButtonsCallback()
-    }, [verArray]);
+    }, [verArray, loadedModel]);
 
 
     
@@ -1268,7 +1367,7 @@ function updateVerSliders() {
     useEffect(() => {
       updateSaltRenderCallback();
       getCurrentTargetCallback();
-    }, [numSalts, saltList]);
+    }, [saltList]);
 
     useEffect(() => {
     checkEpochStateCallback();
@@ -1276,11 +1375,14 @@ function updateVerSliders() {
 
         useEffect(() => {
     endOfAnEpochCallback();
-    }, [epochEnd]) 
+    getCurrentTargetCallback();
+    }, [epochEnd])  // Used to have epochNum in the dependency.
 
+    /*    /// 26/09/2023 1:24 merged with the above, hopefully does not fuck things
     useEffect(() => {
     getCurrentTargetCallback();
     }, [epochNum])
+    */
 
     /*
 
@@ -1326,22 +1428,43 @@ function updateVerSliders() {
           let weightGrads = currentGradients.weightLossGradients;
           let biasGrads = currentGradients.Gradients;
 
+              /// HEre
 
-          let svg; 
+          let svg; // Tjis conditional seems weird and mayeb unnecessary. 
+          let svgWidth = 0;
           if (!svg) { 
-            svg = d3.select("#network-viz") 
-              .append("svg") 
-              .attr("width", 600) 
-              .attr("height", 1250)
-              .style("position", "absolute")
-              .style("left", "1500px")
-              .style("top", "100px"); 
+
+              svg = d3.select("#svg-container")
+
+              // Get the width of the parent div
+              svgWidth = svg.node().getBoundingClientRect().width;
+
+              //d3.select("#network-viz") 
+              svg.append("svg") 
+              .attr("width", "100%") 
+              .attr("height", svgWidth);
+
+    
+              //.style("left", "1500px")
+              //.style("top", "100px")
           }
+
+          
 
             
           // Create the gradient lines
+          const biasGradientLines = svg.append("g")
+          .attr("class", "gradient-lines")
+          .style("position", "absolute");
+          
           const gradientLines = svg.append("g")
-          .attr("class", "gradient-lines");
+          .attr("class", "gradient-lines")
+          .attr("left", 500)
+          .style("position", "absolute")
+          
+
+          //.attr("transform",
+          //"scaleX(0.1)");
           //const weightgradientLines = svg.append("g")
           //.attr("class", "gradient-lines");
 
@@ -1381,14 +1504,14 @@ function updateVerSliders() {
           }
 
           // Append circles for the bias gradients
-          gradientLines.selectAll("circle.bias")
+          biasGradientLines.selectAll("circle.bias")
           .data(Object.values(biasGrads))
           .enter()
           .append("circle") 
           .attr("class", "bias")
-          .attr("cx", (d, i) => -(i * 9) + 200) 
-          .attr("cy", d => 100 - d*50)       
-          .attr("r",  5 - (epochNum / 50))
+          .attr("cx", (d, i) => -(d * 50) + 70 )   // .attr("cx", (d, i) => -(d * 9) + 70 )
+          .attr("cy", (d, i) => 100 + i*500 / Object.values(biasGrads).length)       
+          .attr("r",  (5 - (epochNum / 50)) / 1.5 ) 
           .attr("opacity", 0.25) 
           .attr("fill", (d, i) => {
             const key = biaslayerKeys[i];
@@ -1410,9 +1533,9 @@ function updateVerSliders() {
           .enter()
           .append("circle") 
           .attr("class", "weights")
-          .attr("cy", (d, i) => (i * 9) + 30) 
-          .attr("cx", d => 400 - d*50)       
-          .attr("r", 5 - (epochNum / 50))
+          .attr("cx", d => svgWidth - 75 - d*50)  // .attr("cx", d => svgWidth - 75 - d*10) 
+          .attr("cy", (d, i) => 100 + (i * 500) / Object.values(weightGrads).length) 
+          .attr("r", (5 - (epochNum / 50)) / 2)
           .attr("opacity", 0.25) 
           .attr("fill", (d, i) => {
             const key = weightlayerKeys[i];
@@ -1475,87 +1598,112 @@ function updateVerSliders() {
         }, [engine.neuronGraph])
     
 
-      
+    const [networkMenuOpen, setNetworkMenuOpen] = useState(false);
+
+
+    console.log('World in salt sim: ', engine.world)
 
     return (
   
       
   
-        <div className="container" id="container">
+      <div className="container" id="container" style={{padding: '5%'}}>
 
         
 
-          {<div className = "network-viz" id="network-viz"> HERE</div>
-          }   
-      <div className ="ButtonMenu" id='buttons' style={{margin: '0', padding: '0px'}} >
+        <div 
+          className = "network-viz" id="network-viz" 
+          style={{height: '100%', width: '100%', position: 'absolute'}}>
 
-        
-      <h1 > Translation is Liquid</h1>
-      <p> {trainingScore} / {epochNum} </p>
+            {netState}
+            {outputSaltCount}
+            
+
+        </div>
+             
+      <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'absolute'}} >
+
+      <div id="Data_Graph" style={{position: 'absolute', right: '-40%', top: '30%'}}></div>
+
+      <div style={{transform: 'scale(1.5)', transformOrigin: 'top left'}}>
+
+
+      <img
+        style={{position: 'relative', pointerEvents: 'auto', 
+                top: '-5vh', right: '-45vw',
+                height:'20vh', width:'20vh',
+                transform: `
+                            ${controlPanelImageHovered ? 'rotate(25deg)' : ''}  
+                            ${controlPanelImageMouseDown ? 'scale(0.9)' : ''}
+                          `}}
+
+        onClick={() => setNetworkMenuOpen(!networkMenuOpen)}
+        onMouseEnter={() => setControlPanelImageHovered(true)}
+        onMouseLeave={() => setControlPanelImageHovered(false)}
+        onMouseDown={() => setControlPanelImageMouseDown(true)}
+        onMouseUp={() => setControlPanelImageMouseDown(false)}
+
+        src={control_panel_images[controlPanelImageIndex]} 
+      ></img>
 
       
-
       
-   
-
-        <button onClick={physics}>Start this jam</button> 
-
-        <Button variant="contained" color="primary" onClick={() => {setnumSalts(numSalts + 1); 
-          getCurrentTargetCallback(); 
-          outputSaltCountCallback();}}>
-
-          Add Salt
-        </Button>
-        
-        <p>Salt Count: {numSalts}</p>
-
-        <Button variant="contained" color="primary" 
-        onClick={() => setgraphTime(!graphTime)}>
-          Accuracy Plot
-        </Button>
-
-        <Button variant="contained" color="primary" 
-        onClick={() => setgradTrackTime(!gradTrackTime)}>
-          Gradient Tracking
-        </Button>
-
-        <div id="Data_Graph" style={{position: 'absolute', left: '1300px', top: '100px'}}></div>
-
-      
-        {netState}
-        {outputSaltCount}
-        {freezeButtons}
+      <Network_Menu
+        networkMenuOpen={networkMenuOpen}
+        trainingScore={trainingScore}
+        epochNum={epochNum}
+        togglePhysics={togglePhysics}
+        play_button_back_images={play_button_back_images}
+        controlPanelImageIndex={controlPanelImageIndex}
+        Start={Start}
+        play_button_lever_img={play_button_lever_img}
+        numSalts={numSalts}
+        setgraphTime={setgraphTime}
+        graphTime={graphTime}
+        setgradTrackTime={setgradTrackTime}
+        gradTrackTime={gradTrackTime} 
+        learningRate={learningRate}
+        setLearningRate={setLearningRate}
+        network={network}
+        numLayers={numLayers}
+        layerArray={layerArray}
+        setloadedModel={setloadedModel}
+        loadedModel={loadedModel}
+      />
 
         
-        <LearningRateSlider learningRate={learningRate} setLearningRate={setLearningRate} />
-    
-
-        <ToggleSwitch onInputAndOrStateChange={handleInputAndOrStateChange} 
-        onOutputAndOrStateChange={handleOutputAndOrStateChange} />
-
-        <SaveLoadButton network={network} numLayers={numLayers} layerArray={layerArray}/> 
-
-        {neuronGraph}
-        
-        
-
-        <Slider
-          aria-label="Small steps"
-          ref={horSliderRef}
-          padding={'30px'}
-          margin={'30px'}
-          style={{width: '90%'}}
-          defaultValue={10}
-          step={1}
-          min={0}
-          max={10}
-          marks
-          valueLabelDisplay="auto"
-          onChange={(_, value) => {setnumLayers(value); }}
-        />
-        
-          {verArray}
+        <div style={{ pointerEvents: 'auto', position: 'relative', top: '-10vh', left: '-10vw'}}>
           
+          {verArray}
+
+          <Slider
+            aria-label="Small steps"
+            ref={horSliderRef}
+            padding={'30px'}
+            margin={'30px'}
+            style={{width: '80%', left: '-3.5%'}}
+            defaultValue={2}
+            step={1}
+            min={0}
+            max={8}
+            marks
+            valueLabelDisplay="auto"
+            onChange={(_, value) => {setnumLayers(value); }}
+            
+          />
+
+          {freezeButtons}
+
+          <div style={{ pointerEvents: 'none', position: 'absolute', top: '-20vh', left: '-5vw', transform: 'scale(0.7)' }}>
+
+            {neuronGraph}
+
+          </div>
+            
+            
+        </div>
+
+      </div>
       </div>
       </div>
 

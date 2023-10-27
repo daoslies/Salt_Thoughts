@@ -70,6 +70,7 @@ class Neuron {
     } 
   
     Welcome({self}) {
+      
       function neur_click() {
         
         //alert(self.id + self.type + self.wire.neuron_type);
@@ -86,7 +87,7 @@ class Neuron {
 
         // Draw graph using d3
         //self.engine.neuronGraph = <NeuronGraph weights={weights[0]} biases={biases[0]} />
-        self.engine.neuronGraph = <NeuronGraph weight={weights[self.clickCount]} bias={biases[self.clickCount]} />;
+        self.engine.neuronGraph = <NeuronGraph weight={weights[self.clickCount]} bias={biases[self.clickCount]} neuronID = {self.id} />;
         self.clickCount +=1;
 
         if (self.clickCount > targetConnections.length) {self.clickCount=0}
@@ -213,8 +214,22 @@ class Neuron {
     for (let i = 0; i < nextLayerNeurons.length; i++) {
       let neuron = nextLayerNeurons[i].props.neuron;
       const { weight, bias } = this.getWeightAndBias(neuron, network);
-      let activation = 1 / (1 + Math.exp(-((weight * (saltCount/total_current_salt) * 10) + bias)));
+      let activation = 1 / (1 + Math.exp(-(  (10 * weight * (saltCount/25))) +  ( weight * ((bias * 0.5)-0.5)) - (5 * weight * weight)   )) ;
+
+
+      //(10 * weight * (saltCount/45)) + (bias * 2)
+      //sigmoid( (10 * weight * x) +  ( weight * ((bias * 0.5)-0.5)) - (5 * weight)  )
       //       let activation = 1 / (Math.exp(-((0.01+weight * (saltCount/total_current_salt) * 10) + bias)));
+
+      // we want the weights in the rough range of 10 to -10 and the biases 2 to -2, we're * ing weight by 10 here 
+        // and bias by 2, to achieve this, with our aim to keep both sets of real values between 1 and -1.
+
+        // ok Also. Using (saltCount/total_current_salt), means that the network is always looking at
+          // salt %, which means it can't just be like "this is a lil un, chuck it over there."
+            // so we are just going to set max salt count (which I'm going to guess is like 45)
+            // and that can then be consistent over all samples.
+            // Crazy stuff, we're actually going to lower this to 30, cus it's pretty rare that you're ever going
+            // to get over 30 salt in a neuron at once.
 
       activations.push(activation);
     }

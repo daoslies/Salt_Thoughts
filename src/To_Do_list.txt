@@ -9,12 +9,36 @@ What are we doing:
 
   - realigning plugs and port holes. -- Done ?
 
-  - The buttons - They're there, but atm they don't appear/dissaer, or click
+  - The buttons - They're there, but atm they don't appear/dissaer, or click - They do now click -- ima say done
 
-  - creating the new routes div.
+
+
+
+  - creating the new routes div. - Sort of kinda done, but has spawned further issues
+
+  - Salt sim doesn't render connections if it's closed and reopened. -- Dealt with
+
+  - neurons no longer highlighting connections on mouseover in saltsim, i think due to networkmenu being in front reli 
+      somat about the fact it's a table maybe 07/09/2023
+
+        Resolved :DDD But new issue have spawned. Just around repositioning elements.
+
+  - Fak repositioning is going to fuk on different screens, cus the buttons are vw, and the sim is px
+      - Dealt with this a little, but potentially there is quite a lot more to do to deal with completely.
+
+  - The white space at the bottom, somat to do with salt sim  -- Dealt Withhhh
+
+  - Salt sim crashes if you set the main slider to 0.
+
+  - Neural Mouse hover connection highlight dies on salt run. due to rerendering connections (i think)
 
   - Make an about page
 
+  - Make the audioBook Page
+
   - Center everything properly
+      - Attempts have been made, but still more to do
 
   - Make it so the plug plugs in if the plug is touching anywhere on the port img.
+
+  - Make sure the matter stuff is turned off when it isn't in use/generally deal with the lag.
