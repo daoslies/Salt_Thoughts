@@ -1,5 +1,9 @@
-
 const ChapterText = ` <div>
+<p>
+  line
+  breaks
+  everywhere
+</p>
 <p>
   Practical demo of training and its like a herbology lesson.
 </p>
