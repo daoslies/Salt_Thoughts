@@ -12,6 +12,7 @@ root.render(
     <div className="book" id="bookcheck">
       <div
         className="chapter-text"
+        style={{ whiteSpace: "pre-wrap" }}
         dangerouslySetInnerHTML={{ __html: ChapterText }}
         onMouseDown={(e) => e.stopPropagation()}
       />
