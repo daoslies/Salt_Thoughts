@@ -25,5 +25,8 @@
 
   }
   
-.book-img {
+.chapter-text {
+  white-space: break-spaces;
+  color: green;
+  border: 3px solid red
 }

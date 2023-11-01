@@ -208,7 +208,7 @@ function Wire({ setRenderEmbeddingRep }) {
   const world = engine.world;
   world.gravity.y = 0;
 
-  console.log('World in main Wire', world)
+  //console.log('World in main Wire', world)
 
 
   /*var render = Matter.Render.create({
@@ -942,7 +942,7 @@ useEffect(() => {
 
       
 
-      <Route path="/Salt" element={<Book />} /> 
+      <Route path="/Salt" element={<Book id='bookElement'/>} /> 
 
       <Route path="/Audio" element={<Audio />} /> 
 

@@ -1,5 +1,5 @@
 
-const ChapterText = ` <div>
+const ChapterText1 = ` <div>
 <p>
   Practical demo of training and its like a herbology lesson.
 </p>
@@ -905,4 +905,4 @@ const ChapterText = ` <div>
 </div>
 `;
 
-export default ChapterText;
+export default ChapterText1;
