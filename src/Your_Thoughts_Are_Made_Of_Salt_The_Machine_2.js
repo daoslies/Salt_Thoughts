@@ -1,7 +1,4 @@
-const ChapterText = 
-
-<div id = 'chapter-text' style={{color:'red', whiteSpace: 'break-spaces', wordBreak: 'break-word'}}>
-
+const ChapterText = `
 "First session with The Machine today," said Ave "I hear its going to be a practical." Knowing full well that everyone was already aware of this, as it had said so in bold red letters right by the time & place in all their timetables.
 
 
@@ -561,6 +558,5 @@ oh and just tap on a flower if you want me to tell you which species it is.
 
 XXX stared out at the sudden and, in comparison to the constant voice of the past 20 minutes, quite intense silence.
 
-</div>
-
+`
 export default ChapterText;

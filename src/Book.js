@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 
 
 import "./Book.css";
@@ -10,18 +10,34 @@ import book_img from './Salt_Pics/Book_1_v3.png';
 const Book = () => {                                                                                                                
 
   const [page, setPage] = useState(1);
-  const [leftPage, setLeftPage] = useState([])
-  const [rightPage, setRightPage] = useState([])
+  const [pages, setPages] = useState([]);  
+  const [pageText, setPageText] = useState("");
+  const [leftPage, setLeftPage] = useState([]);
+  const [rightPage, setRightPage] = useState([]);
+  const [bookProgress, setBookProgress] = useState({1 : 0});
+
+  
+    
+  const pageLeft = useRef(null);
+
+  const pageRight = useRef(null);
 
   const paragraphRef = useRef();
 
-  const PAGE_SIZE = 3; 
+  const PAGE_SIZE = 1; 
 
 
   function getPage(index) {
     // Create DOM element from HTML 
     const pageEl = document.createElement('div');
 
+    const textcheck = document.getElementById('XXX')
+
+
+    if (textcheck) {
+
+    //textcheck.innerHTML = "hello hello hgello"
+  }
     pageEl.innerHTML = ChapterText1;
 
     // Get current page nodes
@@ -44,7 +60,7 @@ const Book = () => {
 
   pageNodes.forEach(paragraph => {
 
-    console.log(paragraph.innerHTML.length)
+    //console.log(paragraph.innerHTML.length)
 
 
     var reactElement_Paragraph = React.createElement('div', {
@@ -57,7 +73,7 @@ const Book = () => {
 
 
 
-    console.log('CUrrentHeight: ', currentHeight)
+    //onsole.log('CUrrentHeight: ', currentHeight)
 
     if (currentHeight + paragraph.innerHTML.length  > MAX_HEIGHT) { 
       currentCol = 'right';
@@ -86,45 +102,182 @@ const Book = () => {
     
   }
 
-  function paginate() {
+  useEffect(() => {
+    const pages = PaginateText(ChapterText, pageLeft, pageRight);
+    setPageText(pages);
 
-    var contentBox = document.getElementById('XXX');
+  }, [page]);
 
-    console.log('ContentBox', contentBox)
-  /*   var words = contentBox.text().split(' ');
+  //console.log('pageTRext: ', pageText)
 
-    var newPage = document.createElement('div');
-    contentBox.empty().append(newPage);
-    var pageText = null;
-    for(var i = 0; i < words.length; i++) {
-        var betterPageText;
-        if(pageText) {
-            betterPageText = pageText + ' ' + words[i];
-        } else {
-            betterPageText = words[i];
+  function PaginateText(text, pageLeft, pageRight) {
+
+
+    const words = text.split(' ');
+
+    const pageHeight = 250;
+
+    let currentPage = "";
+    let textOffset = bookProgress[page]; // current position in text
+    var chunkSize = 1; // characters
+
+    let textChunk;
+
+    
+    pageLeft.current.style.transform = ''
+    pageRight.current.style.transform = ''
+
+    console.log('WrapperHeight', pageLeft.current.clientHeight, 'total text length: ', text.length)
+
+      //page left
+
+      if (pageLeft.current) {
+
+      pageLeft.current.innerHTML = ''
+
+      let whilestopper = 0
+
+      while(pageLeft.current.clientHeight < pageHeight && whilestopper < 200) {
+
+        console.log('CurrentHeight: ', pageLeft.current.clientHeight)
+        
+        // Get next chunk
+        let endIndex = Math.min(textOffset + chunkSize, words.length);
+        textChunk = words.slice(textOffset, endIndex).join(" ") + " ";
+        //let textChunk = text.substring(textOffset, textOffset + chunkSize);
+        textOffset = textOffset + chunkSize;
+
+        console.log('textCHunk', textChunk)
+  
+        // Append to wrapper
+        currentPage += textChunk; 
+
+        pageLeft.current.innerText = currentPage;
+        
+        setBookProgress(prevDict => {
+          return {
+            ...prevDict,
+            [page + 1]: textOffset 
+          };
+        });
+
+        whilestopper += 1
+      }
+
+      // backtrack from the last word, cus it's over the height limit
+      var lastSpace = currentPage.lastIndexOf(" ")
+      currentPage = currentPage.substring(0, lastSpace)
+      lastSpace = currentPage.lastIndexOf(" ")
+      currentPage = currentPage.substring(0, lastSpace)
+
+      pageLeft.current.innerText = currentPage;
+
+      textOffset -= chunkSize;
+
+      setBookProgress(prevDict => {
+        return {
+          ...prevDict,
+          [page + 1]: textOffset 
+        };
+      });
+
+      //page Right
+
+      //textOffset = bookProgress[page + 1]; // current position in tex
+
+      pageRight.current.innerHTML = '';
+      currentPage = "";
+      whilestopper = 0
+
+      while(pageRight.current.clientHeight < pageHeight && whilestopper < 200) {
+        
+        // Get next chunk
+        let endIndex = Math.min(textOffset + chunkSize, words.length);
+        let textChunk = words.slice(textOffset, endIndex).join(' ') + " ";
+        //let textChunk = text.substring(textOffset, textOffset + chunkSize);
+        textOffset = textOffset + chunkSize;
+
+        console.log('textCHunk', textChunk)
+  
+        // Append to wrapper
+        currentPage += textChunk; 
+
+        if (pageRight.current) {
+        pageRight.current.innerText = currentPage;
         }
-        newPage.text(betterPageText);
-        if(newPage.height() > window.height()) {
-            newPage.text(pageText);
-            newPage.clone().insertBefore(newPage)
-            pageText = null;
-        } else {
-            pageText = betterPageText;             
-        }
-    } */    
-}
+        setBookProgress(prevDict => {
+          return {
+            ...prevDict,
+            [page + 2]: textOffset 
+          };
+        });
+
+        whilestopper += 1
+
+      } 
+
+      lastSpace = currentPage.lastIndexOf(" ")
+      currentPage = currentPage.substring(0, lastSpace)
+      lastSpace = currentPage.lastIndexOf(" ")
+      currentPage = currentPage.substring(0, lastSpace)
+
+      pageRight.current.innerText = currentPage;
+
+      textOffset -= chunkSize;
+
+      setBookProgress(prevDict => {
+        return {
+          ...prevDict,
+          [page + 2]: textOffset 
+        };
+      });
+
+        
+        // If overflow
+      
+          
+          /*
+          // Reduce chunk size until it fits
+          while(wrapper.current.clientHeight > pageHeight) {
+            textChunk = text.substring(textOffset, textOffset + chunkSize - 10);
+            currentPage = currentPage.slice(0, -chunkSize); 
+            currentPage += textChunk;
+            chunkSize -= 10;
+          } */
+  
+          // Add page
+ /*          setPages(prev => [...prev, currentPage]);
+          currentPage = "";
+          textOffset += chunkSize;
+        } */
+/*         else {
+          textOffset += chunkSize;
+        } */
+  
+      
+  
+      // Remaining text
+      //setPages(prev => [...prev, currentPage]);
+
+      
+    pageLeft.current.style.transform = 'skew(0deg, 10deg)'
+    pageRight.current.style.transform = 'skew(0deg, -9deg)'
 
 
+    }; 
+
+    return pages
+  
+  }
+
+  //console.log('Book progress', bookProgress)
+  //console.log(page)
 
 
   return (
 
     <div className="book" id='bookcheck' style={{position:'relative'}}>
       {/*ChapterText*/}
-      <div id ="XXX" style={{color:'red', whiteSpace: "pre", textAlign: "left"}} >
-          text X text
-          Text
-      </div>
       <div style={{position:'absolute', zIndex: 0, height:'100%', left: '2%'}}>
         <img className="book-img" src={book_img}  draggable="false" dragstart="false" 
               style={{userSelect: 'none', userDrag: 'none', 
@@ -134,7 +287,7 @@ const Book = () => {
 
       <div style={{position:'absolute', zIndex: 1}}>
 
-        <div className="page" style={{position:'absolute',  height: '5vh', width: '18vw', left: '21vw', top:'15vh',
+      {/*   <div className="page" style={{position:'absolute',  height: '5vh', width: '18vw', left: '21vw', top:'15vh',
             }}>
           {getPage(page).left} 
         </div>
@@ -142,16 +295,74 @@ const Book = () => {
         <div className="page" style={{position:'absolute',  height: '5vh', width: '18vw', left: '42vw', top:'15vh',
             }}>
           {getPage(page).right} 
+        </div> */}
+
+        <div className="page" ref ={pageLeft} style={{position:'absolute', 
+        /*  height: '5vh', */ width: '18vw', left: '21vw', top:'15vh',
+         /* transform: 'skew(0deg, 10deg)', */
+         fontSize: '2vh'
+            }}>
         </div>
+
+        <div className="page" ref = {pageRight} style={{position:'absolute',
+        /*  height: '5vh', */ width: '18vw', left: '42vw', top:'15vh',
+        /*  transform: 'skew(0deg, -10deg)', */
+         fontSize: '2vh'
+
+            }}>
+        </div>
+
+        <div className="page" style={{position:'absolute',
+         left: '20.5vw', top:'52vh',
+         transform: 'skew(0deg, 5deg)',
+         fontSize: '2vh'
+            }}>
+
+          {(page * 2) - 1}
+
+        </div>
+
+        <div className="page" style={{position:'absolute',
+         left: '59.5vw', top:'51vh',
+         transform: 'skew(0deg, -5deg)',
+         fontSize: '2vh'
+            }}>
+
+          {(page * 2)}
+
+        </div>
+
+
+
+
+        {/* <div ref = {wrapper} style ={{width: '18vw'}} >
+
+        </div> */}
 
       </div>
 
       <div style={{position:'absolute', zIndex: 1}}>
 
 
-        <button onClick={() => setPage(page-PAGE_SIZE)}>Prev Page</button> 
+        <button onClick={() =>  {
 
-        <button onClick={() => setPage(page+PAGE_SIZE)}>Next Page</button>
+          var currentpage = page - PAGE_SIZE 
+          if (currentpage < 1)
+            {currentpage = 1}
+
+          setPage(currentpage)
+
+        }}>Prev Page</button> 
+
+        <button onClick={() =>  {
+
+          var currentpage = page + PAGE_SIZE 
+          if (currentpage > 110)
+            {currentpage = 110}
+            
+          setPage(currentpage)
+
+        }}>Next Page</button>
 
 
       </div>

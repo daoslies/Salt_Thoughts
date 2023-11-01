@@ -875,7 +875,7 @@ function Salt_Sim() {
 
   const [trainingScore, settrainingScore] = useState(0);
 
-  const [learningRate, setLearningRate] = useState(0.05);
+  const [learningRate, setLearningRate] = useState(0.005);
 
   const [frozenLayers, setFrozenLayers] = useState([]);
   const [freezeButtons, setfreezeButtons] = useState(<div/>);
