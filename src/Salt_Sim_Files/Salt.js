@@ -26,7 +26,8 @@ class Salt {
       this.currentNeuron = null; 
       this.previousNeuron = null; 
 
-      this.stopCount = 0;
+      this.stopCountPump = 0;
+      this.stopCountNudge = 0;
   
       this.position_x = this.initNeuron.wire.position.x -75;
       this.position_y = this.initNeuron.wire.position.y;
@@ -100,7 +101,7 @@ class Salt {
         
             } else {
             // code for calculating activations and force based on nextLayerNeurons
-            const saltCount = curr_neuron.saltCount;
+            const saltCount = curr_neuron.saltCount;  //obvs was saltCOunt , but changed to EverSalt
             const activations = curr_neuron.calculateActivation(nextLayerNeurons, saltCount, network);
             var max_active_index = [].reduce.call(activations, (m, c, i, arr) => c > arr[m] ? i : m, 0);
             //console.log('activates: ', activations)
@@ -123,38 +124,116 @@ class Salt {
                 force.y -= force_y;
               }}
               
-
-              //Nudge if stopped 
               
-              const nudgeThreshold = 0.000005;
-              if (-nudgeThreshold < force.x && force.x < nudgeThreshold 
-                && -nudgeThreshold < force.y && force.y < nudgeThreshold) {
+              //Nudge if stopped
+              
+              const pumpThreshold = 0.000005;
+              const nudgeThreshold = 0.000000005;
+              if (-nudgeThreshold < self.wire.force.x && self.wire.force.x < nudgeThreshold 
+                && -nudgeThreshold < self.wire.force.y && self.wire.force.y < nudgeThreshold) {
                   //Count how many stops it has been still for, if greater than 10, gizzit a nudge
-                  self.stopCount += 1;
+                  self.stopCountNudge += 1;
 
-                  if (self.stopCount > 350) {
-                      if (output_x.wire.position.x && this.wire.position.x) {
-                          const nudgeforce = output_x.wire.position.x - this.wire.position.x;
-                          const absNudgeforce = Math.abs(nudgeforce);
-                          const forceMagnitude = Math.pow(absNudgeforce, 0.05) * 0.1;
+                  if (self.stopCountNudge > 450) {
 
-                          if (!isNaN(forceMagnitude) && forceMagnitude !== 0 && isFinite(forceMagnitude)) {
-                              const forceDirection = Math.sign(nudgeforce);
-                              force.x -= forceMagnitude * forceDirection;
+                    if (output_x.wire.position.x && this.wire.position.x) {
+                      const nudgeforce = output_x.wire.position.x - this.wire.position.x;
+                      const absNudgeforce = Math.abs(nudgeforce);
+                      const forceMagnitude = Math.pow(absNudgeforce, 0.05) * 0.1;
 
-                              const forceDirectionY = Math.sign(output_x.wire.position.y - this.wire.position.y);
+                      if (!isNaN(forceMagnitude) && forceMagnitude !== 0 && isFinite(forceMagnitude)) {
+                          const forceDirection = Math.sign(nudgeforce);
+                          force.x -= forceMagnitude * forceDirection;
 
-                              const randomYForce = (Math.random() * 2) - 1;
-                              force.y -= forceDirectionY * Math.abs(randomYForce) * 0.1;
+                          const forceDirectionY = Math.sign(output_x.wire.position.y - this.wire.position.y);
 
-                              self.stopCount = 0;
-                          }
+                          const randomYForce = (Math.random() * 2) - 1;
+                          force.y -= forceDirectionY * Math.abs(randomYForce) * 0.1;
+
+                          self.stopCountNudge = 0;
                       }
                   }
-              }
 
+                  }
+  
+                }
+
+                //Pump if slow
+              else if (-pumpThreshold < self.wire.force.x && self.wire.force.x < pumpThreshold 
+                && -pumpThreshold < self.wire.force.y && self.wire.force.y < pumpThreshold) {
+                  //Count how many stops it has been still for, if greater than 10, gizzit a nudge
+                  self.stopCountPump += 1;
+
+                  if (self.stopCountPump > 250) {
+
+                    force.x *= 10000;
+                    force.y *= 10000;
+
+                    const beforeOrAfterOutputs = Math.sign(output_x.wire.position.x - this.wire.position.x);
+                    
+                    console.log('Before or After', output_x.wire.position.x, this.wire.position.x)
+
+                    // We're dealing with this fucker. It's that 100 specifically. He is being very frustrating
+
+                    // And mabs you need to visualise in some way.
+                    
+
+
+                    //alert(beforeOrAfterOutputs)
+                    if (beforeOrAfterOutputs > 0) {
+                    force.y +=  Math.random() < 0.5 ? 0.005 : -0.005; // randomly push up or down by 0.5
+                    force.x -= 0.0005;
+                  }
+                    else {
+                    //force.y +=  Math.random() < 0.5 ? 0.005 : -0.005;
+                    force.x += 0.0005;
+                    }
+
+                    self.stopCountPump = 200;
+
+                  }
+  
+                }
+
+
+              // Just be flippin faster
+
+              const slowCoachThreshold = 0.000005;
+              if (-slowCoachThreshold < self.wire.force.x && self.wire.force.x < slowCoachThreshold 
+                && -slowCoachThreshold < self.wire.force.y && self.wire.force.y < slowCoachThreshold) {
+                  //Count how many stops it has been still for, if greater than 10, gizzit a nudge
+
+                    force.x *= 1 / (Math.abs(force.x) * 1000)
+                    force.y *= 1 / (Math.abs(force.y) * 1000)
+
+                    self.stopCountNudge += 1; // because this is maybe preventing the nudge from occuring otherwise.
             
+                    // should functioanlsie as this is a copy n paste of above.
+                    if (self.stopCountNudge > 200) {
+
+                      if (output_x.wire.position.x && this.wire.position.x) {
+                        const nudgeforce = output_x.wire.position.x - this.wire.position.x;
+                        const absNudgeforce = Math.abs(nudgeforce);
+                        const forceMagnitude = Math.pow(absNudgeforce, 0.05) * 0.1;
+  
+                        if (!isNaN(forceMagnitude) && forceMagnitude !== 0 && isFinite(forceMagnitude)) {
+                            const forceDirection = Math.sign(nudgeforce);
+                            force.x -= forceMagnitude * forceDirection;
+  
+                            const forceDirectionY = Math.sign(output_x.wire.position.y - this.wire.position.y);
+  
+                            const randomYForce = (Math.random() * 2) - 1;
+                            force.y -= forceDirectionY * Math.abs(randomYForce) * 0.1;
+  
+                            self.stopCountNudge = 0;
+                        }
+                    }
+  
+                    }
             }
+
+
+          }
   
         // Use the force to determine the direction in which the salt should move
         self.wire.force.x -= force.x; 
@@ -204,7 +283,8 @@ class Salt {
         if (collidesWithNeuron && this.currentNeuron !== collidesWithNeuron) {
 
           //reset nudging critera
-          self.stopCount = 0;
+          this.stopCountPump = 0;
+          this.stopCountNudge = 0;
           
           if (this.previousNeuron) {
           this.previousNeuron.props.neuron.removeSalt(); }

@@ -17,6 +17,8 @@ svg = d3.select("#Data_Graph")
   .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .attr("transform",
+          "translate(" + 0 + "," + 200 + ")")
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
@@ -59,7 +61,7 @@ var data = network.irisData;
       .data(data)
       .enter()
       .append("circle")
-        .attr("cx", function (d) {console.log('here'); console.log(d); return x(d.sepalLength); } )
+        .attr("cx", function (d) { return x(d.sepalLength); } )
         .attr("cy", function (d) { return y(d.sepalWidth); } )
         .attr("r", 4)
         .style("fill", d => 

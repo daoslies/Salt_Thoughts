@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
 import * as d3 from 'd3';
 
-function NeuronGraph({ weight, bias }) {
+function NeuronGraph({ weight, bias, neuronID }) {
   const svgRef = useRef(null);
 
-  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-  const width = 250 - margin.left - margin.right;
-  const height = 100 - margin.top - margin.bottom;
+  const margin = { top: 20, right: 20, bottom: 30, left: 45 };
+  const width = 300 - margin.left - margin.right;
+  const height = 200 - margin.top - margin.bottom;
 
   const xScale = d3.scaleLinear()
-    .domain([-10, 10])
+    .domain([0, 1])
     .range([0, width]);
 
   const yScale = d3.scaleLinear()
@@ -18,7 +18,13 @@ function NeuronGraph({ weight, bias }) {
 
   const sigmoid = x => (1 / (1 + Math.exp(-x)));
 
-  const data = d3.range(-10, 10, 0.01).map(d => [d, sigmoid(weight * d + bias)]);
+  const data = d3.range(0, 1, 0.01).map(x => [x, sigmoid( (10 * weight * x) +  ( weight * ((bias * 0.5)-0.5)) - (5 * weight * weight)  )]);
+
+
+  // NExt task is colour all this by neuron id.
+
+
+  // the * 10 and * 2 are what is happening in the neuron activation.
 
   const line = d3.line()
     .x(d => xScale(d[0]))
@@ -31,12 +37,44 @@ function NeuronGraph({ weight, bias }) {
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 
+    // Create color scales
+  const layerColorScale = d3.scaleLinear()  
+  .domain([-1,8])
+  .range(["blue", "red"]);
+
+  const indexColorScale = d3.scaleLinear()
+  .domain([0,4]) 
+  .range(["lightgray", "black"]);
+
+  // Get layer and index 
+
+
+  var [layer, index] = neuronID.split("-");
+
+  console.log('Colour stuff: ', layer, index)
+
+  // Get colors
+  if (layer == 'i') {layer = 1}
+  else (layer += 1 );
+
+  const layerColor = layerColorScale(layer); 
+  const indexColor = indexColorScale(index);
+
+  console.log(layerColor, indexColor)
+
+  // Combine them 
+
+
+var colour = `hsl(${ (180 * layer)/8},100%,${50 + (((100 * index) / 5) * 0.5) }%)`
+
+console.log(colour)
+
   svg.append("path")
     .datum(data)
     .attr("class", "line")
     .attr("d", line)
     .style("stroke-width", 4)
-    .attr("stroke", "red")
+    .attr("stroke", colour)
     .attr("fill", "none");
 
   svg.append("g")

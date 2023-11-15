@@ -1,12 +1,17 @@
-import React, { useState, useEffect, useRef, createContext } from 'react'; 
+import React, { useState, useEffect, useRef, useCallback } from 'react'; 
 import { BrowserRouter as Router, Routes, Route, Link, Outlet, useLocation, useNavigate }  from "react-router-dom";
 
 import Matter from 'matter-js';
 import * as d3 from 'd3';
 
+
+//import { engine } from './Engine'; 
+
+
 import "./Menu.css";
 
 import Book from "./Book"
+import Audio from "./Audio"
 import Salt_Sim_3 from "./Salty_Sim_3"
 
 import audio_port_img from './Salt_Pics/audio_port.png';
@@ -23,8 +28,7 @@ import push_me_img_1 from './Salt_Pics/PushMe1.png';
 import push_me_img_2 from './Salt_Pics/PushMe2.png';
 import push_me_img_3 from './Salt_Pics/PushMe3.png';
 import push_me_img_4 from './Salt_Pics/PushMe4.png';
-import EmbeddingRep from './Embedding_Representation';
-import zIndex from '@mui/material/styles/zIndex';
+
 
 var jackImageArray = new Array();
 jackImageArray[0] = jack_1_img;
@@ -51,7 +55,7 @@ const push_me_images = [
 
 
 
-function Wire() {
+function Wire({ setRenderEmbeddingRep }) {
 
   const [routeTime, setRouteTime] = useState(false);
 
@@ -99,133 +103,24 @@ function Wire() {
     }, 165);
 
     return () => clearInterval(interval);
-  }, []);
-
-
+  }, [pushMeimageIndex]);
 
   /*
-  const svg = d3.select('#svg-container');
+  useEffect(() => {
+    setRenderEmbeddingRep(routeTime);
+  }, [routeTime])
 
+  */
 
-
-  const routeButtons = {}
-  
-  routeButtons.book = (  
-  
-    <Link 
-
-    to={'/Salt'}  id="book-link" onClick={() => setRouteTime(!routeTime)}>
-
-    {RouteButton(bookElement, 450, 270, pushMeimageIndex)}
-
-    </Link>
-  
-  )
-
-  routeButtons.audio = (  
-
-    <Link 
-    
-    to={'/Audiobook'} id="audio-link" onClick={() => setRouteTime(!routeTime)}>
-
-    {RouteButton(audioElement, 935, 270, pushMeimageIndex)}
-    
-    </Link>   
-
-  )
-
-  routeButtons.flower = (
-
-    <Link 
-    
-    to={'/Salt_Sim_3'} id="sim-link" onClick={() => setRouteTime(!routeTime)}>
-
-    {RouteButton(simElement, 690, 570, pushMeimageIndex)}
-
-    </Link>
-  
-  ) */
-
-
-  /*
+  const updateRenderEmbeddingRep = useCallback(() => {
+    setRenderEmbeddingRep(routeTime);
+  }, [routeTime]) // memoized 
   
   useEffect(() => {
-
-    const handleHover = () => {
-      setIsPortButtonHovering('yyyy')
-      console.log('Hovering!');
-    };
-    
-    const handleLeave = () => {
-      setIsPortButtonHovering('xxxx')
-    };
-  
-    const bookButton = document.getElementById("book-button");
-    const audioButton = document.getElementById("audio-button");
-    const flowerButton = document.getElementById("flower-button");
-
-    console.log('Hover listeners Applied (maybe)')
-  
-    bookButton.addEventListener('mouseenter', handleHover);
-    bookButton.addEventListener('mouseleave', handleLeave);
-  
-    audioButton.addEventListener('mouseenter', handleHover);
-    audioButton.addEventListener('mouseleave', handleLeave);
-  
-    flowerButton.addEventListener('mouseenter', handleHover);
-    flowerButton.addEventListener('mouseleave', handleLeave);
-  
-    return () => {
-      bookButton.removeEventListener('mouseenter', handleHover);
-      bookButton.removeEventListener('mouseleave', handleLeave);
-      
-      audioButton.removeEventListener('mouseenter', handleHover);
-      audioButton.removeEventListener('mouseleave', handleLeave);
-  
-      flowerButton.removeEventListener('mouseenter', handleHover);
-      flowerButton.removeEventListener('mouseleave', handleLeave);
-    }
-  
-  }, []);
+    updateRenderEmbeddingRep();
+  }, [updateRenderEmbeddingRep])
 
 
-*/
-
-  try {
-    /*
-  const handleHover = () => {
-    portButtonHoverRef.current = true;
-    console.log('Hovering!');
-  };
-  
-  const handleLeave = () => {
-    portButtonHoverRef.current = false;
-  };
-
-  bookButton = document.getElementById("book-button");
-  audioButton = document.getElementById("audio-button");
-  flowerButton = document.getElementById("flower-button");
-
-  //console.log('Hover listeners Applied (maybe)')
-
-  bookButton.addEventListener('mouseenter', handleHover);
-  bookButton.addEventListener('mouseleave', handleLeave);
-
-  audioButton.addEventListener('mouseenter', handleHover);
-  audioButton.addEventListener('mouseleave', handleLeave);
-
-  flowerButton.addEventListener('mouseenter', handleHover);
-  flowerButton.addEventListener('mouseleave', handleLeave);
-
-   
-
-    */
-
-  } catch (error) {
-    
-  }
-
-  
 
 
   if (plugButtonTime) {
@@ -308,9 +203,30 @@ function Wire() {
 */
 
   var engine = Matter.Engine.create();
+
+  // 2. Create world and world options
+  const world = engine.world;
+  world.gravity.y = 0;
+
+  //console.log('World in main Wire', world)
+
+
+  /*var render = Matter.Render.create({
+      element: document.body,
+      engine: engine
+    });     
+  */
+
+  const vw = 50; // 50vw
+  var width = window.innerWidth;
+  var vwInPixels = (vw / 100) * width;
+  var scaledWidth = width/1707
+
+  var vhInPixels = (window.innerHeight * 0.5) - 50 ;
   
-  const wire_start_pos_x = 560 + 88;
-  const wire_start_pos_y = 325 - 85 - 60;
+  var wire_start_pos_x = vwInPixels;
+  var wire_start_pos_y = vhInPixels; //325 - 85 - 60;
+  
   
   const [wireBodies, setWireBodies] = useState([]);
 
@@ -328,9 +244,24 @@ function Wire() {
     // Animation frame
   function onAnimationFrame_MatterEvents() {
 
+    if (!routeTime)  {
+      
+    width = window.innerWidth;
+    scaledWidth = width/1707;
+    vwInPixels = (vw / 100) * width;
+    vhInPixels = (window.innerHeight * 0.5);
+    
+    wire_start_pos_x = vwInPixels;
+    wire_start_pos_y = vhInPixels - 120; //325 - 85 - 60;
+
     const points = wireBodies.map(b => b.position);
 
+    points[0].x = wire_start_pos_x;
+    points[0].y = wire_start_pos_y-(90 * scaledWidth * 0.85);
+
     const svg = d3.select('#svg-container');
+
+ 
 
     svg.selectAll('line') 
       .data(points)
@@ -340,6 +271,7 @@ function Wire() {
       .style('stroke', 'black')      // Add stroke color
       .style('stroke-width', (d,i) => 7 + Math.sin(((Date.now() / 250) + ((points.length - i)/(points.length/10)) * Math.PI * 100) +  Math.sin((Date.now() / 200) + ((points.length - i)/(points.length))) * 2) )     // Set stroke width
       .style('opacity', 1)
+      .style('zIndex', 50)
       .attr('x1', (d, i) => i === 0 ? wire_start_pos_x : points[i - 1].x)
       .attr('y1', (d, i) => i === 0 ? wire_start_pos_y : points[i - 1].y)
       .attr('x2', (d,i) => points[i].x) 
@@ -347,6 +279,7 @@ function Wire() {
 
      
     svg.selectAll('.jack-image').remove(); 
+   
 
     checkDistance(points[points.length - 1])
 
@@ -380,18 +313,19 @@ function Wire() {
 
       //Blue Light
 
-      blue_light_counter += 1;
+      blue_light_counter += 2;
 
      
 
       if (blue_light_counter >= 100) {
+
         
         svg.append('image')
         .attr('href', blue_light_img)  //[jackImageIndex])
-        .attr('x', pluggedPortRef.current.portX+66) 
-        .attr('y', pluggedPortRef.current.portY-22)
-        .attr('width', 51)
-        .attr('height', 42) 
+        .attr('x', pluggedPortRef.current.portX+(66 * scaledWidth))
+        .attr('y', pluggedPortRef.current.portY-(28 * scaledWidth))
+        .attr('width', 51 * scaledWidth)
+        .attr('height', 42 * scaledWidth) 
         .attr('class', 'jack-image')
 
         blueLightRef.current = pluggedPortRef.current;
@@ -431,38 +365,63 @@ function Wire() {
         plug_rect = null;
         console.log('World: ', world)
 
+        }
       }
     }
   }
 
+  
   useEffect(() => { 
-    
+
+  
   const onAfterUpdate = () => {
-         // Trigger visual update (It's the bit above)
+        // Trigger visual update (It's the bit above)
+        //console.log('RouteTimeEffect2?', routeTime)
         requestAnimationFrame(onAnimationFrame_MatterEvents); 
+                          
   };
 
+
   Matter.Events.on(engine, 'afterUpdate', onAfterUpdate);
-
-  /*return () => {
-    // Cleanup function
+  
+  return () => {
+   
     Matter.Events.off(engine, 'afterUpdate', onAfterUpdate);
-  }*/
+    //cancelAnimationFrame(what do we put here?)
 
-  /// Potentially you should add a cleanup function here 24/08/2023
+  }
 
   
 }, []);
 
-// 2. Create world and world options
-const world = engine.world;
-world.gravity.y = 0;
 
-/*var render = Matter.Render.create({
-    element: document.body,
-    engine: engine
-  });     
+/*
+useEffect(() => {
+  let animationFrameId;
+
+  const onAnimationFrame = () => {
+    // Visual update
+    onAnimationFrame_MatterEvents()
+
+    animationFrameId = requestAnimationFrame(onAnimationFrame); 
+  }
+
+  const onAfterUpdate = () => {
+    onAnimationFrame();
+  }
+
+  Matter.Events.on(engine, 'beforeUpdate', onAfterUpdate);
+  
+  return () => {
+    Matter.Events.off(engine, 'beforeUpdate', onAfterUpdate);
+    
+    cancelAnimationFrame(animationFrameId);
+  }
+}, []);
+
 */
+
+
   
   // 4. Create chain of circle bodies for wire 
   
@@ -506,11 +465,7 @@ world.gravity.y = 0;
     }
     
     
-    
-    //var mouse_area = document.getElementById('svg-container')
-
-    // add mouse control
-    //var mouse = Matter.Mouse.create(mouse_area);
+// Mouse Events
 
 
 
@@ -549,31 +504,42 @@ world.gravity.y = 0;
         }
       }
 
-      
+
+
+    let isMouseMoving = false;
     
+    const handleMouseMove = (event) => {
+      if (!isMouseMoving) {
+        isMouseMoving = true;
+        requestAnimationFrame(() => {
+          // Update the object's position here
+          if (mouse_rect) {
+            mouse_rect.position.x = event.clientX;
+            mouse_rect.position.y = event.clientY;
+          }
+          
+        });
+        isMouseMoving = false; // this used to be inside the if (mouse_rect)
+      }
+    };
+
     useEffect(() => {
 
       document.addEventListener('mousedown', mousedownevent);
       document.addEventListener('mouseup', mouseupevent);
-
-      return () => 
-
-      document.removeEventListener('mousedown', mousedownevent);
-      //document.removeEventListener('mouseup', mouseupevent);
-
-    }, []);
-
     
-
+      document.addEventListener('mousemove', handleMouseMove);
+    
+      return () => {
+        // Cleanup: Remove the event listener when the component unmounts
         
-    document.addEventListener('mousemove', (event) => {
+        document.removeEventListener('mousedown', mousedownevent);
+        document.removeEventListener('mouseup', mouseupevent);
 
-      if (mouse_rect) {
-      mouse_rect.position.x = event.clientX;
-      mouse_rect.position.y = event.clientY;
-      }
-      
-    });
+        document.removeEventListener('mousemove', handleMouseMove);
+
+      };
+    }, []); 
     
         
         
@@ -581,22 +547,24 @@ world.gravity.y = 0;
         const renderJack = (lastPoint, portX, portY, dist) => {
 
         
+          width = window.innerWidth;
+          var scaledWidth = width/1707;
+
           // Calculate orientation angle
           let angle = Math.atan2(portY - lastPoint.y, portX - lastPoint.x) * (180 / Math.PI);
 
 
 
-          let posx = lastPoint.x -100;
-          let posy = lastPoint.y -150;
+          let posx = lastPoint.x - (100 * scaledWidth);
+          let posy = lastPoint.y - (150 * scaledWidth);
 
           let rot_origx = lastPoint.x;
           let rot_origy = lastPoint.y;
           
           if (isPluggedRef.current) {
-            posx = portX-100;
-            posy = portY-150;
-            angle = 0;
-
+            posx = portX-(100 * scaledWidth);
+            posy = portY-(150 * scaledWidth);
+            if (dist < 30) {angle = 0;}
           }
 
 
@@ -607,8 +575,8 @@ world.gravity.y = 0;
           .attr('x', posx) 
           .attr('y', posy)
           .attr('transform', `rotate(${angle + 90} ${rot_origx} ${rot_origy})`)
-          .attr('width', 200)
-          .attr('height', 200) 
+          .attr('width', 200 * scaledWidth)
+          .attr('height', 200 * scaledWidth) 
           .attr('class', 'jack-image')
 
         }
@@ -622,7 +590,9 @@ world.gravity.y = 0;
               
               return {
                 top: parseFloat(styles.top),
-                left: parseFloat(styles.left)
+                left: parseFloat(styles.left),
+                width: parseFloat(styles.width),
+                height: parseFloat(styles.height)
               };
             }
             
@@ -630,10 +600,11 @@ world.gravity.y = 0;
             const audioPos = getPosition(document.querySelector('.audio-port'));
             const flowerPos = getPosition(document.querySelector('.flower-port'));
 
+
             var ports = {
-              port_1: {port: 1, portX: bookPos.left + 65, portY: bookPos.top + 65 }, 
-              port_2: {port: 2, portX: audioPos.left + 65, portY: audioPos.top + 65 },
-              port_3: {port: 3, portX: flowerPos.left + 65, portY: flowerPos.top + 65 }
+              port_1: {port: 1, portX: bookPos.left + (65 * bookPos.width/237), portY: bookPos.top + (65 * bookPos.width/237)}, 
+              port_2: {port: 2, portX: audioPos.left + (65 * bookPos.width/237), portY: audioPos.top + (65 * bookPos.width/237) },
+              port_3: {port: 3, portX: flowerPos.left + (65 * bookPos.width/237), portY: flowerPos.top + (65 * bookPos.width/237) }
             };
 
 
@@ -659,7 +630,7 @@ world.gravity.y = 0;
               pluggedPortRef.current = closestPort;
 
             
-              var distance_threshold = 15
+              var distance_threshold = 40 //15
 
               if(dist <= distance_threshold) {
                 isPluggedRef.current = true; // Dispatch event if plugged in
@@ -732,9 +703,9 @@ world.gravity.y = 0;
             imgRef.current = 0; 
           } else if (dist >= 110) {
             imgRef.current = 1;
-          } else if (dist >= 60) {
+          } else if (dist >= 70) {
             imgRef.current = 2;
-          } else if (dist >= 15) {
+          } else if (dist >= 30) {
             imgRef.current = 3;
           }else if (dist >= 0) {
             imgRef.current = 4;
@@ -759,6 +730,11 @@ world.gravity.y = 0;
     // run the engine
     Matter.Runner.run(runner, engine);
         
+    return () => {
+
+      Matter.Runner.stop(runner, engine);
+      
+    }
     
 
   }, []);
@@ -775,8 +751,9 @@ world.gravity.y = 0;
          src={push_me_images[pushMeimageIndex]} 
          onMouseEnter={() => portButtonHoverRef.current = true}
          onMouseLeave={() => portButtonHoverRef.current = false}
+         onMouseClick={() => setRouteTime(true)}
          style={{
-          zIndex: 50,
+          zIndex: 25,
           position: 'absolute',
           left: left,
           top: top,
@@ -806,41 +783,129 @@ world.gravity.y = 0;
 
     return {
       left: parseFloat(styles.left),
-      top: parseFloat(styles.top) 
+      top: parseFloat(styles.top),
+      width: parseFloat(styles.width),
+      height: parseFloat(styles.height)
     };
   }
 
-  
+
+
+  // Create a ref 
+  const positionsRef = useRef({
+    book: {left: '100', top: '100'},
+    audio: {left: '100', top: '100'},
+    flower: {left: '100', top: '100'}
+  }); 
+
   useEffect(() => {
+
     // Get positions
     const bookPos = getPosition(PORTS.book);
     const audioPos = getPosition(PORTS.audio);
     const flowerPos = getPosition(PORTS.flower);
 
-    // Set in state  
-    setPositions({
+    // Set positions on ref instead of state
+    positionsRef.current = {
       book: bookPos,
       audio: audioPos,
       flower: flowerPos
-    });
+    };
 
   }, [PORTS]);
 
 
+  /*
+  const updatePositions = () => {
 
-  function Layout() {
 
-    // the potential is there for putting Layout in its own file
+      setPositions({
+        book: bookPos,
+        audio: audioPos,
+        flower: flowerPos
+      });
+  }
 
-    const location = useLocation(); //is used in the return for router stuf... is it even tho? I think has been remove
-    const navigate = useNavigate();
+  useEffect(() => {
 
-    if(!routeTime) return null;
+  updatePositions()
 
+  }, [PORTS]);
+
+*/
+  
 
     return ( 
 
-      <div className="nested-view" 
+
+<div className="port-container">
+
+  <Router>
+
+  <div className="colour-test" />
+
+
+
+        <div className="flex-container">
+        
+          <div className="wire">  
+            
+      
+
+            <img className="book-port" src={audio_port_img} 
+                    style={{
+                    }}  />     
+      
+            <Link to={'Salt'}  id="book-link" 
+            
+            onClick={() => setRouteTime(true)} >
+      
+            {RouteButton('book-button', positionsRef.current.book.left+(200 * positionsRef.current.book.width/273),
+                                        positionsRef.current.book.top+(35 * positionsRef.current.book.width/273), pushMeimageIndex)}
+      
+            </Link>
+                  
+                  
+      
+            <img className="audio-port" src={audio_port_img} 
+                  style={{
+                  }}  /> 
+      
+            <Link to={'Audio'} id="audio-link" 
+            
+            onClick={() => {setRouteTime(true);}}>
+      
+            {RouteButton('audio-button', positionsRef.current.audio.left+(200 * positionsRef.current.audio.width/273), 
+                                         positionsRef.current.audio.top+(35 * positionsRef.current.audio.width/273), pushMeimageIndex)}
+            
+            </Link>   
+      
+      
+      
+            <img className="flower-port" src={audio_port_img} 
+                  style={{
+                  }}  />
+            
+            <Link to={'Salt_Sim_3'} id="sim-link" 
+            
+            onClick={() => setRouteTime(true)}>
+      
+            {RouteButton('flower-button', positionsRef.current.flower.left+(200 * positionsRef.current.flower.width/273), 
+                                         positionsRef.current.flower.top+(35 * positionsRef.current.flower.width/273), pushMeimageIndex)}
+      
+            </Link>
+      
+      
+          </div> 
+          
+         
+        
+        </div>
+
+      
+      {routeTime &&
+
+        <div className="nested-view" 
       
       style={{
         position: 'relative',
@@ -848,8 +913,8 @@ world.gravity.y = 0;
         left: '10vw',
         width: '80vw',
         height: '80vh', 
-        zIndex: "100",
-        border: '3px solid red'
+        zIndex: !routeTime ? 1 : 100,
+        border: '3px solid black'
       }}
       
       flex="1" >
@@ -867,101 +932,51 @@ world.gravity.y = 0;
 
       flex="1"
       
-      onMouseDown={() => {setRouteTime(false); navigate('/')}}>
+      onMouseDown={() => {setRouteTime(false);}}>
 
         X
 
       </button>
 
+      <Routes flex="1"> 
 
-      <Outlet/>
+      
+
+      <Route path="/Salt" element={<Book id='bookElement'/>} /> 
+
+      <Route path="/Audio" element={<Audio />} /> 
+
+
+      <Route path="Salt_Sim_3" element={
+      
+        <div className={'nested-div'} 
+          id='nested-div'
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            overflow: 'auto', 
+            position: 'absolute',
+            }}>
+
+        <div style = {{
+              transform: 'scale(0.6)',
+              transformOrigin: 'top left' 
+              }}>
+
+        <Salt_Sim_3/>
+
+        </div>
+        </div>
+      
+      } /> 
+      
+      </Routes>
 
 
       </div>
-    
-
-    )}
+    }
 
 
-
-
-    return ( 
-
-
-<div className="port-container">
-
-  <Router>
-
-  <div className="colour-test" />
-
-    <Routes> 
-
-      <Route path="/" element={   
-      
-        <div className="flex-container">
-        
-          <div className="wire">  
-            
-      
-
-            <img className="book-port" src={audio_port_img} 
-                    style={{
-                    }}  />     
-      
-            <Link to={'Salt'}  id="book-link" 
-            
-            onClick={() => setRouteTime(!routeTime)} >
-      
-            {RouteButton('book-button', positions.book.left+187, positions.book.top+35, pushMeimageIndex)}
-      
-            </Link>
-                  
-                  
-      
-            <img className="audio-port" src={audio_port_img} 
-                  style={{
-                  }}  /> 
-      
-            <Link to={'Audiobook'} id="audio-link" 
-            
-            onClick={() => setRouteTime(!routeTime)}>
-      
-            {RouteButton('audio-button', positions.audio.left+187, positions.audio.top+35, pushMeimageIndex)}
-            
-            </Link>   
-      
-      
-      
-            <img className="flower-port" src={audio_port_img} 
-                  style={{
-                  }}  />
-            
-            <Link to={'Salt_Sim_3'} id="sim-link" 
-            
-            onClick={() => setRouteTime(!routeTime)}>
-      
-            {RouteButton('flower-button', positions.flower.left+187, positions.flower.top+35, pushMeimageIndex)}
-      
-            </Link>
-      
-      
-          </div> 
-          
-          <Layout/>
-        
-        </div>
-
-      }>
-
-      <Route path="Salt" element={<Book/>} /> 
-      
-      <Route path="Salt_Sim_3" element={<Salt_Sim_3/>} /> 
-
-        
-      </Route> 
-
-      
-    </Routes>
 
   </Router>
 

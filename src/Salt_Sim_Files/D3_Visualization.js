@@ -1,27 +1,31 @@
 import * as d3 from 'd3';
 
-import { drag } from 'd3-drag';
-
-
 let svg = null;
 
 export function createD3Visualization(network, connections, nodes, links, graphTime) {
 
+//svg_check prevents an issue where it wasn't rendering connections if you navigated away from and back to the sim.
+let svg_check = document.querySelector("#connections-svg"); 
 
-//console.log('Connections: ', connections)
-//console.log('Nodes: ', nodes)
-//console.log('Links:  ', links)
 
-const parentDiv = document.querySelector("#buttons");
+const parentDiv = document.querySelector("#nested-div");
+console.log('here')
+console.log(parentDiv)
 var width = parentDiv.getBoundingClientRect().width;
 var height = parentDiv.getBoundingClientRect().height;
   // Create the SVG element that will contain the visualization
-  if (!svg) {
+  if (!svg_check || !svg) {
     svg = d3.select("#network-viz")
       .append("svg")
-      .attr("width", width)
-      .attr("height", height);
-  }
+      .attr('id', 'connections-svg')
+      .attr("width", width * 2)
+      .attr("height", height * 1.5)
+
+      //.style("transform", 'scale(0.75)')
+      //.style("transformOrigin", 'top left')
+    }
+
+  /*
   // Create the force simulation
   const simulation = d3.forceSimulation()
       .force("link", d3.forceLink().id(d => d.id))
@@ -32,6 +36,8 @@ var height = parentDiv.getBoundingClientRect().height;
   //const nodesCopy = [...nodes];
   //console.log(nodesCopy)
   simulation.nodes(nodes).on("tick", ticked);
+
+  */
   
 let linkGroup = svg.select("g.links");
 if(linkGroup.empty()) {
@@ -55,6 +61,8 @@ link.exit().remove();
 
 //const sigmoid = x => 1 / (1 + Math.exp(-x));
 
+const y_correction = 25;
+
 
 link.enter().append("line")
   .style('stroke', d => d.colour)  
@@ -63,9 +71,9 @@ link.enter().append("line")
   .attr("class", "connection") // Add a class to the connections
   .merge(link)
   .attr("x1", d => d.source.position.x)
-  .attr("y1", d => d.source.position.y)
+  .attr("y1", d => d.source.position.y + y_correction) // Mild correction of 25 may need to be propogated elsewhere
   .attr("x2", d => d.target.position.x)
-  .attr("y2", d => d.target.position.y);
+  .attr("y2", d => d.target.position.y + y_correction);
 
 ///Colour on mouseover.
 
@@ -153,8 +161,8 @@ network.neural_welcome_list.forEach(neuron => {
       }
     })
     .merge(node)
-    .attr("cx", d => d.position.x)
-    .attr("cy", d => d.position.y);
+    .attr("cx", d => d.position.x - 2)
+    .attr("cy", d => d.position.y + y_correction - 2);  // Mild correction of 25 may need to be propogated elsewhere
 
     node.append("title")
     .text(d => d.id);
@@ -193,6 +201,7 @@ network.neural_welcome_list.forEach(neuron => {
 
   // Add labels to the nodes
 
+  /*
 
   // Create the ticked function
 function ticked() {
@@ -207,6 +216,9 @@ function ticked() {
         .attr("cy", d => d.position.y);
 }
 
+*/
+
+/*
 
   function dragstarted(d) {
     if (!d.active) simulation.alphaTarget(0.3).restart();
@@ -224,7 +236,9 @@ function ticked() {
     d.fx = null;
     d.fy = null;
   }
+  */
 }
+
 
     
       
@@ -345,11 +359,11 @@ export function generateVisualizationData(network) {
             .domain([-2, 2]); // assumes weight and bias values are normalized between -1 and 1
 
           const widthScale = d3.scaleLinear()
-            .range([0.001, 1]) // set the range of line widths
+            //.range([0.001, 1]) // set the range of line widths
             .domain([0, 2]); // assumes weight and bias values are normalized between -1 and 1
 
-          const color = colorScale(-(weight + bias));
-          const width = widthScale(Math.abs(weight) + Math.abs(bias));
+          const color = colorScale(weight * 2)    // colorScale(-(weight + bias));
+          const width = widthScale(bias * 10)    //widthScale(Math.abs(weight) + Math.abs(bias));
 
 
           connections.push({

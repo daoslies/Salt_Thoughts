@@ -4,12 +4,12 @@
   }
   
   .slider-container {
-    width: 400px;
+    width: 150%;
     height: 20px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 87%;
+    left: -35%;
+    
     background-color: rgb(21, 45, 82);
     border: 1px solid #ccc;
     padding: 20px;
