@@ -263,7 +263,7 @@ function Wire({ setRenderEmbeddingRep }) {
 
  
 
-    svg.selectAll('line') 
+    svg.selectAll(null) 
       .data(points)
       .enter()
       .append('line')
@@ -273,9 +273,9 @@ function Wire({ setRenderEmbeddingRep }) {
       .style('opacity', 1)
       .style('zIndex', 50)
       .attr('x1', (d, i) => i === 0 ? wire_start_pos_x : points[i - 1].x)
-      .attr('y1', (d, i) => i === 0 ? wire_start_pos_y : points[i - 1].y)
+      .attr('y1', (d, i) => i === 0 ? points[0].y : points[i - 1].y)
       .attr('x2', (d,i) => points[i].x) 
-      .attr('y2', (d,i) => points[i].y+1);   
+      .attr('y2', (d,i) => points[i].y);   
 
      
     svg.selectAll('.jack-image').remove(); 
@@ -425,7 +425,7 @@ useEffect(() => {
   
   // 4. Create chain of circle bodies for wire 
   
-  if (wireBodies.length <= 4) {
+  if (wireBodies.length <= 0) {
 
   let wireBody = Matter.Bodies.circle(wire_start_pos_x, wire_start_pos_y, 5, {
     restitution: 0.5, 

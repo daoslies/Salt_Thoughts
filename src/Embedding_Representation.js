@@ -101,20 +101,27 @@ const EmbeddingRep = (props) => {
 
 useEffect(() => {
 
+  var neuronContainer = svg.append("g")
+
+  var saltContainer = svg.append("g")
+
+  var laserContainer = svg.append("g")
+
+
   //svg.selectAll('laser').remove();  
  
   // Draw initial grid
   dots.map((dot, id)=> {
 
     // Black outline
-    svg.append('circle') 
+    neuronContainer.append('circle') 
       .attr('id', `${id}-outline`)
       .attr('cx', (dot.x + 0 + wireNodeX-(70 * widthScaled))) 
       .attr('cy', (dot.y - 0 + wireNodeY+(85 * widthScaled)))   
       .attr('r', dotSize + 2) 
-      .style('fill', 'black');
+      .style('fill', '#140b00');
 
-    svg.append('circle')
+    neuronContainer.append('circle')
       .attr('id', 'circle-' + id) 
       .attr('class', 'embedNeuron')
       .attr('cx', (dot.x + 0 + wireNodeX-(70 * widthScaled))) 
@@ -130,22 +137,21 @@ useEffect(() => {
 
     if (laserPosId % 10 == id % 10) { //laserPosId % 10 == id % 10
  
-      svg.append('line')
+      laserContainer.append('line')
       .style('stroke', 'red')      // Add stroke color
-      .style('stroke-width', 2)     // Set stroke width
-      .style('stroke-opacity', 0.75)
+      .style('stroke-width', 5)     // Set stroke width
+      .style('stroke-opacity', 0.25)
       .attr('class', 'laser')
-      .attr('id', 'laser-line-' + laserPosId)
+      .attr('id', 'laser-line-' + id)
       .attr('x1', wireNodeX)
       .attr('y1', wireNodeY-25)
       .attr('x2', dot.x + 0 + wireNodeX-(70 * widthScaled))
       .attr('y2', dot.y - 0 + wireNodeY+(85 * widthScaled))
-      .attr('z-index', 50);
 
       
       setLaserDelay(laserDelay + 1)
 
-      if (laserDelay >= 3) {
+      if (laserDelay >= 5) {
         
 
         setLaserDelay(0)
@@ -176,7 +182,7 @@ useEffect(() => {
     const index = particle.id % ImageArray.length;
     const image = ImageArray[index];
 
-    svg.append('image')
+    saltContainer.append('image')
       .attr('class', 'particle-img-')
       .attr('x', particle.x)
       .attr('y', particle.y)
@@ -188,6 +194,7 @@ useEffect(() => {
   
    
 
+      //svg.selectAll('line').remove();   
 
  
 
