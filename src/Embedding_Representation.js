@@ -32,6 +32,9 @@ const EmbeddingRep = (props) => {
                                       opacity: Math.random() 
                                   }]);
 
+  const [laserPosId, setLaserPosId] = useState(0)
+  const [laserDelay, setLaserDelay] = useState(0);
+
   //const [particles, setParticles] = useState([]);
 
 
@@ -98,6 +101,7 @@ const EmbeddingRep = (props) => {
 
 useEffect(() => {
 
+  //svg.selectAll('laser').remove();  
  
   // Draw initial grid
   dots.map((dot, id)=> {
@@ -116,9 +120,44 @@ useEffect(() => {
       .attr('cx', (dot.x + 0 + wireNodeX-(70 * widthScaled))) 
       .attr('cy', (dot.y - 0 + wireNodeY+(85 * widthScaled))) 
       .attr('r', dotSize)
-      .style('fill', '#938332' ) 
+      .style('fill', '#10216e' ) 
       .style('opacity', dot.opacity)
       .style('z-index', 1);
+
+      
+    /////// Laser
+
+
+    if (laserPosId % 10 == id % 10) { //laserPosId % 10 == id % 10
+ 
+      svg.append('line')
+      .style('stroke', 'red')      // Add stroke color
+      .style('stroke-width', 2)     // Set stroke width
+      .style('stroke-opacity', 0.75)
+      .attr('class', 'laser')
+      .attr('id', 'laser-line-' + laserPosId)
+      .attr('x1', wireNodeX)
+      .attr('y1', wireNodeY-25)
+      .attr('x2', dot.x + 0 + wireNodeX-(70 * widthScaled))
+      .attr('y2', dot.y - 0 + wireNodeY+(85 * widthScaled))
+      .attr('z-index', 50);
+
+      
+      setLaserDelay(laserDelay + 1)
+
+      if (laserDelay >= 3) {
+        
+
+        setLaserDelay(0)
+        setLaserPosId(laserPosId + 1)
+
+        if (laserPosId >= numDots -1) {
+          setLaserPosId(0)
+        }
+      }
+
+
+    }
       
   });
 
@@ -127,6 +166,7 @@ useEffect(() => {
   if (Math.random() < 0.05) {
     spawnParticleDispatcher(dots);
   }
+  
 
   if (particles)  {
 
@@ -146,22 +186,8 @@ useEffect(() => {
       //.style('opacity', particle.opacity);
 
   
+   
 
-    /////// Laser
-
-
-    svg.selectAll('line').remove();   
-    svg.append('line')
-    .style('stroke', 'red')      // Add stroke color
-    .style('stroke-width', 2)     // Set stroke width
-    .style('stroke-opacity', 0.5)
-    .attr('class', 'laser')
-    .attr('id', 'laser-line-' + particle.id)
-    .attr('x1', wireNodeX)
-    .attr('y1', wireNodeY-25)
-    .attr('x2', particle.x) 
-    .attr('y2', particle.y)  
-    .attr('z-index', 50);
 
  
 
