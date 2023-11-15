@@ -5,18 +5,20 @@ import "./Book.css";
 import ChapterText from "./Your_Thoughts_Are_Made_Of_Salt_The_Machine_2"
 import ChapterText1 from "./Your_Thoughts_Are_Made_Of_Salt_The_Machine_1"
 
-import book_img from './Salt_Pics/Book_1_v3.png';
+import book_img from './Salt_Pics/Sweet_v2_2.png';
+import book_img_2 from './Salt_Pics/Sweet_v2_3.png';
+import bookHand_img from './Salt_Pics/Book_Hand_CutOut.png';
 
 const Book = () => {                                                                                                                
 
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState([]);  
   const [pageText, setPageText] = useState("");
-  const [leftPage, setLeftPage] = useState([]);
-  const [rightPage, setRightPage] = useState([]);
+
   const [bookProgress, setBookProgress] = useState({1 : 0});
 
-  
+  const [opacity, setOpacity] = useState(1);
+  const [opacityDirection, setOpacityDirection] = useState('Down');
     
   const pageLeft = useRef(null);
 
@@ -25,6 +27,29 @@ const Book = () => {
   const paragraphRef = useRef();
 
   const PAGE_SIZE = 1; 
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+
+      if (opacity >= 0.9) {setOpacityDirection('Down')};
+      if (opacity <= 0.1) {setOpacityDirection('Up')};
+
+      setOpacity(prevOpacity => {
+
+        if (opacityDirection === 'Up') {
+          return prevOpacity + 0.035; 
+        }
+        if (opacityDirection === 'Down') {
+          return prevOpacity - 0.05; 
+        }
+        
+        
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [opacity]);
 
 
   function getPage(index) {
@@ -281,40 +306,44 @@ const Book = () => {
       <div style={{position:'absolute', zIndex: 0, height:'100%', left: '2%'}}>
         <img className="book-img" src={book_img}  draggable="false" dragstart="false" 
               style={{userSelect: 'none', userDrag: 'none', 
-                      height: '100%'}} >
+                      height: '100%', position: 'absolute'}} >
         </img>
+
+        <img className="book-img" src={book_img_2}  draggable="false" dragstart="false" 
+              style={{userSelect: 'none', userDrag: 'none', 
+                      height: '100%', position: 'absolute',
+                      opacity: opacity}} >
+        </img>
+
+        <img className="book-img" src={bookHand_img}  draggable="false" dragstart="false" 
+              style={{userSelect: 'none', userDrag: 'none', 
+                      height: '100%', position: 'absolute'}} >
+        </img>
+
       </div>
 
       <div style={{position:'absolute', zIndex: 1}}>
 
-      {/*   <div className="page" style={{position:'absolute',  height: '5vh', width: '18vw', left: '21vw', top:'15vh',
-            }}>
-          {getPage(page).left} 
-        </div>
-
-        <div className="page" style={{position:'absolute',  height: '5vh', width: '18vw', left: '42vw', top:'15vh',
-            }}>
-          {getPage(page).right} 
-        </div> */}
-
         <div className="page" ref ={pageLeft} style={{position:'absolute', 
-        /*  height: '5vh', */ width: '18vw', left: '21vw', top:'15vh',
+        /*  height: '5vh', */ width: '16vw', left: '22.5vw', top:'15.5vh',
          /* transform: 'skew(0deg, 10deg)', */
          fontSize: '2vh'
             }}>
         </div>
 
         <div className="page" ref = {pageRight} style={{position:'absolute',
-        /*  height: '5vh', */ width: '18vw', left: '42vw', top:'15vh',
+        /*  height: '5vh', */ width: '18vw', left: '40.5vw', top:'16vh',
         /*  transform: 'skew(0deg, -10deg)', */
          fontSize: '2vh'
 
             }}>
         </div>
 
+        {/* the page numbers */}
+
         <div className="page" style={{position:'absolute',
-         left: '20.5vw', top:'52vh',
-         transform: 'skew(0deg, 5deg)',
+         left: '20.25vw', top:'53.75vh',
+         transform: 'skew(0deg, 8deg)',
          fontSize: '2vh'
             }}>
 
@@ -323,7 +352,7 @@ const Book = () => {
         </div>
 
         <div className="page" style={{position:'absolute',
-         left: '59.5vw', top:'51vh',
+         left: '59.25vw', top:'52.75vh',
          transform: 'skew(0deg, -5deg)',
          fontSize: '2vh'
             }}>
@@ -332,40 +361,36 @@ const Book = () => {
 
         </div>
 
-
-
-
-        {/* <div ref = {wrapper} style ={{width: '18vw'}} >
-
-        </div> */}
-
       </div>
 
-      <div style={{position:'absolute', zIndex: 1}}>
+      <div className = 'page-turn-left' 
+        style = {{width: '40vw', height: '100%', zIndex: 5, position: 'absolute'}}
 
-
-        <button onClick={() =>  {
+        onClick={() =>  {
 
           var currentpage = page - PAGE_SIZE 
           if (currentpage < 1)
             {currentpage = 1}
 
           setPage(currentpage)
+        }}> 
 
-        }}>Prev Page</button> 
+      </div>
 
-        <button onClick={() =>  {
+      <div className = 'page-turn-right' 
+        style = {{right: '0px', width: '40vw', height: '100%', zIndex: 5, position: 'absolute'}}
+
+        onClick={() =>  {
 
           var currentpage = page + PAGE_SIZE 
           if (currentpage > 110)
             {currentpage = 110}
             
           setPage(currentpage)
-
-        }}>Next Page</button>
-
+        }}> 
 
       </div>
+
     </div>
   );
 };

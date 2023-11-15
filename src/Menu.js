@@ -5,6 +5,8 @@ import { useState } from 'react';
 import Dyanmic_Menu_Elements from "./Dynamic_Menu_Elements";
 import About_Menu from "./AboutMenu";
 
+import The_Desk from './Salt_Pics/The_Desk.png';
+
 const Menu = () => {
 
   const [isAboutMenu, setIsAboutMenu] = useState(false);
@@ -16,6 +18,7 @@ const Menu = () => {
         <b className="your-thoughts-are">Your Thoughts Are Made Of Salt</b>
       </div>
 
+      <img src={The_Desk} style={{position: 'absolute', left: '0vh', top: '12.5vh', width: '100vw'}}></img>
 
       <Dyanmic_Menu_Elements/>
 

@@ -30,3 +30,10 @@
   color: green;
   border: 3px solid red
 }
+
+.page-turn-right {
+  cursor:   url(./Salt_Pics/Cursor_Right.png) 100 10, pointer;
+}
+.page-turn-left {
+  cursor:   url(./Salt_Pics/Cursor_left.png) 0 10, auto;
+}
