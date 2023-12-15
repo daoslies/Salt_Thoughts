@@ -51,7 +51,7 @@ const Book = () => {
     return () => clearInterval(interval);
   }, [opacity]);
 
-
+/*
   function getPage(index) {
     // Create DOM element from HTML 
     const pageEl = document.createElement('div');
@@ -126,7 +126,7 @@ const Book = () => {
     return pages
     
   }
-
+*/
   useEffect(() => {
     const pages = PaginateText(ChapterText, pageLeft, pageRight);
     setPageText(pages);
