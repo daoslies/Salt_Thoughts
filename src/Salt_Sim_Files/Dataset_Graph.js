@@ -27,6 +27,9 @@ svg = d3.select("#Data_Graph")
 
 var data = network.irisData;
 
+console.log('IRIS DATA: ', network.irisData)
+console.log('Iris Data just the network: ', network)
+
   // Add X axis
   var x = d3.scaleLinear()
     .domain([4, 8])
