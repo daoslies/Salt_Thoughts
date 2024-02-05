@@ -34,6 +34,7 @@ import NeuronGraph from './Salt_Sim_Files/Neuron_WB_Graph';
 import Network_Menu from './Salt_Sim_Files/NetworkMenu';
 
 
+import Iris_Data_Import from './Salt_Sim_Files/Iris_Data.csv';
 //import * as d3 from 'd3';
 
 import Matter, { Events } from 'matter-js';
@@ -497,7 +498,7 @@ console.log('weights post init: ', this.weights)
       return array
   }
 
-    const response = await fetch("\Iris_Data.csv");
+    const response = await fetch(Iris_Data_Import);
     const data = await response.text();
     var rows = data.split("\n").slice(1);
     
