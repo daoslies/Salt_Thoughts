@@ -500,7 +500,8 @@ console.log('weights post init: ', this.weights)
 
     const response = await fetch(Iris_Data_Import);
     const data = await response.text();
-    var rows = data.split("\n").slice(1);
+    const normalizedData = data.replace(/\r/g, '\n');  //A random carriage return '\r' was messing with the live site.
+    var rows = normalizedData.split("\n").slice(1);
     
     var processedData = rows.map(row => {
       
@@ -978,11 +979,11 @@ function Salt_Sim() {
         var target = 'x'
         
     
-        if (currentFlower.species === "Iris-setosa\r") {
+        if (currentFlower.species === "Iris-setosa") {
           target =  0;
-        } else if (currentFlower.species === "Iris-versicolor\r") {
+        } else if (currentFlower.species === "Iris-versicolor") {
           target =  1;
-        } else if (currentFlower.species === "Iris-virginica\r") {
+        } else if (currentFlower.species === "Iris-virginica") {
           target = 2;
         }
 
@@ -1398,6 +1399,7 @@ function updateVerSliders() {
 
     useEffect(() => {
       if (graphTime) {
+        console.log('Iris data in main: ', network)
         graphing(network)
         const visualizationData = generateVisualizationData(network)
         createD3Visualization(network, visualizationData.validConnections, visualizationData.nodes, visualizationData.links, graphTime);
