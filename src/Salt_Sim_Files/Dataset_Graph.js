@@ -45,6 +45,14 @@ console.log('Iris Data just the network: ', network)
   svg.append("g")
     .call(d3.axisLeft(y));
 
+    for (let i = 0; i < data.length; i++) {
+      const currentData = data[i];
+
+      console.log("Iris Data LOOOP SPECIES:", currentData.species);
+      console.log('IRis Data LOOOP is it a stetosa? "Iris-setosa"', currentData.species === "Iris-setosa" ? 'YES' : "No")
+
+    }
+
   // Add dots
   svg.append('g')
     .selectAll("dot")
