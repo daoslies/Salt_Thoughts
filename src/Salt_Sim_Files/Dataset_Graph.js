@@ -55,8 +55,8 @@ console.log('Iris Data just the network: ', network)
       .attr("cy", function (d) { return y(d.sepalWidth); } )
       .attr("r", 5.5)
       .style("fill", d => {
-        console.log("SPECIES:", d.species);  // Log species value
-        console.log('is it a stetosa? "Iris-setosa"', d.species === "Iris-setosa" ? 'YES' : "No")
+        console.log("Iris Data SPECIES:", d.species);  // Log species value
+        console.log('IRis Data is it a stetosa? "Iris-setosa"', d.species === "Iris-setosa" ? 'YES' : "No")
         return d.species === "Iris-setosa" ? '#FF1F9F' :
               d.species === "Iris-versicolor" ? '#39FFFF' :
               d.species === "Iris-virginica" ? '#FF8900' : '#000000';})
