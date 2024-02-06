@@ -42,3 +42,27 @@ What are we doing:
   - Make it so the plug plugs in if the plug is touching anywhere on the port img.
 
   - Make sure the matter stuff is turned off when it isn't in use/generally deal with the lag.
+
+
+
+
+
+  ----------------------
+
+  06/02/2024 -- Coming back to this after christmas. All the NaViOli stuff is being fun and lovely (tho vi is not messsaging much and that is causing insecurity)
+
+
+  Right so, What are we doing:
+
+    -- Just fixed the colours in the graph and targets. --- TICKTICKTICK
+
+    -- Screen spacing :'(
+
+    -- Mobile clicks
+
+    -- Finish off the about page text
+
+    -- Compress all the big assets
+
+    -- THe extended / urls don't work.  (which is big bolox)
+
