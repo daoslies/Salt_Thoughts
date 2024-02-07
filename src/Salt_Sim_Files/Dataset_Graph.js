@@ -27,9 +27,6 @@ svg = d3.select("#Data_Graph")
 
 var data = network.irisData;
 
-console.log('IRIS DATA: ', network.irisData)
-console.log('Iris Data just the network: ', network)
-
   // Add X axis
   var x = d3.scaleLinear()
     .domain([4, 8])
@@ -45,14 +42,6 @@ console.log('Iris Data just the network: ', network)
   svg.append("g")
     .call(d3.axisLeft(y));
 
-    for (let i = 0; i < data.length; i++) {
-      const currentData = data[i];
-
-      console.log("Iris Data LOOOP SPECIES:", currentData.species);
-      console.log('IRis Data LOOOP is it a stetosa? "Iris-setosa"', currentData.species === "Iris-setosa" ? 'YES' : "No")
-
-    }
-
   // Add dots
   svg.append('g')
     .selectAll("dot")
@@ -63,8 +52,6 @@ console.log('Iris Data just the network: ', network)
       .attr("cy", function (d) { return y(d.sepalWidth); } )
       .attr("r", 5.5)
       .style("fill", d => {
-        console.log("Iris Data SPECIES:", d.species);  // Log species value
-        console.log('IRis Data is it a stetosa? "Iris-setosa"', d.species === "Iris-setosa" ? 'YES' : "No")
         return d.species === "Iris-setosa" ? '#FF1F9F' :
               d.species === "Iris-versicolor" ? '#39FFFF' :
               d.species === "Iris-virginica" ? '#FF8900' : '#000000';})

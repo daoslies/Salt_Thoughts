@@ -66,3 +66,5 @@ What are we doing:
 
     -- THe extended / urls don't work.  (which is big bolox)
 
+    -- Recording the chapter/editing the chapter/is this even the right chapter.
+
