@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, Link, Outlet, useLocation, useN
 import Matter from 'matter-js';
 import * as d3 from 'd3';
 
+import {isMobile} from 'react-device-detect';
+
 
 //import { engine } from './Engine'; 
 
@@ -43,7 +45,6 @@ const push_me_images = [
   push_me_img_3,
   push_me_img_4
 ];
-
 
 
 
@@ -474,11 +475,20 @@ useEffect(() => {
     let mouseCon = null;
 
     const mousedownevent = (event) => {
+
+      if (isMobile) {
+        var X_down = event.changedTouches[0].pageX
+        var Y_down = event.changedTouches[0].pageY
+      }
+      else {
+        var X_down = event.clientX
+        var Y_down = event.clientY
+      }
       
       if (!pluggedPortRef.current || !portButtonHoverRef.current) {
 
       if (!mouse_rect) {
-      mouse_rect = Matter.Bodies.rectangle(event.clientX, event.clientY, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
+      mouse_rect = Matter.Bodies.rectangle(X_down, Y_down, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
       
       Matter.World.add(world, mouse_rect); 
       
@@ -509,13 +519,23 @@ useEffect(() => {
     let isMouseMoving = false;
     
     const handleMouseMove = (event) => {
+      
+      if (isMobile) {
+        var X_move = event.changedTouches[0].pageX
+        var Y_move = event.changedTouches[0].pageY
+      }
+      else {
+        var X_move = event.clientX
+        var Y_move = event.clientY
+      }
+
       if (!isMouseMoving) {
         isMouseMoving = true;
         requestAnimationFrame(() => {
           // Update the object's position here
           if (mouse_rect) {
-            mouse_rect.position.x = event.clientX;
-            mouse_rect.position.y = event.clientY;
+            mouse_rect.position.x = X_move;
+            mouse_rect.position.y = Y_move;
           }
           
         });
@@ -525,18 +545,32 @@ useEffect(() => {
 
     useEffect(() => {
 
-      document.addEventListener('mousedown', mousedownevent);
-      document.addEventListener('mouseup', mouseupevent);
-    
-      document.addEventListener('mousemove', handleMouseMove);
+      if (isMobile) {
+        document.addEventListener('touchstart', mousedownevent);
+        document.addEventListener('touchend', mouseupevent);
+        document.addEventListener('touchmove', handleMouseMove);
+      }
+
+      else {
+        document.addEventListener('mousedown', mousedownevent);
+        document.addEventListener('mouseup', mouseupevent);
+        document.addEventListener('mousemove', handleMouseMove);
+      }
     
       return () => {
         // Cleanup: Remove the event listener when the component unmounts
-        
-        document.removeEventListener('mousedown', mousedownevent);
-        document.removeEventListener('mouseup', mouseupevent);
 
-        document.removeEventListener('mousemove', handleMouseMove);
+        if (isMobile) {
+          document.removeEventListener('touchstart', mousedownevent);
+          document.removeEventListener('touchend', mouseupevent);
+          document.removeEventListener('touchmove', handleMouseMove);
+        }
+        
+        else {
+          document.removeEventListener('mousedown', mousedownevent);
+          document.removeEventListener('mouseup', mouseupevent);
+          document.removeEventListener('mousemove', handleMouseMove);
+        }
 
       };
     }, []); 

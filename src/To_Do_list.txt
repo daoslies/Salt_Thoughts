@@ -64,7 +64,7 @@ What are we doing:
 
     -- Compress all the big assets
 
-    -- THe extended / urls don't work.  (which is big bolox)
+    -- THe extended / urls don't work.  (which is big bolox) --- Dealt with -- Error file in kinsta set to index.html
 
     -- Recording the chapter/editing the chapter/is this even the right chapter.
 
