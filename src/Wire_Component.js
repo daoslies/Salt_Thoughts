@@ -25,6 +25,10 @@ jackImageArray[4] = jack_5_img;
 
 
 
+// HMmmmmm maybe this is a dead version of wire. Potentially delete 21/02/24.
+
+
+
 
 export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
 

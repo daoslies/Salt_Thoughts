@@ -891,8 +891,19 @@ useEffect(() => {
                     }}  />     
       
             <Link to={'Salt'}  id="book-link" 
-            
-            onClick={() => setRouteTime(true)} >
+          
+            onClick={() => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={() => {
+              if (isMobile) {
+                setRouteTime(true);
+              }
+            }}
+
+            >
       
             {RouteButton('book-button', positionsRef.current.book.left+(200 * positionsRef.current.book.width/273),
                                         positionsRef.current.book.top+(35 * positionsRef.current.book.width/273), pushMeimageIndex)}
@@ -907,7 +918,18 @@ useEffect(() => {
       
             <Link to={'Audio'} id="audio-link" 
             
-            onClick={() => {setRouteTime(true);}}>
+            onClick={() => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={() => {
+              if (isMobile) {
+                setRouteTime(true);
+              }
+            }} 
+            
+            >
       
             {RouteButton('audio-button', positionsRef.current.audio.left+(200 * positionsRef.current.audio.width/273), 
                                          positionsRef.current.audio.top+(35 * positionsRef.current.audio.width/273), pushMeimageIndex)}
@@ -922,7 +944,18 @@ useEffect(() => {
             
             <Link to={'Salt_Sim_3'} id="sim-link" 
             
-            onClick={() => setRouteTime(true)}>
+            onClick={() => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={() => {
+              if (isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            
+            >
       
             {RouteButton('flower-button', positionsRef.current.flower.left+(200 * positionsRef.current.flower.width/273), 
                                          positionsRef.current.flower.top+(35 * positionsRef.current.flower.width/273), pushMeimageIndex)}
@@ -966,7 +999,19 @@ useEffect(() => {
 
       flex="1"
       
-      onMouseDown={() => {setRouteTime(false);}}>
+
+      onClick={() => {
+        if (!isMobile) {
+          setRouteTime(false);
+        }
+      }}
+      onTouchStart={() => {
+        if (isMobile) {
+          setRouteTime(false);
+        }
+      }}
+      
+      >
 
         X
 
