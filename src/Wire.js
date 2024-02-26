@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'; 
-import { BrowserRouter as Router, Routes, Route, Link, Outlet, useLocation, useNavigate }  from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation, useNavigate  }  from "react-router-dom";
+import { Link, redirect, useNavigation } from "react-router-dom";
+
+
 
 import Matter from 'matter-js';
 import * as d3 from 'd3';
@@ -58,6 +61,9 @@ const push_me_images = [
 
 function Wire({ setRenderEmbeddingRep }) {
 
+  
+
+
   const [routeTime, setRouteTime] = useState(false);
 
   const navbarExpanded = true; // props.navbarExpanded;
@@ -79,6 +85,8 @@ function Wire({ setRenderEmbeddingRep }) {
   const bookRouteRef = useRef(null);
   const audioRouteRef = useRef(null);
   const simRouteRef = useRef(null);
+
+
 
   useEffect(() => {
     
@@ -779,13 +787,16 @@ useEffect(() => {
 
   
   function RouteButton(Route, left, top, pushMeimageIndex) {
+
+    
+
     return (
          <img className='route-button hidden' 
          id={Route} 
          src={push_me_images[pushMeimageIndex]} 
          onMouseEnter={() => portButtonHoverRef.current = true}
          onMouseLeave={() => portButtonHoverRef.current = false}
-         onMouseClick={() => setRouteTime(true)}
+
          style={{
           zIndex: 25,
           position: 'absolute',
@@ -867,7 +878,6 @@ useEffect(() => {
   }, [PORTS]);
 
 */
-  
 
     return ( 
 
@@ -883,22 +893,29 @@ useEffect(() => {
         <div className="flex-container">
         
           <div className="wire">  
+          
+            
+
             
       
 
             <img className="book-port" src={audio_port_img} 
                     style={{
                     }}  />     
-      
-            <Link to={'Salt'}  id="book-link" 
+
+            <Link to={'/Salt'}  id="book-link" 
+
+            
           
-            onClick={() => {
+            onClick={(e) => {
               if (!isMobile) {
                 setRouteTime(true);
               }
             }}
-            onTouchStart={() => {
+            onTouchStart={(e) => {
               if (isMobile) {
+                window.history.pushState({urlPath:'/Salt'}, "",'/Salt');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
                 setRouteTime(true);
               }
             }}
@@ -916,18 +933,20 @@ useEffect(() => {
                   style={{
                   }}  /> 
       
-            <Link to={'Audio'} id="audio-link" 
+            <Link to={'/Audio'} id="audio-link" 
             
             onClick={() => {
               if (!isMobile) {
                 setRouteTime(true);
               }
             }}
-            onTouchStart={() => {
+            onTouchStart={(e) => {
               if (isMobile) {
+                window.history.pushState({urlPath:'/Audio'}, "",'/Audio');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
                 setRouteTime(true);
               }
-            }} 
+            }}
             
             >
       
@@ -942,15 +961,17 @@ useEffect(() => {
                   style={{
                   }}  />
             
-            <Link to={'Salt_Sim_3'} id="sim-link" 
+            <Link to='/Salt_Sim_3' id="sim-link" 
             
             onClick={() => {
               if (!isMobile) {
                 setRouteTime(true);
               }
             }}
-            onTouchStart={() => {
+            onTouchStart={(e) => {
               if (isMobile) {
+                window.history.pushState({urlPath:'/Salt_Sim_3'}, "",'/Salt_Sim_3');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
                 setRouteTime(true);
               }
             }}
@@ -1021,9 +1042,9 @@ useEffect(() => {
 
       
 
-      <Route path="/Salt" element={<Book id='bookElement'/>} /> 
+      <Route path="Salt" element={<Book id='bookElement'/>} /> 
 
-      <Route path="/Audio" element={<Audio />} /> 
+      <Route path="Audio" element={<Audio />} /> 
 
 
       <Route path="Salt_Sim_3" element={
