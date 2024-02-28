@@ -31,6 +31,7 @@ const Menu = () => {
         <div className="about-container">
           <b className="about" 
             onClick={() =>  setIsAboutMenu(!isAboutMenu)}
+            onTouchStart={() =>  setIsAboutMenu(!isAboutMenu)}
           >
             What is this all <span style = {{color: 'white', margin: '1vw', fontSize: 'calc(7px + 1.5vmin)' }}> About </span> ? 
           </b>

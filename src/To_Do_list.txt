@@ -56,9 +56,20 @@ What are we doing:
 
     -- Just fixed the colours in the graph and targets. --- TICKTICKTICK
 
+    -- Www. kills the dns or something. 
+
     -- Screen spacing :'(
 
     -- Mobile clicks
+
+        -- Routing has a solution.  :D :D :D
+
+        -- Need to double check all the other clicks 
+
+              -- wire in audio. 
+              -- Alllll The shit in salt sim :'(
+              -- Book
+              -- About menu.
 
     -- Finish off the about page text
 

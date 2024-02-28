@@ -70,7 +70,10 @@ const Network_Menu = (props) => {
               transform: 'translateX(-50%)',
                           }}       
            
-            onClick={() => togglePhysics()} src={play_button_back_images[Math.max(0,controlPanelImageIndex-1)]}/>
+            onClick={() => togglePhysics()}
+            onTouchStart={() => togglePhysics()}
+            
+            src={play_button_back_images[Math.max(0,controlPanelImageIndex-1)]}/>
 
 
           <img className={`play-button-lever ${Start ? 'on' : 'off'}`}
@@ -79,7 +82,10 @@ const Network_Menu = (props) => {
               left: '50%',
                           }}    
 
-            onMouseDown={() => togglePhysics()} src={play_button_lever_img}/>
+            onMouseDown={() => togglePhysics()} 
+            onTouchStart={() => togglePhysics()}
+            
+            src={play_button_lever_img}/>
 
             <div style = {{position:'relative', left: '55%', top: '-55%'}}>On</div>
             <div style = {{position:'relative', left: '110%', top: '0%'}}>Off</div>

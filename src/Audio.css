@@ -10,7 +10,7 @@
     font-size: calc(10px + 2vmin);
     color: var(--color-gainsboro-100);
     font-family: var(--desktop-menu);
-    border: 2px solid rgb(255, 0, 0);
+    
   }
 
 
@@ -19,7 +19,7 @@
 { 
   position: absolute;
   left: calc(40vw - 40vh);
-  border: 2px solid rgb(30, 255, 0);
+  border: 2px solid rgba(30, 255, 0, 0);
 }
 
 .image-container .radio-main      

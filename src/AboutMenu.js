@@ -15,7 +15,8 @@ const About_Menu = ({ isAboutMenu, setIsAboutMenu }) => {
               
               overflow: 'hidden',
               border: '3px solid black'}}
-            onClick={() => setOpen(!open)}>
+            onClick={() => setOpen(!open)}
+            onTouchStart={() => setOpen(!open)}>
 
           {title}  
 
@@ -57,7 +58,8 @@ const About_Menu = ({ isAboutMenu, setIsAboutMenu }) => {
 
         flex="1"
         
-        onMouseDown={() => {setIsAboutMenu(false);}}>
+        onMouseDown={() => {setIsAboutMenu(false);}}
+        onTouchStart={() => {setIsAboutMenu(false);}}>
 
           X
 
@@ -107,7 +109,8 @@ const About_Menu = ({ isAboutMenu, setIsAboutMenu }) => {
 
         flex="1"
         
-        onMouseDown={() => {setIsAboutMenu(false);}}>
+        onMouseDown={() => {setIsAboutMenu(false);}}
+        onTouchStart={() => {setIsAboutMenu(false);}}>
 
           X
 

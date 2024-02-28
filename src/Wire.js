@@ -1002,7 +1002,8 @@ useEffect(() => {
         width: '80vw',
         height: '80vh', 
         zIndex: !routeTime ? 1 : 100,
-        border: '3px solid black'
+        border: '3px solid black',
+        overflow: 'hidden'
       }}
       
       flex="1" >
@@ -1054,19 +1055,16 @@ useEffect(() => {
           style={{ 
             width: '100%', 
             height: '100%', 
-            overflow: 'auto', 
+            overflow: 'clip', 
             position: 'absolute',
             }}>
 
-        <div style = {{
-              transform: 'scale(0.6)',
-              transformOrigin: 'top left' 
-              }}>
+   
 
         <Salt_Sim_3/>
-
+ 
         </div>
-        </div>
+        
       
       } /> 
       

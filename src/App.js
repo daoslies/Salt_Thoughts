@@ -34,8 +34,11 @@ const App = () => {
         {/* Conditionally render message only if on mobile and message is visible */}
         {isMobile && showMobileMessage && (
           <div className="mobile-message">
-            The World Of Salt is optimized for horizontal viewing. Please rotate your device (or access the site from your desktop computer)
+            The World Of Salt is optimized for horizontal viewing.
+            
+             Please rotate your device (or access the site from your desktop computer)
             for the best experience.
+            
             {/* Optional button to dismiss the message */}
             <button onClick={handleDismissMessage} onTouchStart={handleDismissMessage}>Dismiss</button>
           </div>

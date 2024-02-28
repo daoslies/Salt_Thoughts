@@ -263,8 +263,8 @@ class Network {
           //console.log(neuronPos)
           const saltCountStyle = {
             position: 'absolute',
-            left: parseInt(neuronPos.left) + 75 + 'px', // Position the text to the right of the neuron image
-            top: parseInt(neuronPos.top) + 5 + 'px',
+            left: parseInt(neuronPos.left) + 75 + '%', // Position the text to the right of the neuron image
+            top: parseInt(neuronPos.top) + 5 + '%',
             color: index === target ? 'green' : 'red'
           };
           return <span style={saltCountStyle}> {outputNeuron.props.neuron.saltCount} </span>
@@ -434,8 +434,8 @@ console.log('weights post init: ', this.weights)
     let blank_neuron = new Neuron(
       `Blank`,
       engine,
-      2000,
-      2000,
+      -200,
+      -200,
       `Blank`,
       'Blank',
       'Blank',
@@ -555,7 +555,7 @@ updateHtmlRender(layers, layerArray) {
 
 const nullLayerArray = layerArray[1].map(num => Array(num).fill(null));
 
-const propslist = [];
+var propslist = [];
 
 nullLayerArray.forEach((innerArray, outerIndex) => {
 innerArray.forEach((_, innerIndex) => {
@@ -599,9 +599,9 @@ old_neurons.forEach(neuron => {
   console.log('TO remove: ', wireToRemove)
   
   if (wireToRemove) {
-    console.log('World b4: ', engine.world)
+    //console.log('World b4: ', engine.world)
     Composite.remove(engine.world, wireToRemove);
-    console.log('World afta: ', engine.world)
+    //console.log('World afta: ', engine.world)
 }
 });
 
@@ -1162,9 +1162,10 @@ function updateVerSliders() {
 
   var vertSlides = markPositions.map((position, index) => (
     <Slider
+
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${((position * 0.0812)) + 12}vw`, bottom: '8vh', height: 75 }}
+      style={{ position: "absolute", left: `${((position * 0.145)) + 12}%`, bottom: '90%', height: 75 }}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -1604,43 +1605,65 @@ function updateVerSliders() {
     const [networkMenuOpen, setNetworkMenuOpen] = useState(false);
 
 
-    console.log('World in salt sim: ', engine.world)
+    //console.log('World in salt sim: ', engine.world)
+    /* you're gunna have 2 come up with 2 different renderigns. One for mob, one for main*/
 
     return (
   
       
   
-      <div className="container" id="container" style={{padding: '5%'}}>
+      <div className="container" id="container" style={{width:'100%', height:'100%'}}>
 
         
-
         <div 
           className = "network-viz" id="network-viz" 
-          style={{height: '100%', width: '100%', position: 'absolute'}}>
+          style={{height: '100%', width: '100%', position: 'absolute', 
+          top: '2.5vh', left: '5vh',
+          transform: 'scale(0.5)', transformOrigin: 'top left'}}>
 
             {netState}
             {outputSaltCount}
-            
+
 
         </div>
              
-      <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'absolute'}} >
+      <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'relative', top: '0%', left: '0%'}} >
 
       <div id="Data_Graph" style={{position: 'absolute', right: '-40%', top: '30%'}}></div>
 
-      <div style={{transform: 'scale(1.5)', transformOrigin: 'top left'}}>
+      <div id="Holder_Of_Controls" 
+      
+      style={{
+        position: 'relative', bottom: '0%', left: '0%',
+        width: '100%', height: '100%'
+      }}>
 
-
+      <button
+  style={{
+    position: 'absolute',
+    bottom: '5%',
+    right: '-10%',
+    padding: 0,
+    margin: 0,
+    border: 'none', // Remove any unwanted borders
+    backgroundColor: 'transparent', // Make it transparent if needed
+  }}
+>
       <img
         style={{position: 'relative', pointerEvents: 'auto', 
-                top: '-5vh', right: '-45vw',
-                height:'20vh', width:'20vh',
+                height: '30%',
+                width: '30%',
                 transform: `
                             ${controlPanelImageHovered ? 'rotate(25deg)' : ''}  
                             ${controlPanelImageMouseDown ? 'scale(0.9)' : ''}
                           `}}
 
         onClick={() => setNetworkMenuOpen(!networkMenuOpen)}
+
+        onTouchStart={() => {setNetworkMenuOpen(!networkMenuOpen)
+                              setControlPanelImageMouseDown(true)}}
+        onTouchEnd={() => setControlPanelImageMouseDown(false)}
+
         onMouseEnter={() => setControlPanelImageHovered(true)}
         onMouseLeave={() => setControlPanelImageHovered(false)}
         onMouseDown={() => setControlPanelImageMouseDown(true)}
@@ -1649,7 +1672,7 @@ function updateVerSliders() {
         src={control_panel_images[controlPanelImageIndex]} 
       ></img>
 
-      
+</button>
       
       <Network_Menu
         networkMenuOpen={networkMenuOpen}
@@ -1675,7 +1698,7 @@ function updateVerSliders() {
       />
 
         
-        <div style={{ pointerEvents: 'auto', position: 'relative', top: '-10vh', left: '-10vw'}}>
+        <div style={{ pointerEvents: 'auto', position: 'absolute', bottom: '10%', left: '0vw', width: '80%'}}>
           
           {verArray}
 
@@ -1684,7 +1707,7 @@ function updateVerSliders() {
             ref={horSliderRef}
             padding={'30px'}
             margin={'30px'}
-            style={{width: '80%', left: '-3.5%'}}
+            style={{width: '100%', left: /*'-3.5%'*/ '5%'}}
             defaultValue={2}
             step={1}
             min={0}
