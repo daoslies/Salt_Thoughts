@@ -60,6 +60,14 @@ What are we doing:
 
     -- Screen spacing :'(
 
+      -- Salt size
+
+      -- Output neurons being weird sometimes
+
+      -- That input neuron doesnt render any copnnections sometimes the bastard
+
+      -- on certain sizes the neurons and wires are close, but not 100% aligned.
+
     -- Mobile clicks
 
         -- Routing has a solution.  :D :D :D
@@ -78,4 +86,6 @@ What are we doing:
     -- THe extended / urls don't work.  (which is big bolox) --- Dealt with -- Error file in kinsta set to index.html
 
     -- Recording the chapter/editing the chapter/is this even the right chapter.
+
+    -- Maybe the welcome in network.js is the source of the lag.
 

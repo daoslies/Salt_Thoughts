@@ -40,14 +40,17 @@ class Salt {
   
       this.saltStyle = {
         position: "absolute",
-        height: '20px',
-        width: '20px',
+        height: '5%',  /*20px*/
+        aspectRatio: 1,
+        width: 'auto',
         left: this.position_x + "px",
         top: this.position_y + "px",
   
       };
+
+      this.wire_size_in_px = 2.5 * (window.innerHeight * 0.8/ 100)
       
-      this.wire = Bodies.circle(this.position_x, this.position_y, 10);
+      this.wire = Bodies.circle(this.position_x, this.position_y, this.wire_size_in_px);  //wire size was 10
       this.wire.mass += 1.5
   
       Composite.add(this.engine.world, this.wire);

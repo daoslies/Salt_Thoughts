@@ -180,7 +180,7 @@ const SaveLoadButton = (props) => {
 
             {isPreTrainedStorageOptionsOpen && (
 
-              <div className="pre-trained-storage-options-container">
+              <div className="pre-trained-storage-options-container" style = {{'width':'99%'}}>
 
 
                 <Box className="pre-trained-storage-options-box-button" textAlign='center'>
@@ -188,7 +188,7 @@ const SaveLoadButton = (props) => {
                   <Button variant="contained"
                     //sx={{ml: 2}}
                     onClick={() => handleLoad_PreTrained(preTrainedModelToLoad)}>
-                       <span style={{color: 'white', fontSize: '145%'}}>Load PreTrained Model</span>
+                       <span style={{color: 'white', fontSize: '140%'}}>Load PreTrained Model</span>
                   </Button> 
 
                 </Box>
@@ -209,6 +209,7 @@ const SaveLoadButton = (props) => {
                 <Box className="pre-trained-storage-options-box-slider" textAlign='center'>
 
                   <Slider
+                  style={{width: '80%'}}
                     value={preTrainedModelToLoad}
                     onChange={(event, newValue) => {
                       setPreTrainedModelToLoad(newValue);

@@ -31,21 +31,30 @@ class Neuron {
   
       this.saltCount = 0;  // Initialize saltCount to 0
       this.everSalt = 0;
-      
+
+      this.canvasWidth = window.innerWidth;
+      this.canvasHeight = window.innerHeight;
+
+      this.left_in_px = (this.init_pos.x - 40) * 0.1 * (this.canvasWidth * 0.8/ 100);
+      this.top_in_px = (this.init_pos.y - 15) * 0.15 * (this.canvasHeight * 0.8/ 100);
+
+      this.wire_size_in_px = 25 * (this.canvasHeight * 0.8/ 100)
+
       this.state = {
         imgStyle: {
           position: "absolute",
-          height: '75px',
-          width: '75px',
-          left: this.init_pos.x - 40 + "px",
-          top: this.init_pos.y - 15 + "px",
+          height: '12%',
+          width: 'auto',  /* Automatically adjust height based on aspect ratio */
+          aspectRatio: 1, /* Defines a 1:1 aspect ratio (square) */
+          left: (this.init_pos.x - 40) * 0.1 + "%",
+          top: (this.init_pos.y - 15) * 0.15 + "%",
           opacity: 0.8,
           textalign: "center"
         }
       };
-  
+
       
-      this.wire = Bodies.circle(this.init_pos.x, this.init_pos.y, 25, {
+      this.wire = Bodies.circle(this.left_in_px, this.top_in_px, this.wire_size_in_px, {
         isStatic: true,
         neuron_type: this.type,
         neuron_id: this.id,
@@ -130,6 +139,7 @@ class Neuron {
         // Get all the connections that are linked to this node
         console.log('Valid Connections: ', self.vizData.validConnections)
         console.log('do t + S match the id? ', self.wire.id)
+        console.log('self: ', self)
 
         const connectedConnections = self.vizData.validConnections.filter(con => con.source.id === self.wire.id || con.target.id === self.wire.id);
         
@@ -245,6 +255,28 @@ class Neuron {
     // Method to decrement saltCount
     removeSalt() {
       this.saltCount--;
+    }
+
+    updateWireFromScreenSize(finalLayerIndex) {
+
+      this.canvasWidth = window.innerWidth;
+      this.canvasHeight = window.innerHeight;
+
+      if (this.type != 'output') {
+      this.left_in_px = (this.init_pos.x) * 0.1 * (this.canvasWidth * 0.8/ 100);
+      }
+      else {
+        this.left_in_px = (this.init_pos.x + ((finalLayerIndex+1) * 175) ) * 0.1 * (this.canvasWidth * 0.8/ 100);
+      }
+
+      this.top_in_px = (this.init_pos.y) * 0.15 * (this.canvasHeight * 0.8/ 100);
+
+      this.wire_size_in_px = 25 * (this.canvasHeight * 0.8/ 100)
+
+      
+      this.wire.position.x = this.left_in_px    
+      this.wire.position.y = this.top_in_px
+      this.wire.circleRadius = this.wire_size_in_px
     }
     
   }
