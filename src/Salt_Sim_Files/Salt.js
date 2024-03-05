@@ -29,8 +29,8 @@ class Salt {
       this.stopCountPump = 0;
       this.stopCountNudge = 0;
   
-      this.position_x = this.initNeuron.wire.position.x -75;
-      this.position_y = this.initNeuron.wire.position.y;
+      this.position_x = this.initNeuron.wire.position.x - ( 75 * 0.075 * (window.innerWidth * 0.8/ 100)); // * 0.1 * (window.innerWidth * 0.8/ 100);
+      this.position_y = this.initNeuron.wire.position.y //* 0.2 * (window.innerHeight * 0.8/ 100);
 
       this.output_x = output_x;
   
@@ -40,19 +40,31 @@ class Salt {
   
       this.saltStyle = {
         position: "absolute",
-        height: '5%',  /*20px*/
+        height: '4.4%',  /*20px*/
         aspectRatio: 1,
         width: 'auto',
-        left: this.position_x + "px",
-        top: this.position_y + "px",
+        left: this.position_x * 0.1+ "%",
+        top: this.position_y * 0.18 + "%",
   
       };
 
-      this.wire_size_in_px = 2.5 * (window.innerHeight * 0.8/ 100)
+      this.wire_size_in_px = 10 // 2.2
+
+      //alert('SIZE' + this.wire_size_in_px)
       
       this.wire = Bodies.circle(this.position_x, this.position_y, this.wire_size_in_px);  //wire size was 10
-      this.wire.mass += 1.5
-  
+      this.wire.mass += 2  //* (0.1778 * (window.innerHeight * 0.8/ 100))  ///// 1.5
+      console.log('Wire MASS', this.wire.mass, this.wire.id)
+      //alert(this.wire.mass)
+      //alert(window.innerHeight)
+      //alert((0.17781 * window.innerHeight * 0.8/ 100))
+
+      Matter.Body.scale(this.wire, (0.17781 * window.innerHeight * 0.8/ 100), (0.17781 * window.innerHeight * 0.8/ 100))
+      //this.wire.mass = 2.394 // 2.394
+      Matter.Body.set(this.wire, 'mass', 5)
+      console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
+      
+
       Composite.add(this.engine.world, this.wire);
   
       //salt.props.self.head_towards(salt.props.self, nextLayerNeurons, network);

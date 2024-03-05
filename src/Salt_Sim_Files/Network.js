@@ -97,8 +97,8 @@ class Network {
             //console.log(neuronPos)
             const saltCountStyle = {
               position: 'absolute',
-              left: parseInt(neuronPos.left) + 75 + '%', // Position the text to the right of the neuron image
-              top: parseInt(neuronPos.top) + 5 + '%',
+              left: parseInt(neuronPos.left) + 10 + '%', // Position the text to the right of the neuron image
+              top: parseInt(neuronPos.top) + 2.5 + '%',
               color: index === target ? 'green' : 'red'
             };
             return <span style={saltCountStyle}> {outputNeuron.props.neuron.saltCount} </span>
@@ -664,14 +664,25 @@ class Network {
   updateBasedOnScreenSize() {
     
     for (let i = 0; i < this.neural_welcome_list.length; i++) {
-      this.neural_welcome_list[i].props.neuron.updateWireFromScreenSize(this.finalLayerIndex)
+      console.log('1 - welcome list: ', this.neural_welcome_list[i].props.neuron.wire.position)
+      console.log(this.neural_welcome_list[i].props.neuron.id)
+      console.log('final layer index check', this.finalLayerIndex)
+      this.neural_welcome_list[i].props.neuron.updateWireFromScreenSize(this.currentFinalLayerIndex)
+      console.log('2: ', this.neural_welcome_list[i].props.neuron.wire.position)
     }
+
+    /*
     for (let i = 0; i < this.output_welcome_list.length; i++) {
+      console.log('1 - output welcopme list: ', this.output_welcome_list[i].props.neuron.wire.position)
+      console.log(this.output_welcome_list[i].props.neuron.id)
       this.output_welcome_list[i].props.neuron.updateWireFromScreenSize(this.finalLayerIndex)
+      console.log('2: ', this.output_welcome_list[i].props.neuron.wire.position)
     }
     for (let i = 0; i < this.input_welcome_list.length; i++) {
       this.input_welcome_list[i].props.neuron.updateWireFromScreenSize(this.finalLayerIndex)
     }
+
+    */
   
   }
   

@@ -18,27 +18,29 @@ const LearningRateSlider = ({ learningRate, setLearningRate }) => {
     <div>
       <Button variant="contained" 
         color={learningRateButtonColor} 
-        onClick={handleSetLearningRateClick}>
+        onClick={handleSetLearningRateClick}
+        onTouchStart={handleSetLearningRateClick}>
 
           {isSliderOpen ? "Close Slider" : "Set Learning Rate"}
 
       </Button>
 
       {isSliderOpen && (
-        <div className="slider-container">
+        <div className="slider-container" style ={{width: '80%', margin: '0 auto'}}>
           <Slider
             value={Math.log10(learningRate)}
             onChange={(event, newValue) => {
                 setLearningRate(10 ** newValue);
             }}
+            
             step={0.01}
             min={Math.log10(0.0000000001)}
             max={Math.log10(10)}
             marks={[
-                { value: Math.log10(0.0000000001), label: "0.0000000001" },
-                { value: Math.log10(0.0001), label: "0.0001" },
-                { value: Math.log10(1), label: "1" },
-                { value: Math.log10(10), label: "10" },
+                { value: Math.log10(0.0000000001), label: "" }, //label: "0.0000000001" },
+                { value: Math.log10(0.0001), label: "" }, //, label: "0.0001" },
+                { value: Math.log10(1), label: "" }, // , label: "1" },
+                { value: Math.log10(10), label: "" }, // , label: "10" },
             ]}
             />
         </div>

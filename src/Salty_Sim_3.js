@@ -61,7 +61,7 @@ const play_button_back_images = [
 
 // module aliases
 var Engine = Matter.Engine,
-    //Render = Matter.Render,
+    Render = Matter.Render,
     Runner = Matter.Runner,
     Bodies = Matter.Bodies,
     Composite = Matter.Composite,
@@ -74,12 +74,16 @@ engine = Engine.create();
 engine.world.gravity.scale = 0;
 engine.neuronGraph = null;
 // create a renderer
-//var render = null;
+var render = null;
 
-/*Render.create({
+render = Render.create({
   element: document.body,
-  engine: engine
-});  */
+  engine: engine,
+  background: 'blue',
+  width: 1200
+});  
+
+Matter.Render.setPixelRatio(render, 0.5)
 
 var runner = Runner.create();  ////////////////////////////////////////// Mabs make this conditional in some way.
 
@@ -191,6 +195,7 @@ Events.on(engine, 'beforeUpdate', function() {
 
 let network = new Network('TheNet', engine, Composite)
 network.initializeWeightsAndBiases();
+network.updateBasedOnScreenSize();
 
 
 //////// The Salt Sim
@@ -265,6 +270,8 @@ function Salt_Sim() {
           height: window.innerHeight,
         });
         network.updateBasedOnScreenSize()
+        if (graphTime) {
+          graphing(network)}
         updateHtmlRenderCallback()
       };
   
@@ -591,12 +598,12 @@ function updateVerSliders() {
       Runner.run(runner, engine);
 
 
-      /*
+      
       // run the renderer
       Render.run(render);
       if(!render) {
         render = Render.create({}); 
-      }*/
+      }
 
     }
 
@@ -1011,7 +1018,7 @@ function updateVerSliders() {
              
       <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'relative', top: '0%', left: '0%'}} >
 
-      <div id="Data_Graph" style={{position: 'absolute', right: '-40%', top: '30%'}}></div>
+      <div id="Data_Graph" style={{position: 'absolute', right: '5%', top: '5%'}}></div>
 
       <div id="Holder_Of_Controls" 
       

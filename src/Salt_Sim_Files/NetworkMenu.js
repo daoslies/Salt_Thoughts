@@ -115,6 +115,11 @@ const Network_Menu = (props) => {
             onClick={() => {
               setgraphTime(!graphTime)
               setAccuracyPlotButtonColorButtonColor(accuracyPlotButtonColor === primaryColour ? secondaryColour : primaryColour);    
+            }}
+
+            onTouchStart={() => {
+              setgraphTime(!graphTime)
+              setAccuracyPlotButtonColorButtonColor(accuracyPlotButtonColor === primaryColour ? secondaryColour : primaryColour);    
             }}>
 
               Accuracy Plot
@@ -127,6 +132,11 @@ const Network_Menu = (props) => {
             }}
 
             onClick={() => {
+              setgradTrackTime(!gradTrackTime)
+              setGradientTrackingButtonColorButtonColor(gradientTrackingButtonColor === primaryColour ? secondaryColour : primaryColour);
+            }}
+
+            onTouchStart={() => {
               setgradTrackTime(!gradTrackTime)
               setGradientTrackingButtonColorButtonColor(gradientTrackingButtonColor === primaryColour ? secondaryColour : primaryColour);
             }}>

@@ -60,13 +60,15 @@ What are we doing:
 
     -- Screen spacing :'(
 
-      -- Salt size
+      -- Salt size - yes, I think
 
-      -- Output neurons being weird sometimes
+      -- learning r89 slider
+ 
+      -- Output neurons being weird sometimes -- I think dealt with?
 
-      -- That input neuron doesnt render any copnnections sometimes the bastard
+      -- That input neuron doesnt render any copnnections sometimes the bastard -- Maybe these are just 0 weight connex
 
-      -- on certain sizes the neurons and wires are close, but not 100% aligned.
+      -- on certain sizes the neurons and wires are close, but not 100% aligned. - better, but still faffy
 
     -- Mobile clicks
 

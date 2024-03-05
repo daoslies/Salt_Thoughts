@@ -155,12 +155,14 @@ const SaveLoadButton = (props) => {
             sx={{mr: 2}}
             className="local-storage-options-save"
             position="relative"
-            onClick={handleSave}>
+            onClick={handleSave}
+            onTouchStart={handleSave}>
               Save
           </Button>
           <Button variant="contained"
             sx={{ml: 2}}
-            onClick={handleLoad}>
+            onClick={handleLoad}
+            onTouchStart={handleLoad}>
               Load
           </Button>
           </Box>
@@ -171,7 +173,8 @@ const SaveLoadButton = (props) => {
 
       <Button variant="contained" 
         color={preTrainedStorageButtonColor} 
-        onClick={handleSetIsPreTrainedStorageOptionsOpenClick}>
+        onClick={handleSetIsPreTrainedStorageOptionsOpenClick}
+        onTouchStart={handleSetIsPreTrainedStorageOptionsOpenClick}>
 
           {isPreTrainedStorageOptionsOpen ? "Close Pre-Trained Storage Options" : "Open Pre-Trained Model Storage Options"}
       
@@ -187,7 +190,8 @@ const SaveLoadButton = (props) => {
                   
                   <Button variant="contained"
                     //sx={{ml: 2}}
-                    onClick={() => handleLoad_PreTrained(preTrainedModelToLoad)}>
+                    onClick={() => handleLoad_PreTrained(preTrainedModelToLoad)}
+                    onTouchStart={() => handleLoad_PreTrained(preTrainedModelToLoad)}>
                        <span style={{color: 'white', fontSize: '140%'}}>Load PreTrained Model</span>
                   </Button> 
 

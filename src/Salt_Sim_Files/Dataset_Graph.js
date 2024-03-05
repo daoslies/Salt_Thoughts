@@ -3,10 +3,14 @@ import * as d3 from 'd3';
 
 function graphing(network) {
 
+var SFW = window.innerWidth * 0.8/ 100
+var SFH = window.innerHeight * 0.8/ 100
+
+
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 600 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+var margin = {top: 0.8 * SFH, right: 2.4 * SFW, bottom: 3 * SFH, left: 4.8 * SFW},
+    width = ((35 * SFW) - margin.left - margin.right) ,
+    height = ((50 * SFH) - margin.top - margin.bottom) ;
 
 // clean up from last time
 var svg = d3.select('#Data_Graph').selectAll("*");
@@ -18,7 +22,7 @@ svg = d3.select("#Data_Graph")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .attr("transform",
-          "translate(" + 0 + "," + 200 + ")")
+          "translate(" + 0 + "," + 0 + ")")
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
@@ -50,7 +54,7 @@ var data = network.irisData;
     .append("circle")
       .attr("cx", function (d) { return x(d.sepalLength); } )
       .attr("cy", function (d) { return y(d.sepalWidth); } )
-      .attr("r", 5.5)
+      .attr("r", 0.4 * SFW)
       .style("fill", d => {
         return d.species === "Iris-setosa" ? '#FF1F9F' :
               d.species === "Iris-versicolor" ? '#39FFFF' :
@@ -63,7 +67,7 @@ var data = network.irisData;
       .append("circle")
         .attr("cx", function (d) { return x(d.sepalLength); } )
         .attr("cy", function (d) { return y(d.sepalWidth); } )
-        .attr("r", 4)
+        .attr("r", 0.3 * SFW)
         .style("fill", d => 
         d.prediction === 0 ? '#FF1F9F' : 
         d.prediction === 1 ? '#39FFFF' : 
