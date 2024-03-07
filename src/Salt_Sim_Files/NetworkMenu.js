@@ -43,9 +43,11 @@ const Network_Menu = (props) => {
 
     <div 
         className={`network-menu-wrapper ${networkMenuOpen ? 'open' : 'collapsed'}`}
-        style={{ pointerEvents: 'auto' }}>
+        style={{ pointerEvents: 'none', position: 'relative', left: '0%', bottom: '0%', width: '100%', height: '100%', zIndex: '100'}}>
 
-        <networkmenu>
+        <networkmenu style={{ pointerEvents: 'auto', position: 'absolute', left: '50%', top: '5%',
+                   overflowY: 'auto', padding: '10px', width: '50%', minWidth: '30px', maxHeight: '160%',
+                   transform: 'scale(0.55)', transformOrigin: 'top left'}}> 
 
         <h1 >   Translation is Liquid  </h1>
 
@@ -70,7 +72,10 @@ const Network_Menu = (props) => {
               transform: 'translateX(-50%)',
                           }}       
            
-            onClick={() => togglePhysics()} src={play_button_back_images[Math.max(0,controlPanelImageIndex-1)]}/>
+            onClick={() => togglePhysics()}
+            onTouchStart={() => togglePhysics()}
+            
+            src={play_button_back_images[Math.max(0,controlPanelImageIndex-1)]}/>
 
 
           <img className={`play-button-lever ${Start ? 'on' : 'off'}`}
@@ -79,10 +84,13 @@ const Network_Menu = (props) => {
               left: '50%',
                           }}    
 
-            onMouseDown={() => togglePhysics()} src={play_button_lever_img}/>
+            onMouseDown={() => togglePhysics()} 
+            onTouchStart={() => togglePhysics()}
+            
+            src={play_button_lever_img}/>
 
-            <div style = {{position:'relative', left: '55%', top: '-55%'}}>On</div>
-            <div style = {{position:'relative', left: '110%', top: '0%'}}>Off</div>
+            <div style = {{position:'relative', left: '92%', top: '-55%'}}>On</div>
+            <div style = {{position:'relative', left: '147%', top: '0%'}}>Off</div>
 
 
 
@@ -107,6 +115,11 @@ const Network_Menu = (props) => {
             onClick={() => {
               setgraphTime(!graphTime)
               setAccuracyPlotButtonColorButtonColor(accuracyPlotButtonColor === primaryColour ? secondaryColour : primaryColour);    
+            }}
+
+            onTouchStart={() => {
+              setgraphTime(!graphTime)
+              setAccuracyPlotButtonColorButtonColor(accuracyPlotButtonColor === primaryColour ? secondaryColour : primaryColour);    
             }}>
 
               Accuracy Plot
@@ -119,6 +132,11 @@ const Network_Menu = (props) => {
             }}
 
             onClick={() => {
+              setgradTrackTime(!gradTrackTime)
+              setGradientTrackingButtonColorButtonColor(gradientTrackingButtonColor === primaryColour ? secondaryColour : primaryColour);
+            }}
+
+            onTouchStart={() => {
               setgradTrackTime(!gradTrackTime)
               setGradientTrackingButtonColorButtonColor(gradientTrackingButtonColor === primaryColour ? secondaryColour : primaryColour);
             }}>

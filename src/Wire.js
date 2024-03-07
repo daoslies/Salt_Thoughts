@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'; 
-import { BrowserRouter as Router, Routes, Route, Link, Outlet, useLocation, useNavigate }  from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation, useNavigate  }  from "react-router-dom";
+import { Link, redirect, useNavigation } from "react-router-dom";
+
+
 
 import Matter from 'matter-js';
 import * as d3 from 'd3';
@@ -58,6 +61,9 @@ const push_me_images = [
 
 function Wire({ setRenderEmbeddingRep }) {
 
+  
+
+
   const [routeTime, setRouteTime] = useState(false);
 
   const navbarExpanded = true; // props.navbarExpanded;
@@ -79,6 +85,8 @@ function Wire({ setRenderEmbeddingRep }) {
   const bookRouteRef = useRef(null);
   const audioRouteRef = useRef(null);
   const simRouteRef = useRef(null);
+
+
 
   useEffect(() => {
     
@@ -218,12 +226,15 @@ function Wire({ setRenderEmbeddingRep }) {
     });     
   */
 
+
+  const deskAspectRatio = (737/1920) * 0.52
+
   const vw = 50; // 50vw
   var width = window.innerWidth;
   var vwInPixels = (vw / 100) * width;
   var scaledWidth = width/1707
 
-  var vhInPixels = (window.innerHeight * 0.5) - 50 ;
+  var vhInPixels =  vwInPixels * deskAspectRatio  //(window.innerHeight * 0.5) - 50 ;
   
   var wire_start_pos_x = vwInPixels;
   var wire_start_pos_y = vhInPixels; //325 - 85 - 60;
@@ -250,10 +261,10 @@ function Wire({ setRenderEmbeddingRep }) {
     width = window.innerWidth;
     scaledWidth = width/1707;
     vwInPixels = (vw / 100) * width;
-    vhInPixels = (window.innerHeight * 0.5);
+    vhInPixels = vwInPixels * deskAspectRatio //(window.innerHeight * 0.5);
     
     wire_start_pos_x = vwInPixels;
-    wire_start_pos_y = vhInPixels - 120; //325 - 85 - 60;
+    wire_start_pos_y = vhInPixels + 4; //325 - 85 - 60;
 
     const points = wireBodies.map(b => b.position);
 
@@ -779,15 +790,18 @@ useEffect(() => {
 
   
   function RouteButton(Route, left, top, pushMeimageIndex) {
+
+    
+
     return (
          <img className='route-button hidden' 
          id={Route} 
          src={push_me_images[pushMeimageIndex]} 
          onMouseEnter={() => portButtonHoverRef.current = true}
          onMouseLeave={() => portButtonHoverRef.current = false}
-         onMouseClick={() => setRouteTime(true)}
+
          style={{
-          zIndex: 25,
+          zIndex: 50,
           position: 'absolute',
           left: left,
           top: top,
@@ -867,7 +881,6 @@ useEffect(() => {
   }, [PORTS]);
 
 */
-  
 
     return ( 
 
@@ -883,16 +896,34 @@ useEffect(() => {
         <div className="flex-container">
         
           <div className="wire">  
+          
+            
+
             
       
 
             <img className="book-port" src={audio_port_img} 
                     style={{
                     }}  />     
-      
-            <Link to={'Salt'}  id="book-link" 
+
+            <Link to={'/Salt'}  id="book-link" 
+
             
-            onClick={() => setRouteTime(true)} >
+          
+            onClick={(e) => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={(e) => {
+              if (isMobile) {
+                window.history.pushState({urlPath:'/Salt'}, "",'/Salt');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
+                setRouteTime(true);
+              }
+            }}
+
+            >
       
             {RouteButton('book-button', positionsRef.current.book.left+(200 * positionsRef.current.book.width/273),
                                         positionsRef.current.book.top+(35 * positionsRef.current.book.width/273), pushMeimageIndex)}
@@ -905,9 +936,22 @@ useEffect(() => {
                   style={{
                   }}  /> 
       
-            <Link to={'Audio'} id="audio-link" 
+            <Link to={'/Audio'} id="audio-link" 
             
-            onClick={() => {setRouteTime(true);}}>
+            onClick={() => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={(e) => {
+              if (isMobile) {
+                window.history.pushState({urlPath:'/Audio'}, "",'/Audio');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
+                setRouteTime(true);
+              }
+            }}
+            
+            >
       
             {RouteButton('audio-button', positionsRef.current.audio.left+(200 * positionsRef.current.audio.width/273), 
                                          positionsRef.current.audio.top+(35 * positionsRef.current.audio.width/273), pushMeimageIndex)}
@@ -920,9 +964,22 @@ useEffect(() => {
                   style={{
                   }}  />
             
-            <Link to={'Salt_Sim_3'} id="sim-link" 
+            <Link to='/Salt_Sim_3' id="sim-link" 
             
-            onClick={() => setRouteTime(true)}>
+            onClick={() => {
+              if (!isMobile) {
+                setRouteTime(true);
+              }
+            }}
+            onTouchStart={(e) => {
+              if (isMobile) {
+                window.history.pushState({urlPath:'/Salt_Sim_3'}, "",'/Salt_Sim_3');
+                window.location.hash+= '/'  // This is nonsense that triggers the link to actually update the url.
+                setRouteTime(true);
+              }
+            }}
+            
+            >
       
             {RouteButton('flower-button', positionsRef.current.flower.left+(200 * positionsRef.current.flower.width/273), 
                                          positionsRef.current.flower.top+(35 * positionsRef.current.flower.width/273), pushMeimageIndex)}
@@ -943,12 +1000,13 @@ useEffect(() => {
       
       style={{
         position: 'relative',
-        top: '12vh', 
+        top: '0.75vw', 
         left: '10vw',
         width: '80vw',
         height: '80vh', 
         zIndex: !routeTime ? 1 : 100,
-        border: '3px solid black'
+        border: '3px solid black',
+        overflow: 'hidden'
       }}
       
       flex="1" >
@@ -966,7 +1024,19 @@ useEffect(() => {
 
       flex="1"
       
-      onMouseDown={() => {setRouteTime(false);}}>
+
+      onClick={() => {
+        if (!isMobile) {
+          setRouteTime(false);
+        }
+      }}
+      onTouchStart={() => {
+        if (isMobile) {
+          setRouteTime(false);
+        }
+      }}
+      
+      >
 
         X
 
@@ -976,9 +1046,9 @@ useEffect(() => {
 
       
 
-      <Route path="/Salt" element={<Book id='bookElement'/>} /> 
+      <Route path="Salt" element={<Book id='bookElement'/>} /> 
 
-      <Route path="/Audio" element={<Audio />} /> 
+      <Route path="Audio" element={<Audio />} /> 
 
 
       <Route path="Salt_Sim_3" element={
@@ -988,19 +1058,16 @@ useEffect(() => {
           style={{ 
             width: '100%', 
             height: '100%', 
-            overflow: 'auto', 
+            overflow: 'clip', 
             position: 'absolute',
             }}>
 
-        <div style = {{
-              transform: 'scale(0.6)',
-              transformOrigin: 'top left' 
-              }}>
+   
 
         <Salt_Sim_3/>
-
+ 
         </div>
-        </div>
+        
       
       } /> 
       

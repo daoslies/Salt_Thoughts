@@ -56,9 +56,30 @@ What are we doing:
 
     -- Just fixed the colours in the graph and targets. --- TICKTICKTICK
 
+    -- Www. kills the dns or something. 
+
     -- Screen spacing :'(
 
+      -- Salt size - yes, I think
+
+      -- learning r89 slider
+ 
+      -- Output neurons being weird sometimes -- I think dealt with?
+
+      -- That input neuron doesnt render any copnnections sometimes the bastard -- Maybe these are just 0 weight connex
+
+      -- on certain sizes the neurons and wires are close, but not 100% aligned. - better, but still faffy
+
     -- Mobile clicks
+
+        -- Routing has a solution.  :D :D :D
+
+        -- Need to double check all the other clicks 
+
+              -- wire in audio. 
+              -- Alllll The shit in salt sim :'(
+              -- Book
+              -- About menu.
 
     -- Finish off the about page text
 
@@ -67,4 +88,40 @@ What are we doing:
     -- THe extended / urls don't work.  (which is big bolox) --- Dealt with -- Error file in kinsta set to index.html
 
     -- Recording the chapter/editing the chapter/is this even the right chapter.
+
+    -- Maybe the welcome in network.js is the source of the lag.
+
+
+
+
+    -------------
+
+    05/-3/2024 -- Cleaning up wires -- In aid of adaptively resizing salt sim
+
+      -- There seems to be 2 wires for the update neurons (at least the first layer, going in for further schekcs)
+         
+         -- Skooshing up and down on the sliders produces lots of extra wwires.
+        
+            -- Presumably some of these don't get resized which is what causes the fukkery when resizing.
+
+            -- ctrl-f to 'remove'. The print (filter for 'bodies') is at salt_sim line 475.
+
+      -- Seperately the first sample of salts also don't seem to get removed. - Dealt
+
+
+      -- Cleaning seems to sort of be dealt with.
+
+      -- Scaling of neurons on resize is being weird -- I think Is dealt.
+
+      1 * 0.5 = 0.5
+
+      1 * 1 = 1
+
+      0.5 * 1 = 0.5
+
+      0.5 * 2 = 1
+
+      -- positioning of input and output neurons (mostly output) is being weird.  -- Think is dealt 
+
+
 

@@ -15,7 +15,7 @@ function spawnParticle( state, dots ) {
   // Select random circle element
   if (dots[0]) {
 
-
+    const deskAspectRatio = (737/1920) * 0.52
     
     const vw = 50; // 50vw
     const width = window.innerWidth;
@@ -24,7 +24,7 @@ function spawnParticle( state, dots ) {
     const vhInPixels = 0.5 * window.innerHeight;
     
     const x_offset = vwInPixels - 70;
-    const y_offset = vhInPixels - 50;
+    const y_offset = ((vwInPixels + 380)  * deskAspectRatio)  //vhInPixels - 50;
     
     // LaserBoxPosition 
     const wireNodeX = x_offset + 70;
@@ -79,10 +79,7 @@ const Dyanmic_Menu_Elements = () => {
 
     <div className="port-div">
 
-        <svg  
-            className="svg-container" id="svg-container"
-            width="100vw" height = "100vh" > 
-        </svg>  {/* Wire & EmbeddingRep live in this svg-container */}
+
 
         {  <Wire setRenderEmbeddingRep={setRenderEmbeddingRep} /> }
 

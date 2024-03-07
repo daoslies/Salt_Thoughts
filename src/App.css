@@ -1,0 +1,26 @@
+.mobile-message {
+    background-color: rgb(0, 13, 80);; /* Light gray background */
+    border: 1px solid #ddd; /* Light gray border */
+    color: white;
+    border-radius: 5px; /* Rounded corners */
+    padding: 15px; /* Padding for content */
+    margin: 0 auto; /* Center the message horizontally */
+    width: 50%; /* Set a fixed width */
+    text-align: center; /* Center the text within the message */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the element */
+    z-index: 10; /* Set a higher z-index to display above other content */
+
+  }
+  
+  
+  .mobile-message button {
+    background-color: #4CAF50; /* Green background for button */
+    color: white; /* White text color */
+    padding: 5px 10px; /* Padding for button content */
+    border: none; /* Remove border */
+    border-radius: 3px; /* Rounded corners for button */
+    cursor: pointer; /* Set cursor to pointer on hover */
+  }

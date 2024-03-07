@@ -31,21 +31,38 @@ class Neuron {
   
       this.saltCount = 0;  // Initialize saltCount to 0
       this.everSalt = 0;
-      
+
+      this.canvasWidth = window.innerWidth;
+      this.canvasHeight = window.innerHeight;
+      this.prevCanvasHeight = this.canvasHeight
+
+      this.SFH = (this.canvasHeight / this.prevCanvasHeight)
+
+      this.left_in_px = (this.init_pos.x) * 0.1 * (this.canvasWidth * 0.8/ 100);
+      this.top_in_px = (this.init_pos.y) * 0.15 * (this.canvasHeight * 0.8/ 100);
+
+      this.wire_size_in_px =  0.0284495 * this.canvasHeight // = 20 @ full screen 703
+
       this.state = {
         imgStyle: {
           position: "absolute",
-          height: '75px',
-          width: '75px',
-          left: this.init_pos.x - 40 + "px",
-          top: this.init_pos.y - 15 + "px",
+          height: '70px',   //'12%',
+          width: 'auto',  /* Automatically adjust height based on aspect ratio */
+          aspectRatio: 1, /* Defines a 1:1 aspect ratio (square) */
+          left: (this.init_pos.x - 40) * 0.1 + "%",
+          top: (this.init_pos.y - 15) * 0.15 + "%",
           opacity: 0.8,
-          textalign: "center"
+          textalign: "center",
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          objectFit: 'cover',
+          transform: 'scale(' + (window.innerHeight * 0.0014224751) + ')'
         }
       };
-  
+
       
-      this.wire = Bodies.circle(this.init_pos.x, this.init_pos.y, 25, {
+      this.wire = Bodies.circle(this.left_in_px, this.top_in_px, this.wire_size_in_px, {
         isStatic: true,
         neuron_type: this.type,
         neuron_id: this.id,
@@ -54,19 +71,12 @@ class Neuron {
           'category': 2,
           'mask': 0,}
       });
-      /*
-      if (this.type === 'output') {
-        this.wire.position.x -= 200;
-      }
-      
-      this.wire.collisionFilter = {
-        'group': -1,
-        'category': 2,
-        'mask': 0,
-      };
-*/
-      //alert(this.wire)
+
+      Matter.Body.scale(this.wire, this.SFH, this.SFH)
+
       Composite.add(this.engine.world, this.wire);
+
+
     } 
   
     Welcome({self}) {
@@ -130,6 +140,7 @@ class Neuron {
         // Get all the connections that are linked to this node
         console.log('Valid Connections: ', self.vizData.validConnections)
         console.log('do t + S match the id? ', self.wire.id)
+        console.log('self: ', self)
 
         const connectedConnections = self.vizData.validConnections.filter(con => con.source.id === self.wire.id || con.target.id === self.wire.id);
         
@@ -245,6 +256,54 @@ class Neuron {
     // Method to decrement saltCount
     removeSalt() {
       this.saltCount--;
+    }
+
+    updateWireFromScreenSize(finalLayerIndex) {
+
+      this.canvasWidth = window.innerWidth;
+      this.canvasHeight = window.innerHeight;
+
+      var screenSizeWidthScalingFactor =  (this.canvasWidth * 0.8/ 100)
+
+      this.SFH = (this.canvasHeight / this.prevCanvasHeight) //0.1778
+
+      this.prevCanvasHeight = this.canvasHeight
+
+      if (this.type != 'output') {
+        if (this.type == 'input') {
+          var lil_nudge = 0 * screenSizeWidthScalingFactor
+        }
+        else {
+          var lil_nudge = 100 * screenSizeWidthScalingFactor
+        }
+      this.left_in_px = (this.init_pos.x + lil_nudge) * 0.1 * screenSizeWidthScalingFactor;
+      }
+      else {
+        this.left_in_px = (this.init_pos.x + ((finalLayerIndex) * 175) ) * 0.1 * screenSizeWidthScalingFactor;
+      }
+
+      this.top_in_px = (this.init_pos.y) * 0.15 * (this.canvasHeight * 0.8/ 100);
+
+      this.wire_size_in_px = 20 * (this.canvasHeight * 0.8/ 100)
+
+      Matter.Body.scale(this.wire, this.SFH, this.SFH)
+
+      
+      //this.wire.position.x = this.left_in_px    
+      //this.wire.position.y = this.top_in_px
+      Matter.Body.set(this.wire, "position", {x: this.left_in_px , y: this.top_in_px})
+
+      this.wire.circleRadius = this.wire_size_in_px
+
+      // and transform the image.
+
+      console.log(this.htmlID)
+
+      if (document.getElementById(this.htmlID))
+      {document.getElementById(this.htmlID).style.transform = 'scale(' + (window.innerHeight * 0.0014224751) + ')'}
+
+      
+
     }
     
   }

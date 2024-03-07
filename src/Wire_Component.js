@@ -3,7 +3,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Matter from 'matter-js';
 import * as d3 from 'd3';
 
+import {isMobile} from 'react-device-detect';
+
 import "./Menu.css";
+
+
 
 import jack_1_img from './Salt_Pics/jack_1.png';
 import jack_2_img from './Salt_Pics/jack_2.png';
@@ -25,6 +29,15 @@ jackImageArray[4] = jack_5_img;
 
 
 
+// HMmmmmm maybe this is a dead version of wire. Potentially delete 21/02/24.
+
+// It's not dead, it's the version in the audio tab - if you were a pro you'd have both of them 
+// looking at the same file. 
+
+// But ya not so smd. - 27/02/2024
+
+
+
 
 export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
 
@@ -40,11 +53,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
   // 2. Create world and world options
   const world = engine.world;
   world.gravity.y = 0;
-
-
-
-
-  console.log('World in AUDIO wire: ', world)
 
   /*
   var render = Matter.Render.create({
@@ -77,9 +85,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
     // Animation frame
   function onAnimationFrame_MatterEvents() {
 
-    console.log('Engie: ', engine)
-    console.log()
-
     var wireBodies = world.bodies;
     
     if (!routeTime)  {
@@ -93,10 +98,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
     wire_start_pos_y = vhInPixels * 2; //325 - 85 - 60;
 
     const points = wireBodies.map(b => b.position);
-
-    console.log('wireBodies_Audio before Lines: ', wireBodies)
-    console.log('Points: ', points)
-
 
     points[0].x = wire_start_pos_x;
     points[0].y = wire_start_pos_y-(90 * scaledWidth * 0.85);
@@ -122,8 +123,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
      
     svg.selectAll('.jack-image').remove(); 
 
-    console.log('SVG Check', svg)
-
     checkDistance(points[points.length - 1])
 
     //Lock in that plug if we're plugged in.
@@ -148,8 +147,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
               length: 0, 
               aaplugidentify: 'PlugCOn'
             }); 
-
-            console.log('Plug Con', plugCon)
     
             Matter.World.add(world, plugCon); 
           }
@@ -173,8 +170,6 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
 
         Matter.World.remove(world, plug_rect);  
         plug_rect = null;
-        console.log('World: ', world)
-
         }
       }
     } 
@@ -312,15 +307,19 @@ function initialiseWire() {
 
     const mousedownevent = (event) => {
 
+      if (isMobile) {
+        var X_down = event.changedTouches[0].pageX
+        var Y_down = event.changedTouches[0].pageY
+      }
+      else {
+        var X_down = event.clientX
+        var Y_down = event.clientY
+      }
 
-      if (!wireStaysPluggedCusOfHoverRef.current) {
-      
       if (!mouse_rect) {
-        //alert()
-      mouse_rect = Matter.Bodies.rectangle(event.clientX, event.clientY, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
+      mouse_rect = Matter.Bodies.rectangle(X_down, Y_down, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
       
       Matter.World.add(world, mouse_rect); 
-
       
       if (wireBodies_Audio.length > 0) {
         mouseCon = Matter.Constraint.create({ 
@@ -332,7 +331,8 @@ function initialiseWire() {
 
         Matter.World.add(world, mouseCon); }
       
-      }}}
+      }}
+
 
       const mouseupevent = (event) => {
         Matter.World.remove(world, mouse_rect);
@@ -349,13 +349,23 @@ function initialiseWire() {
     let isMouseMoving = false;
     
     const handleMouseMove = (event) => {
+      
+      if (isMobile) {
+        var X_move = event.changedTouches[0].pageX
+        var Y_move = event.changedTouches[0].pageY
+      }
+      else {
+        var X_move = event.clientX
+        var Y_move = event.clientY
+      }
+
       if (!isMouseMoving) {
         isMouseMoving = true;
         requestAnimationFrame(() => {
           // Update the object's position here
           if (mouse_rect) {
-            mouse_rect.position.x = event.clientX;
-            mouse_rect.position.y = event.clientY;
+            mouse_rect.position.x = X_move;
+            mouse_rect.position.y = Y_move;
           }
           
         });
@@ -365,19 +375,33 @@ function initialiseWire() {
 
     useEffect(() => {
 
-      document.addEventListener('mousedown', mousedownevent);
-      document.addEventListener('mouseup', mouseupevent);
-    
-      document.addEventListener('mousemove', handleMouseMove);
+
+      if (isMobile) {
+        document.addEventListener('touchstart', mousedownevent);
+        document.addEventListener('touchend', mouseupevent);
+        document.addEventListener('touchmove', handleMouseMove);
+      }
+
+      else {
+        document.addEventListener('mousedown', mousedownevent);
+        document.addEventListener('mouseup', mouseupevent);
+        document.addEventListener('mousemove', handleMouseMove);
+      }
     
       return () => {
         // Cleanup: Remove the event listener when the component unmounts
+
+        if (isMobile) {
+          document.removeEventListener('touchstart', mousedownevent);
+          document.removeEventListener('touchend', mouseupevent);
+          document.removeEventListener('touchmove', handleMouseMove);
+        }
         
-        document.removeEventListener('mousedown', mousedownevent);
-        document.removeEventListener('mouseup', mouseupevent);
-
-        document.removeEventListener('mousemove', handleMouseMove);
-
+        else {
+          document.removeEventListener('mousedown', mousedownevent);
+          document.removeEventListener('mouseup', mouseupevent);
+          document.removeEventListener('mousemove', handleMouseMove);
+        }
       };
     }, [wireBodies_Audio]); 
     

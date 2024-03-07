@@ -8,8 +8,6 @@ import { useCallback } from 'react';
 //This means that the information contained in the embedding will be a compromise between the detailed information in the input and output data, and the more abstract and general representation of the relationship between the input and output data that is learned by the model.
 
 
-import ToggleSwitch from './Salt_Sim_Files/ToggleSwitch';
-
 
 
 import FrozenLayerButton from './Salt_Sim_Files/FrozenLayerButton';
@@ -19,22 +17,19 @@ import * as d3 from 'd3';
 import { createD3Visualization, generateVisualizationData } from './Salt_Sim_Files/D3_Visualization';
 
 
-import Salt from './Salt_Sim_Files/Salt';
 import updateSaltPositions from './Salt_Sim_Files/UpdateSaltPositions.worker';
 
 
-import Neuron from './Salt_Sim_Files/Neuron';
+
+import Network from './Salt_Sim_Files/Network';
 
 import backpropagation from './Salt_Sim_Files/BackProp_Flower';
 
 import graphing from './Salt_Sim_Files/Dataset_Graph';
 
-import NeuronGraph from './Salt_Sim_Files/Neuron_WB_Graph';
-
 import Network_Menu from './Salt_Sim_Files/NetworkMenu';
 
 
-import Iris_Data_Import from './Salt_Sim_Files/Iris_Data.csv';
 //import * as d3 from 'd3';
 
 import Matter, { Events } from 'matter-js';
@@ -66,7 +61,7 @@ const play_button_back_images = [
 
 // module aliases
 var Engine = Matter.Engine,
-    //Render = Matter.Render,
+    Render = Matter.Render,
     Runner = Matter.Runner,
     Bodies = Matter.Bodies,
     Composite = Matter.Composite,
@@ -78,14 +73,24 @@ var engine;
 engine = Engine.create(); 
 engine.world.gravity.scale = 0;
 engine.neuronGraph = null;
+
+/*
+
 // create a renderer
-//var render = null;
+var render = null;
 
-/*Render.create({
+render = Render.create({
   element: document.body,
-  engine: engine
-});  */
+  engine: engine,
+  background: 'blue',
+  width: 1200
+});  
 
+Matter.Render.setPixelRatio(render, 0.5)
+
+render.options.width = 2000;
+
+*/
 var runner = Runner.create();  ////////////////////////////////////////// Mabs make this conditional in some way.
 
 var mouse_area = document.getElementById('buttons')
@@ -188,649 +193,15 @@ Events.on(engine, 'beforeUpdate', function() {
 });
 
 
-class SaltBag {
-  constructor() {
-    this.saltList = [];
-  }
-  setSaltList(newSaltList) {
-    this.saltList = newSaltList;
-  }
 
-  Welcome({self}) {
-    return this.saltList.map(salt => <salt.Welcome self={salt} />);
-  }
-}
-
-
-class Network {
-  constructor(name) {
-
-    this.name = name;
-    this.htmlID = this.name + 'ID';
-    this.neural_array = [];
-    this.neural_welcome_list = [];
-    
-    this.saltBag = new SaltBag()
-    this.state = { htmlRender: this.neural_welcome_list};
-
-    this.outputSaltTotal = 0;
-
-    this.layers = 2;
-
-    this.inputLayers = 4;
-    this.hiddenLayers = null;
-    this.outputLayers = 3;
-
-    this.maxLayers = 10 + 2;
-    this.maxLayerArray = Array(this.maxLayers).fill(5);
-
-    //this.maxLayerArray[0] = this.inputLayers; /////////////////// CAn we set the first 2 layers 2 zero? look at how many nodes there are in the first layer and check the console log for network.maxlayerarray,
-    this.maxLayerArray[this.maxLayerArray.length - 1] = this.outputLayers;
-    this.currentFinalLayerIndex = 0;
-
-
-    this.initializeInputOutputNeurons();
-    this.loadData(this);
-
-    this.weights = {};
-    this.biases = {};
-    
-  }
-
-  
-
-  Welcome({self}) {
-
-    return <div>{self.saltBag.saltList}{self.state.htmlRender}
-    </div>;
-  }
-
-  OutputSaltCounts({self}) {
-    const outputNeurons = self.neural_welcome_list.filter(neuron => neuron.props.neuron.type === 'output');
-    //console.log(outputNeurons)
-
-    self.outputSaltTotal = outputNeurons.map(img => img.props.neuron.saltCount)
-    .reduce((prev, next) => prev + next);
-
-    var target = network.currentTarget;
-
-    //alert('in the count: ' + target)
-    return (
-
-      <div>
-        {outputNeurons.map((outputNeuron, index) => {
-          const neuronPos = outputNeuron.props.style;
-          //console.log(neuronPos)
-          const saltCountStyle = {
-            position: 'absolute',
-            left: parseInt(neuronPos.left) + 75 + 'px', // Position the text to the right of the neuron image
-            top: parseInt(neuronPos.top) + 5 + 'px',
-            color: index === target ? 'green' : 'red'
-          };
-          return <span style={saltCountStyle}> {outputNeuron.props.neuron.saltCount} </span>
-        })}
-      </div>
-    );
-  }
-
-
-  setState(newState) {
-
-    this.state = Object.assign({}, this.state, newState);
-  }
-
-  //// Weights and Bias Stuff
-
-  setWeightInit(fromNeuron, toNeuron, value) {
-    this.weights[`${fromNeuron}-${toNeuron}`] = value;
-  }
-
-  setBiasInit(toNeuron, value) {
-    this.biases[toNeuron] = value;
-  }
-
-  
-  setWeight(fromNeuron, toNeuron, value) {
-    this.weights[`${fromNeuron.id}-${toNeuron.id}`] = value;
-  }
-
-  setBias(toNeuron, value) {
-    this.biases[toNeuron.id] = value;
-  }
-
-  randomNormal() {
-    // Generate a random number with a normal distribution
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-  }
-
-  randomNormalBias() {
-    // Generate a random number with a normal distribution
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
-    const normal = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-
-    // Scale the normal value to the range [0, 5]
-    //const scaled = (normal + 5) / 2.0; // Transforming to range [0, 1]
-    return normal * 0.5; // Scaling to range [0, 10] // I think // mayube
-    // No scaling here anymore. We're  now doing that in the activation itself.
-      // And aiming to keep weights and biases between -1 and 1.
-      // no we're now going with 0.5 and - 0.5, because that leads to less activation saturation 
-      // I.e 0 weight, so flat line, and that flat line is purely at the top or bottom
-
-  }
-
-  
-
-  initializeWeightsAndBiases() {
-    for (let i = 0; i < this.maxLayerArray.length; i++) {
-      // Loop over all neurons in the current layer
-      for (let j = 0; j < this.maxLayerArray[i]; j++) {
-        const fromNeuron = `${i}-${j}`;
-        // Loop over all neurons in the next layer
-        for (let k = 0; k < this.maxLayerArray[i + 1]; k++) {
-          const toNeuron = `${i + 1}-${k}`;
-          this.setWeightInit(fromNeuron, toNeuron, this.randomNormal());
-          // Set the bias for the current neuron in the next layer
-          this.setBiasInit(toNeuron, this.randomNormalBias());
-        }
-      }
-    }
-
-// Make sure all the inputs and outputs have weights and biases //////////HERE
-
-const outputNeurons = this.output_welcome_list;
-
-for (let i = 0; i < this.input_welcome_list.length; i++) {
-
-  var initNeuron = this.input_welcome_list[i];
-  initNeuron = initNeuron.props.neuron;
-
-
-
-  // Adding in a section to ensure fresh input layer weights and biases on 'load randomly initialised model'
-
-  // add a bias
-
-  
-  // then Something about for i in layer 0 neurons. add a weight
-
-  for (let j = 0; j < this.maxLayerArray[0]; j++) {
-     const toNeuron = `${0}-${j}`;
-     //const key = `${currentNeuron.layer}-${currentNeuron.index}-${toNeuron}`;
-     this.setWeightInit(initNeuron.id, toNeuron, this.randomNormal());
-     this.setBias(initNeuron, network.randomNormalBias());
-  }
-
-  
-  //console.log('nextlayers', nextLayerNeurons)
-  if (outputNeurons.length > 0) {
-    // Check if there are weights and biases between the current neuron and the output neurons
-    outputNeurons.forEach(neuron => {
-      var outputNeuron = neuron.props.neuron;
-      //key = `${currentNeuron.layer}-${currentNeuron.index}-${neuron.layer}-${neuron.index}`;
-      //if (!network.weights[key]) { ////// Removed this conditional for purposes of loading random model.
-        // Generate weights and biases if they do not exist     // May need to be put back. lets find out.,
-      this.setWeight(initNeuron, outputNeuron, network.randomNormal());
-        
-      //}
-    });
-  }
-}
-
-console.log('weights post init: ', this.weights)
-
-    
-  }
-
-
-  initializeInputOutputNeurons() {
-    // Initialize the input neurons
-    this.inputNeurons = [];
-    for (let i = 0; i < this.inputLayers; i++) {
-      const inputNeuron = new Neuron(
-        `input-${i}`,
-        engine,
-        50,
-        125 + i * 150,  //125 + i * 100,
-        `i-${i}`, 
-        'i',
-        i,
-        'input'
-      );
-      this.inputNeurons.push(inputNeuron);
-    }
-    //position_x: 300 + outerIndex * 400,
-    //position_y: 2200 - 400 * innerIndex,
-
-    // Initialize the output neurons
-    this.outputNeurons = [];
-
-    
-    for (let i = 0; i < this.outputLayers; i++) {
-
-      var distanceFromCentre = Math.abs(i- 1)
-      const outputNeuron = new Neuron(
-        `output-${i}`,
-        engine,
-        400 - (distanceFromCentre * 55),
-        190 + i * 175, //150 150
-        `${this.maxLayers-1}-${i}`,
-        this.maxLayers - 1,
-        i,
-        'output'
-      );
-      this.outputNeurons.push(outputNeuron);
-    }
-    
-    /// kk And this next bit IS going to be silly. we are making a blank neuron to deal 
-    // with the fact that the final neuron created collides where none of the others do
-    // and I cannot work out why the flip that is happening.
-    
-    
-    let blank_neuron = new Neuron(
-      `Blank`,
-      engine,
-      2000,
-      2000,
-      `Blank`,
-      'Blank',
-      'Blank',
-      'Blank'
-    )
-
-    //let blank_welcome = blank_neuron.Welcome({self: blank_neuron})
-   
-    this.outputNeurons.push(blank_neuron);
-    this.blankNeuron = blank_neuron.Welcome({self: blank_neuron})
-
-    
- 
-
-    // Add the input and output neurons to the neural_array and neural_welcome_list
-    this.neural_array.unshift(...this.inputNeurons);
-    this.neural_array.push(...this.outputNeurons);
-    //this.neural_array.push(blank_neuron)
-  
-    // Create new arrays for input_welcome_list and neural_welcome_list
-    this.input_welcome_list = []
-    this.output_welcome_list = []
-    const newInputWelcomeList = this.inputNeurons.map(neuron => neuron.Welcome({self: neuron}));
-    const newOutputWelcomeList = this.outputNeurons.map(neuron => neuron.Welcome({self: neuron}));
-    
-    // Assign the new arrays to the input_welcome_list and neural_welcome_list variables
-    this.input_welcome_list.push(...newInputWelcomeList);
-    this.output_welcome_list.push(...newOutputWelcomeList);
-
-
-    this.neural_welcome_list = [] //Clearing out the neural_welcome_list here
-    const newNeuralWelcomeList = this.neural_welcome_list.concat(this.input_welcome_list, this.output_welcome_list);
-
-    this.neural_welcome_list = newNeuralWelcomeList;
-
-      
-    this.outputNeurons = this.outputNeurons.filter(function(neuron) {
-      return neuron.type !== 'Blank'
-  }) 
-
-
-    // Remove the stupid blank neuron
-    this.neural_welcome_list = this.neural_welcome_list.filter(function(img) {
-      return img.props.neuron.type !== 'Blank'
-  }) 
-
-    
-  }
-  
-
-  async loadData(self) {
-
-    function shuffleArray(array) {
-      for (var i = array.length - 1; i > 0; i--) {
-          var j = Math.floor(Math.random() * (i + 1));
-          var temp = array[i];
-          array[i] = array[j];
-          array[j] = temp;
-      }
-      return array
-  }
-
-    const response = await fetch(Iris_Data_Import);
-    const data = await response.text();
-    const normalizedData = data.replace(/\r/g, '\n');  //A random carriage return '\r' was messing with the live site.
-    var rows = normalizedData.split("\n").slice(1);
-    
-    var processedData = rows.map(row => {
-      
-      const columns = row.split(",");
-
-      const sepalLength = parseFloat(columns[0]);
-      const sepalWidth = parseFloat(columns[1]);
-      const petalLength = parseFloat(columns[2]);
-      const petalWidth = parseFloat(columns[3]);
-      const species = columns[4];
-
-      if (isNaN(sepalLength) || isNaN(sepalWidth) || isNaN(petalLength) || isNaN(petalWidth)) {
-          return null;
-        }
-
-        return {
-          sepalLength: sepalLength,
-          sepalWidth: sepalWidth,
-          petalLength: petalLength,
-          petalWidth: petalWidth,
-          species: species
-        };
-      });
-
-    processedData = processedData.filter(row => row !== null);
-    
-    processedData = shuffleArray(processedData)
-    console.log('Processed Data: ', processedData)
-    self.irisData = processedData;
-    return processedData;
-  }
- 
-
-
-
-
-/// Rendering
-
-
-updateHtmlRender(layers, layerArray) {
-
-  console.log('layaz: ', layers, layerArray)
-
-  //Remove the silly blank neuron if it is hanging around
-
-  this.neural_welcome_list = this.neural_welcome_list.filter(neuron => {
-    return neuron.props.neuron.layer !== 'Blank';
-  });
-  
-
-
-const nullLayerArray = layerArray[1].map(num => Array(num).fill(null));
-
-const propslist = [];
-
-nullLayerArray.forEach((innerArray, outerIndex) => {
-innerArray.forEach((_, innerIndex) => {
-
-var distanceFromCentre = Math.abs(innerIndex - 2)
-const neurProps = {
-name: 'Update_Neur' + outerIndex + '_' + (innerIndex),
-position_x: 300 + (outerIndex * 175) - (15 * distanceFromCentre ** 2),
-position_y: 700 - 175 * innerIndex, // 500 100
-layer: outerIndex,
-index: innerIndex
-};
-propslist.push(neurProps);
-});
-});
-  
-if (layers === 0) {propslist=[]};
-
-  console.log('propsList: ', propslist)
-
-  var old_neurons = [];
-
-// Filter the neural_welcome_list to only include neurons that are not in the propslist
-  old_neurons = this.neural_welcome_list.filter(existingNeuron => {
-    // check if the neuron has a type of 'input' or 'output'
-    if (existingNeuron.props.neuron.type === 'input' || existingNeuron.props.neuron.type === 'output') {
-        return false;
-    } 
-    return !propslist.some(neuron_props => {
-        return neuron_props.name === existingNeuron.props.neuron.name;
-    });
-  });
-
-
-console.log('olds', old_neurons)
-// Apply clean-up functions to the old neurons
-old_neurons.forEach(neuron => {
-
-  const wireToRemove = Composite.get(engine.world, neuron.props.neuron.wire.id, 'body');
-  
-  console.log('TO remove: ', wireToRemove)
-  
-  if (wireToRemove) {
-    console.log('World b4: ', engine.world)
-    Composite.remove(engine.world, wireToRemove);
-    console.log('World afta: ', engine.world)
-}
-});
-
-
-console.log('Old Ns: ', old_neurons)
-
-var indicesToRemove = old_neurons.map(neuron => this.neural_welcome_list.indexOf(neuron));
-// Use the splice method to remove the elements from the neural_welcome_list array
-this.neural_welcome_list.splice(
-  ...indicesToRemove,
-  old_neurons.length
-);
-
-
-try {
-  var new_neurons = propslist.filter(props => {
-    return !this.neural_welcome_list.some(neur => {
-      return props.name === neur.props.neuron.name;
-    });
-  });
-
-  
-  
-  console.log('New Ns (Props): ', new_neurons)
-
-
-
-  if (new_neurons !== []) {
-  this.neural_welcome_list.push(
-      ...new_neurons.map(neur_props => {
-        console.log(neur_props)
-      var neur = new Neuron(neur_props.name, engine, neur_props.position_x, neur_props.position_y, neur_props.layer + '-' + neur_props.index, neur_props.layer, neur_props.index, 'hidden');
-      console.log(neur)
-      var Welcome_in = neur.Welcome({self: neur});
-      return Welcome_in;
-    })
-  );}
-
-
-} catch (error) {
-  console.error(error);
-}
-
-
-//console.log('Final Ns: ', this.neural_welcome_list)
-
-const hiddenLayerArray = layerArray[1]
-
-
-//console.log('Layer:array ', layerArray)
-
-const expected_neuron_total = Number(network.inputLayers) + hiddenLayerArray.reduce((prev, next) => prev + Number(next), 0)  + Number(network.outputLayers);
-
-//console.log('Neuron_total: ', expected_neuron_total)
-const start = this.neural_welcome_list.length - expected_neuron_total
-
-
-if (start > 0) {
-this.neural_welcome_list.splice(expected_neuron_total, start)
-}
-
-var filteredArray = this.neural_welcome_list.filter(element =>
-  typeof element === 'object' && 'type' in element && element.type === 'img'
-);
-
-this.neural_welcome_list = filteredArray;
-
-//console.log('hidden_layer_array', hiddenLayerArray)
-var finalLayerIndex = 0
-
-//console.log('Final Layers indices: ', this.currentFinalLayerIndex, finalLayerIndex)
-
-hiddenLayerArray.forEach((item, idx) => {
-  if (item !== 0) {
-    finalLayerIndex = idx;
-  }
-});
-
-
-finalLayerIndex = finalLayerIndex + 1
-
-if (hiddenLayerArray.every(item => item === 0 || item === null || item === "")) {finalLayerIndex = 0};
-
-
-if (this.currentFinalLayerIndex !== finalLayerIndex) {
-
-console.log('NUMBER OF OUTPUT NEURONS: ', this.output_welcome_list)
-
-
-for (let i = 0; i < this.output_welcome_list.length; i++) {
-  
-  console.log('The neur: ', this.output_welcome_list[i])
-
-  var distanceFromCentre = Math.abs(i- 1)
-
-  this.output_welcome_list[i].props.neuron.wire.position.x = 400 + (finalLayerIndex * 175) - (distanceFromCentre * 55);
-
-  const newStyle = Object.assign({}, this.output_welcome_list[i].props.style, { left: `${363 + (finalLayerIndex * 175) - (distanceFromCentre * 55)}px` });
-  const newProps = {...this.output_welcome_list[i].props, style: newStyle};
-  this.output_welcome_list[i] = {...this.output_welcome_list[i], props: newProps};
-
-  console.log(' Checking OUTPUTS post position WIIIRE: ' , this.output_welcome_list[i].props.neuron.wire.position.x)
-  console.log(' Checking OUTPUTS post position IIMG: ' , this.output_welcome_list[i].props.style.left)
-} 
-}
-
-
-this.currentFinalLayerIndex = finalLayerIndex;
-
- // Check if the input neurons are already in the neural_welcome_list
- if (!this.input_welcome_list.some(neuron => this.neural_welcome_list.includes(neuron))) {
-  // Add the input neurons to the beginning of the neural_welcome_list
-  this.neural_welcome_list.unshift(...this.input_welcome_list);
-}
-
-
-if (!this.output_welcome_list.some(neuron => {
-  return this.neural_welcome_list.some(existingNeuron => {
-    return neuron.props.neuron.name === existingNeuron.props.neuron.name;
-  });
-})) {
-  // Add the output neurons to the end of the neural_welcome_list
-  this.neural_welcome_list.push(...this.output_welcome_list);
-}
-
-
-//Reinstate the silly blank neuron if it isn't there.
-if (!this.neural_welcome_list.some(neuron => neuron.props.neuron.layer === 'Blank')) {
-  this.neural_welcome_list.push(this.blankNeuron);
-}
-
-
-
-
-
-this.setState({htmlRender: this.neural_welcome_list});
-
-}
-
-
-
-updateSaltRender(network, epochNum, setepochNum, numSalts, setnumSalts, saltList, setsaltList, outputSaltCountCallback, inputAndOrState) {
-  
-  if (network.irisData) {
-  var current_flower = network.irisData[epochNum];
-
-  try {var sepalLength = current_flower.sepalLength;}
-
-  catch(error) 
-
-  { //network.loadData(); //maybe just shuffle this? the load did a fail, but i think a shuffle woudl b fine.
-    setepochNum(0); 
-    var current_flower = network.irisData[0];
-    var sepalLength = current_flower.sepalLength;}
-
-  var sepalWidth = current_flower.sepalWidth;
-  var petalLength = current_flower.petalLength;
-  var petalWidth = current_flower.petalWidth;
-
-
-
-  const scalingFactor = 2; // Adjust the scaling factor as desired
-
-
-
-  var total_current_salt = Math.round((sepalLength + sepalWidth + petalLength + petalWidth) * scalingFactor);
-
-  numSalts = total_current_salt 
-  setnumSalts(numSalts)
-
-  var anOutputNeuron = network.outputNeurons[0];
-
-
-  if (numSalts > saltList.length) {
-
-  // Create new salt objects and render them
-  const newSaltRenderList = [];
-  var initNeuron = null;
-
-  for (let i = saltList.length; i < numSalts; i++) {
-
-    // Calculate the proportions of salt for each input feature
-    
-    const sepalLengthProportion = sepalLength / total_current_salt * scalingFactor;
-    const sepalWidthProportion = sepalWidth / total_current_salt * scalingFactor;
-    const petalLengthProportion = petalLength / total_current_salt * scalingFactor;
-    const petalWidthProportion = petalWidth / total_current_salt * scalingFactor;
-  
-    // Determine the number of salt objects for each input feature
-    const sepalLengthSalt = Math.round(numSalts * sepalLengthProportion);
-    const sepalWidthSalt = Math.round(numSalts * sepalWidthProportion);
-    const petalLengthSalt = Math.round(numSalts * petalLengthProportion);
-    const petalWidthSalt = Math.round(numSalts * petalWidthProportion);
-  
-    // Place the salt objects in the corresponding neurons
-    if (i < sepalLengthSalt) {
-      initNeuron = this.input_welcome_list[0].props.neuron;
-    } else if (i >= sepalLengthSalt && i < sepalLengthSalt + sepalWidthSalt) {
-      initNeuron = this.input_welcome_list[1].props.neuron;
-    } else if (i >= sepalLengthSalt + sepalWidthSalt && i < sepalLengthSalt + sepalWidthSalt + petalLengthSalt) {
-      initNeuron = this.input_welcome_list[2].props.neuron;
-    } else if (i >= sepalLengthSalt + sepalWidthSalt + petalLengthSalt && i < numSalts) {
-      initNeuron = this.input_welcome_list[3].props.neuron;
-    }
- 
-  
-
-  let salt = new Salt("Salty_" + i, engine, outputSaltCountCallback, initNeuron, anOutputNeuron);
-  newSaltRenderList.push(<salt.Welcome self={salt} key={i} />);
-}
-
-  // Concatenate the new salt render list with the existing salt list
-  this.saltBag.setSaltList(newSaltRenderList) // this.saltBag.saltList.concat(newSaltRenderList));
-  } else if (numSalts < saltList.length) {
-  // Remove excess salt objects from the salt list
-  this.saltBag.setSaltList(this.saltBag.saltList.splice(numSalts, saltList.length - numSalts));
-  }
-
-  setsaltList(this.saltBag.saltList)
-}
-}
-}
 
 
 /// Instantiate The Objects
 
 
-let network = new Network('TheNet')
+let network = new Network('TheNet', engine, Composite)
 network.initializeWeightsAndBiases();
+network.updateBasedOnScreenSize();
 
 
 //////// The Salt Sim
@@ -886,6 +257,8 @@ function Salt_Sim() {
   const [controlPanelImageHovered, setControlPanelImageHovered] = useState(false);
   const [controlPanelImageMouseDown, setControlPanelImageMouseDown] = useState(false);
 
+
+
     useEffect(() => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * control_panel_images.length);
@@ -894,6 +267,30 @@ function Salt_Sim() {
     
       return () => clearInterval(interval);
     }, []);
+
+    const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
+    useEffect(() => {
+      // Function to update window size on resize
+      const handleResize = () => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+        network.updateBasedOnScreenSize()
+        if (graphTime) {
+          graphing(network)}
+        updateHtmlRenderCallback()
+      };
+  
+      // Add event listener on component mount
+      window.addEventListener("resize", handleResize);
+      handleResize()
+
+  
+      // Cleanup function to remove listener on unmount
+      return () => window.removeEventListener("resize", handleResize);
+    }, []); // Empty dependency array ensures effect runs only once on mount
 
 
 
@@ -1081,8 +478,10 @@ function Salt_Sim() {
             }
           });
           
-          try {Matter.World.remove(salt.engine.world, salt.wire);}
-          catch (error) {}
+          try { console.log('bodies: ', network)
+            Matter.World.remove(salt.engine.world, salt.wire);
+          }
+          catch (error) {console.log('The error: ', error)}
 
           try {
             let saltHTML = salt.htmlID;
@@ -1110,6 +509,14 @@ function Salt_Sim() {
         neuron.saltCount = 0;
         neuron.everSalt = 0;
       });
+
+      // Double check all the salt are gone
+      var saltDregs = network.engine.world.bodies.filter(dreg => dreg.salt === true);
+
+      saltDregs.forEach(dreg => {
+      Matter.World.remove(network.engine.world, dreg);
+      })
+
 
 
       setepochNum(epochNum + 1)
@@ -1160,11 +567,15 @@ function updateVerSliders() {
   const markPositions = [...Array(numMarks)].map((_, index) => (horizontalSliderWidth / (numMarks + 1)) * (index ));
 
 
+
+
   var vertSlides = markPositions.map((position, index) => (
     <Slider
+
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${((position * 0.0812)) + 12}vw`, bottom: '8vh', height: 75 }}
+      style={{ position: "absolute", left: `${((position * 1)) + (0.6 * (horizontalSliderWidth ** 0.75)-10)}px`, bottom: '10vh', 
+                height: 75, transform: `scale(` + (0.25 * (windowSize.height ** 0.95)/100) + `)`}}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -1207,13 +618,14 @@ function updateVerSliders() {
       // run the engine
       Runner.run(runner, engine);
 
-
       /*
+      
       // run the renderer
       Render.run(render);
       if(!render) {
         render = Render.create({}); 
-      }*/
+      }
+      */
 
     }
 
@@ -1351,7 +763,7 @@ function updateVerSliders() {
     useEffect(() => {
       // Call the sliderLoad() function after the horizontal slider has been rendered:
       updateVerSliders();
-    }, [numLayers, layerArray]);
+    }, [numLayers, layerArray, windowSize]);
 
 
     
@@ -1604,43 +1016,65 @@ function updateVerSliders() {
     const [networkMenuOpen, setNetworkMenuOpen] = useState(false);
 
 
-    console.log('World in salt sim: ', engine.world)
+    //console.log('World in salt sim: ', engine.world)
+    /* you're gunna have 2 come up with 2 different renderigns. One for mob, one for main*/
 
     return (
   
       
   
-      <div className="container" id="container" style={{padding: '5%'}}>
+      <div className="container" id="container" style={{width:'100%', height:'100%'}}>
 
         
-
         <div 
           className = "network-viz" id="network-viz" 
-          style={{height: '100%', width: '100%', position: 'absolute'}}>
+          style={{height: '100%', width: '100%', position: 'absolute', 
+          top: '2.5vh', left: '5vh',
+          transform: 'scale(0.5)', transformOrigin: 'top left'}}>
 
             {netState}
             {outputSaltCount}
-            
+
 
         </div>
              
-      <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'absolute'}} >
+      <div className ="ButtonMenu" id='buttons' style={{height: '100%', width: '100%', position: 'relative', top: '0%', left: '0%'}} >
 
-      <div id="Data_Graph" style={{position: 'absolute', right: '-40%', top: '30%'}}></div>
+      <div id="Data_Graph" style={{position: 'absolute', right: '5%', top: '5%'}}></div>
 
-      <div style={{transform: 'scale(1.5)', transformOrigin: 'top left'}}>
+      <div id="Holder_Of_Controls" 
+      
+      style={{
+        position: 'relative', bottom: '0%', left: '0%',
+        width: '100%', height: '100%'
+      }}>
 
-
+      <button
+  style={{
+    position: 'absolute',
+    bottom: '5%',
+    right: '-10%',
+    padding: 0,
+    margin: 0,
+    border: 'none', // Remove any unwanted borders
+    backgroundColor: 'transparent', // Make it transparent if needed
+  }}
+>
       <img
         style={{position: 'relative', pointerEvents: 'auto', 
-                top: '-5vh', right: '-45vw',
-                height:'20vh', width:'20vh',
+                height: '30%',
+                width: '30%',
                 transform: `
                             ${controlPanelImageHovered ? 'rotate(25deg)' : ''}  
                             ${controlPanelImageMouseDown ? 'scale(0.9)' : ''}
                           `}}
 
         onClick={() => setNetworkMenuOpen(!networkMenuOpen)}
+
+        onTouchStart={() => {setNetworkMenuOpen(!networkMenuOpen)
+                              setControlPanelImageMouseDown(true)}}
+        onTouchEnd={() => setControlPanelImageMouseDown(false)}
+
         onMouseEnter={() => setControlPanelImageHovered(true)}
         onMouseLeave={() => setControlPanelImageHovered(false)}
         onMouseDown={() => setControlPanelImageMouseDown(true)}
@@ -1649,7 +1083,7 @@ function updateVerSliders() {
         src={control_panel_images[controlPanelImageIndex]} 
       ></img>
 
-      
+</button>
       
       <Network_Menu
         networkMenuOpen={networkMenuOpen}
@@ -1675,7 +1109,7 @@ function updateVerSliders() {
       />
 
         
-        <div style={{ pointerEvents: 'auto', position: 'relative', top: '-10vh', left: '-10vw'}}>
+        <div style={{ pointerEvents: 'auto', position: 'absolute', bottom: '10%', left: '0vw', width: '80%'}}>
           
           {verArray}
 
@@ -1684,7 +1118,7 @@ function updateVerSliders() {
             ref={horSliderRef}
             padding={'30px'}
             margin={'30px'}
-            style={{width: '80%', left: '-3.5%'}}
+            style={{width: '100%', left: /*'-3.5%'*/ '5%'}}
             defaultValue={2}
             step={1}
             min={0}

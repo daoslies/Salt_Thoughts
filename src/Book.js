@@ -373,6 +373,15 @@ const Book = () => {
             {currentpage = 1}
 
           setPage(currentpage)
+        }}
+
+        onTouchStart={() =>  {
+
+        var currentpage = page - PAGE_SIZE 
+        if (currentpage < 1)
+          {currentpage = 1}
+
+        setPage(currentpage)
         }}> 
 
       </div>
@@ -387,6 +396,17 @@ const Book = () => {
             {currentpage = 110}
             
           setPage(currentpage)
+        }}
+
+        onTouchStart={() =>  {
+
+          console.log('Touched')
+
+        var currentpage = page + PAGE_SIZE 
+        if (currentpage > 110)
+          {currentpage = 110}
+          
+        setPage(currentpage)
         }}> 
 
       </div>
