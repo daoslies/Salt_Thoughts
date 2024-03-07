@@ -73,6 +73,9 @@ var engine;
 engine = Engine.create(); 
 engine.world.gravity.scale = 0;
 engine.neuronGraph = null;
+
+/*
+
 // create a renderer
 var render = null;
 
@@ -85,6 +88,9 @@ render = Render.create({
 
 Matter.Render.setPixelRatio(render, 0.5)
 
+render.options.width = 2000;
+
+*/
 var runner = Runner.create();  ////////////////////////////////////////// Mabs make this conditional in some way.
 
 var mouse_area = document.getElementById('buttons')
@@ -250,6 +256,8 @@ function Salt_Sim() {
   const [controlPanelImageIndex, setControlPanelImageIndex] = useState(0);
   const [controlPanelImageHovered, setControlPanelImageHovered] = useState(false);
   const [controlPanelImageMouseDown, setControlPanelImageMouseDown] = useState(false);
+
+
 
     useEffect(() => {
     const interval = setInterval(() => {
@@ -470,8 +478,10 @@ function Salt_Sim() {
             }
           });
           
-          try {Matter.World.remove(salt.engine.world, salt.wire);}
-          catch (error) {}
+          try { console.log('bodies: ', network)
+            Matter.World.remove(salt.engine.world, salt.wire);
+          }
+          catch (error) {console.log('The error: ', error)}
 
           try {
             let saltHTML = salt.htmlID;
@@ -499,6 +509,14 @@ function Salt_Sim() {
         neuron.saltCount = 0;
         neuron.everSalt = 0;
       });
+
+      // Double check all the salt are gone
+      var saltDregs = network.engine.world.bodies.filter(dreg => dreg.salt === true);
+
+      saltDregs.forEach(dreg => {
+      Matter.World.remove(network.engine.world, dreg);
+      })
+
 
 
       setepochNum(epochNum + 1)
@@ -549,12 +567,15 @@ function updateVerSliders() {
   const markPositions = [...Array(numMarks)].map((_, index) => (horizontalSliderWidth / (numMarks + 1)) * (index ));
 
 
+
+
   var vertSlides = markPositions.map((position, index) => (
     <Slider
 
       key={index}
       id ={'slide' + index}
-      style={{ position: "absolute", left: `${((position * 0.145)) + 12}%`, bottom: '90%', height: 75 }}
+      style={{ position: "absolute", left: `${((position * 1)) + (0.6 * (horizontalSliderWidth ** 0.75)-10)}px`, bottom: '10vh', 
+                height: 75, transform: `scale(` + (0.25 * (windowSize.height ** 0.95)/100) + `)`}}
       getAriaLabel={() => 'Small steps'}
       orientation="vertical"
       defaultValue={layerArray[1][index]}
@@ -597,13 +618,14 @@ function updateVerSliders() {
       // run the engine
       Runner.run(runner, engine);
 
-
+      /*
       
       // run the renderer
       Render.run(render);
       if(!render) {
         render = Render.create({}); 
       }
+      */
 
     }
 
@@ -741,7 +763,7 @@ function updateVerSliders() {
     useEffect(() => {
       // Call the sliderLoad() function after the horizontal slider has been rendered:
       updateVerSliders();
-    }, [numLayers, layerArray]);
+    }, [numLayers, layerArray, windowSize]);
 
 
     

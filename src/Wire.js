@@ -226,12 +226,15 @@ function Wire({ setRenderEmbeddingRep }) {
     });     
   */
 
+
+  const deskAspectRatio = (737/1920) * 0.52
+
   const vw = 50; // 50vw
   var width = window.innerWidth;
   var vwInPixels = (vw / 100) * width;
   var scaledWidth = width/1707
 
-  var vhInPixels = (window.innerHeight * 0.5) - 50 ;
+  var vhInPixels =  vwInPixels * deskAspectRatio  //(window.innerHeight * 0.5) - 50 ;
   
   var wire_start_pos_x = vwInPixels;
   var wire_start_pos_y = vhInPixels; //325 - 85 - 60;
@@ -258,10 +261,10 @@ function Wire({ setRenderEmbeddingRep }) {
     width = window.innerWidth;
     scaledWidth = width/1707;
     vwInPixels = (vw / 100) * width;
-    vhInPixels = (window.innerHeight * 0.5);
+    vhInPixels = vwInPixels * deskAspectRatio //(window.innerHeight * 0.5);
     
     wire_start_pos_x = vwInPixels;
-    wire_start_pos_y = vhInPixels - 120; //325 - 85 - 60;
+    wire_start_pos_y = vhInPixels + 4; //325 - 85 - 60;
 
     const points = wireBodies.map(b => b.position);
 
@@ -798,7 +801,7 @@ useEffect(() => {
          onMouseLeave={() => portButtonHoverRef.current = false}
 
          style={{
-          zIndex: 25,
+          zIndex: 50,
           position: 'absolute',
           left: left,
           top: top,
@@ -997,7 +1000,7 @@ useEffect(() => {
       
       style={{
         position: 'relative',
-        top: '12vh', 
+        top: '0.75vw', 
         left: '10vw',
         width: '80vw',
         height: '80vh', 

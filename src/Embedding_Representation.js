@@ -40,22 +40,26 @@ const EmbeddingRep = (props) => {
 
   const svg = d3.select('#svg-container');
 
+
+  const deskAspectRatio = (737/1920) * 0.52
+
     
   const vw = 50; // 50vw
-  const width = window.innerWidth;
-  const widthScaled = width/1707;
+  const width = window.innerWidth;  // 1536 at your full screen   // full desk 1920 * 737 ratio is 2.60515603799
+  const widthScaled = width/1707;  /// Y by 1707? lets not touch this.
   const vwInPixels = (vw / 100) * width;
   const vhInPixels = 0.5 * window.innerHeight;
   
   const x_offset = vwInPixels - 70;
-  const y_offset = vhInPixels - 50;
-  
+  const y_offset = ((vwInPixels + 380)  * deskAspectRatio) ;   //h -50
+
+   
   // LaserBoxPosition 
   const wireNodeX = x_offset + 70;
   const wireNodeY = y_offset - 75;
   
 
-  const killparticlepastY = 260 * widthScaled;  //240
+  const killparticlepastY = 150 * widthScaled;  //240
 
 
   var laserbox_img;

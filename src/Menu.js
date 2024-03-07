@@ -13,23 +13,45 @@ const Menu = () => {
 
 
   return (
-    <div className="menu" style ={{overflow:'hidden'}}>
+    <div className="menu" style ={{overflowY:'auto'}}>
       <div className="title-container" >
         <b className="your-thoughts-are">Your Thoughts Are Made Of Salt</b>
       </div>
+      
+      <div id='desk-dynamic+ports' style={{position: 'absolute', left: '0vh', top: '10vh', width: '100vw', height: '90vh'
+        }}>
 
-      <img src={The_Desk} style={{position: 'absolute', left: '0vh', top: '12.5vh', width: '100vw'}}></img>
 
-      <Dyanmic_Menu_Elements/>
+          
+      <Dyanmic_Menu_Elements style={{ zIndex: 20}}/>
+
+      <svg  
+              className="svg-container" id="svg-container"
+              width="100%" height = "100%" style={{position: 'absolute', zIndex:49}}> 
+          </svg>  {/* Wire & EmbeddingRep live in this svg-container */}
+
+          
+      
+
+
+      <img src={The_Desk}  style={{position: 'relative', left: '0vh', width: '100%', zIndex:0
+        }}></img>
+
+
+     
+
+
+      
+      </div>
 
       <About_Menu isAboutMenu={isAboutMenu} setIsAboutMenu={setIsAboutMenu} />
 
 
 
       <div className="footer">
-        <img className="div-child" alt="" />
-        <div className="about-container">
+        <div className="about-container" style={{pointerEvents: 'none'}}>
           <b className="about" 
+            style={{pointerEvents: 'auto', bottom: '5%'}}
             onClick={() =>  setIsAboutMenu(!isAboutMenu)}
             onTouchStart={() =>  setIsAboutMenu(!isAboutMenu)}
           >

@@ -34,18 +34,19 @@ class Neuron {
 
       this.canvasWidth = window.innerWidth;
       this.canvasHeight = window.innerHeight;
+      this.prevCanvasHeight = this.canvasHeight
 
-      this.SFH = (0.1778 * this.canvasHeight * 0.8/ 100)
+      this.SFH = (this.canvasHeight / this.prevCanvasHeight)
 
       this.left_in_px = (this.init_pos.x) * 0.1 * (this.canvasWidth * 0.8/ 100);
       this.top_in_px = (this.init_pos.y) * 0.15 * (this.canvasHeight * 0.8/ 100);
 
-      this.wire_size_in_px = 20  //* (this.canvasHeight * 0.8/ 100) //20
+      this.wire_size_in_px =  0.0284495 * this.canvasHeight // = 20 @ full screen 703
 
       this.state = {
         imgStyle: {
           position: "absolute",
-          height: '12%',
+          height: '70px',   //'12%',
           width: 'auto',  /* Automatically adjust height based on aspect ratio */
           aspectRatio: 1, /* Defines a 1:1 aspect ratio (square) */
           left: (this.init_pos.x - 40) * 0.1 + "%",
@@ -56,6 +57,7 @@ class Neuron {
           justifyContent: 'center',
           alignItems: 'center',
           objectFit: 'cover',
+          transform: 'scale(' + (window.innerHeight * 0.0014224751) + ')'
         }
       };
 
@@ -70,19 +72,8 @@ class Neuron {
           'mask': 0,}
       });
 
-      //Matter.Body.scale(this.wire, this.SFH, this.SFH)
-      /*
-      if (this.type === 'output') {
-        this.wire.position.x -= 200;
-      }
-      
-      this.wire.collisionFilter = {
-        'group': -1,
-        'category': 2,
-        'mask': 0,
-      };
-*/
-      //alert(this.wire)
+      Matter.Body.scale(this.wire, this.SFH, this.SFH)
+
       Composite.add(this.engine.world, this.wire);
 
 
@@ -274,6 +265,10 @@ class Neuron {
 
       var screenSizeWidthScalingFactor =  (this.canvasWidth * 0.8/ 100)
 
+      this.SFH = (this.canvasHeight / this.prevCanvasHeight) //0.1778
+
+      this.prevCanvasHeight = this.canvasHeight
+
       if (this.type != 'output') {
         if (this.type == 'input') {
           var lil_nudge = 0 * screenSizeWidthScalingFactor
@@ -294,9 +289,21 @@ class Neuron {
       Matter.Body.scale(this.wire, this.SFH, this.SFH)
 
       
-      this.wire.position.x = this.left_in_px    
-      this.wire.position.y = this.top_in_px
+      //this.wire.position.x = this.left_in_px    
+      //this.wire.position.y = this.top_in_px
+      Matter.Body.set(this.wire, "position", {x: this.left_in_px , y: this.top_in_px})
+
       this.wire.circleRadius = this.wire_size_in_px
+
+      // and transform the image.
+
+      console.log(this.htmlID)
+
+      if (document.getElementById(this.htmlID))
+      {document.getElementById(this.htmlID).style.transform = 'scale(' + (window.innerHeight * 0.0014224751) + ')'}
+
+      
+
     }
     
   }

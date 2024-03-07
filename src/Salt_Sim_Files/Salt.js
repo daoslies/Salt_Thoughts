@@ -63,6 +63,8 @@ class Salt {
       //this.wire.mass = 2.394 // 2.394
       Matter.Body.set(this.wire, 'mass', 5)
       console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
+
+      this.wire.salt = true;
       
 
       Composite.add(this.engine.world, this.wire);
@@ -281,7 +283,8 @@ class Salt {
       
       this.updateCurrentNeuron = function updateCurrentNeuron(self, network) {
         // Set a collision threshold distance in pixels
-        const collisionThreshold = 75;
+        const collisionThreshold = 0.106685633 * window.innerHeight // = 75 @ full screen 703 ;
+        //alert(collisionThreshold)
       
         // Check if the salt is within the collision threshold distance of any neuron
         const collidesWithNeuron = network.neural_welcome_list.find(neuron => {

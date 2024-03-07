@@ -9,6 +9,8 @@ import NeuronGraph from './Neuron_WB_Graph';
 
 import Iris_Data_Import from './Iris_Data.csv';
 
+import Matter from 'matter-js';
+
 //import ToggleSwitch from './Salt_Sim_Files/ToggleSwitch';
 
 class SaltBag {
@@ -531,8 +533,14 @@ class Network {
   
     var distanceFromCentre = Math.abs(i- 1)
   
-    this.output_welcome_list[i].props.neuron.wire.position.x = 
-            (400 + (finalLayerIndex * 175) - (distanceFromCentre * 55)) * 0.1  * 0.8 * window.innerWidth /100;
+    //this.output_welcome_list[i].props.neuron.wire.position.x = 
+    //        (400 + (finalLayerIndex * 175) - (distanceFromCentre * 55)) * 0.1  * 0.8 * window.innerWidth /100;
+
+    var newOutX = (400 + (finalLayerIndex * 175) - (distanceFromCentre * 55)) * 0.1  * 0.8 * window.innerWidth /100;
+
+    Matter.Body.set(this.output_welcome_list[i].props.neuron.wire, "position", 
+                      {x: newOutX , y: this.output_welcome_list[i].props.neuron.wire.position.y})
+
   
     const newStyle = Object.assign({}, this.output_welcome_list[i].props.style, 
       { left: `${(363 + (finalLayerIndex * 175) - (distanceFromCentre * 55)) *0.1}%` });
@@ -568,7 +576,37 @@ class Network {
   if (!this.neural_welcome_list.some(neuron => neuron.props.neuron.layer === 'Blank')) {
     this.neural_welcome_list.push(this.blankNeuron);
   }
-  
+
+  // Delete duplicates that seem to be formed when you create new neurons.
+
+  // Currently is just not deleting duplicates.
+
+  // 1. Create a set from neuron IDs in the welcome list
+  const welcomeNeuronIds = new Set(this.neural_welcome_list.map(neuron => neuron.props.neuron.id));
+
+  // 2. Track duplicate IDs (temporarily)
+  const duplicateIds = new Set();
+
+  // 3. Iterate through the world bodies
+  for (let i = this.engine.world.bodies.length - 1; i >= 0; i--) {
+    const body = this.engine.world.bodies[i];
+    const neuronId = body.neuron_id;
+
+    // Check if the body should be kept (has valid neuron_id)
+    if (neuronId) {
+      if (!welcomeNeuronIds.has(neuronId))
+      {Matter.World.remove(this.engine.world, body);}
+      // Check if the ID is in the welcome list and already marked as duplicate
+      if (welcomeNeuronIds.has(neuronId) && duplicateIds.has(neuronId)) {
+        // Remove duplicate body using Matter's method
+        Matter.World.remove(this.engine.world, body);
+      } else {
+        // If not a duplicate, add the ID to the tracking sets
+        //welcomeNeuronIds.delete(neuronId); // Mark ID as seen in welcome list
+        duplicateIds.add(neuronId); // Track potential duplicates for later checks
+      }
+    }
+  }
   
   
   

@@ -37,27 +37,28 @@
   .audio-port,
   .flower-port {
     position: absolute;
+    z-index: 10;
     margin: 0 !important;
     
     background-color: var(--color-mediumslateblue);
     width: 16vw;
-    height: 7.25vw;
+    height: 6.9vw;
     justify-self: center;
   }
   
   .book-port {
-    left: 22vw;
-    top: 20vh;
+    left: 22.1vw; 
+    top: 3.9vw;
   }
 
   .audio-port {
     left: 62vw;
-    top: 20vh;
+    top: 3.9vw;
   }
 
   .flower-port {
     left: 42vw;
-    top: 70vh;   
+    top: 28.2vw   
   } 
 
   {/*   .book-port,

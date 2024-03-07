@@ -91,3 +91,37 @@ What are we doing:
 
     -- Maybe the welcome in network.js is the source of the lag.
 
+
+
+
+    -------------
+
+    05/-3/2024 -- Cleaning up wires -- In aid of adaptively resizing salt sim
+
+      -- There seems to be 2 wires for the update neurons (at least the first layer, going in for further schekcs)
+         
+         -- Skooshing up and down on the sliders produces lots of extra wwires.
+        
+            -- Presumably some of these don't get resized which is what causes the fukkery when resizing.
+
+            -- ctrl-f to 'remove'. The print (filter for 'bodies') is at salt_sim line 475.
+
+      -- Seperately the first sample of salts also don't seem to get removed. - Dealt
+
+
+      -- Cleaning seems to sort of be dealt with.
+
+      -- Scaling of neurons on resize is being weird -- I think Is dealt.
+
+      1 * 0.5 = 0.5
+
+      1 * 1 = 1
+
+      0.5 * 1 = 0.5
+
+      0.5 * 2 = 1
+
+      -- positioning of input and output neurons (mostly output) is being weird.  -- Think is dealt 
+
+
+
