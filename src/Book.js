@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 
+import {isMobile} from 'react-device-detect';
 
 import "./Book.css";
 import ChapterText from "./Your_Thoughts_Are_Made_Of_Salt_The_Machine_2"
@@ -8,6 +9,7 @@ import ChapterText1 from "./Your_Thoughts_Are_Made_Of_Salt_The_Machine_1"
 import book_img from './Salt_Pics/Sweet_v2_2.png';
 import book_img_2 from './Salt_Pics/Sweet_v2_3.png';
 import bookHand_img from './Salt_Pics/Book_Hand_CutOut.png';
+
 
 const Book = () => {                                                                                                                
 
@@ -51,82 +53,7 @@ const Book = () => {
     return () => clearInterval(interval);
   }, [opacity]);
 
-/*
-  function getPage(index) {
-    // Create DOM element from HTML 
-    const pageEl = document.createElement('div');
 
-    const textcheck = document.getElementById('XXX')
-
-
-    if (textcheck) {
-
-    //textcheck.innerHTML = "hello hello hgello"
-  }
-    pageEl.innerHTML = ChapterText1;
-
-    // Get current page nodes
-    const numPages = Math.ceil(pageEl.childElementCount / PAGE_SIZE);  
-    const start = index * PAGE_SIZE;
-    const end = Math.min(start + PAGE_SIZE, pageEl.children[0].childElementCount);
-
-    const pageNodes = [...pageEl.children[0].children].slice(start, end);
-
-    //const paragraphs = pageNodes.map(paragraph => <div>{paragraph}</div>)
-    
-  // Multi-column layout
-
-  var leftPage = []
-  var rightPage = []
-  const MAX_HEIGHT = 450;
-
-  let currentCol = 'left';
-  let currentHeight = 0;
-
-  pageNodes.forEach(paragraph => {
-
-    //console.log(paragraph.innerHTML.length)
-
-
-    var reactElement_Paragraph = React.createElement('div', {
-      style: {
-        transform: 'skew(1deg, 10deg)',
-        fontSize: '2vh'
-      },
-      ref: {paragraphRef}
-    }, paragraph.innerHTML);
-
-
-
-    //onsole.log('CUrrentHeight: ', currentHeight)
-
-    if (currentHeight + paragraph.innerHTML.length  > MAX_HEIGHT) { 
-      currentCol = 'right';
-      currentHeight = 0;
-    }
-
-
-    if (currentCol == 'left') {
-      leftPage.push(reactElement_Paragraph)
-    }
-    else {
-      reactElement_Paragraph.props.style.transform = 'skew(-1deg, -10deg) ' 
-      rightPage.push(reactElement_Paragraph)
-    }
-
-    currentHeight += paragraph.innerHTML.length;
-
-  });
-
-
-
-    var pages = {left: leftPage, right: rightPage}
-
-
-    return pages
-    
-  }
-*/
   useEffect(() => {
     const pages = PaginateText(ChapterText, pageLeft, pageRight);
     setPageText(pages);
@@ -140,7 +67,7 @@ const Book = () => {
 
     const words = text.split(' ');
 
-    const pageHeight = 250;
+    const pageHeight = 250 * window.innerHeight * 0.0014224751;
 
     let currentPage = "";
     let textOffset = bookProgress[page]; // current position in text
@@ -285,7 +212,7 @@ const Book = () => {
       //setPages(prev => [...prev, currentPage]);
 
       
-    pageLeft.current.style.transform = 'skew(0deg, 10deg)'
+    pageLeft.current.style.transform = 'skew(0deg, 10deg) translateX(-112.5%)'
     pageRight.current.style.transform = 'skew(0deg, -9deg)'
 
 
@@ -295,55 +222,57 @@ const Book = () => {
   
   }
 
-  //console.log('Book progress', bookProgress)
-  //console.log(page)
 
 
   return (
 
     <div className="book" id='bookcheck' style={{position:'relative'}}>
       {/*ChapterText*/}
-      <div style={{position:'absolute', zIndex: 0, height:'100%', left: '2%'}}>
+      <div style={{position:'absolute', zIndex: 0, height:'100%', left: '50%'}}>
+  
         <img className="book-img" src={book_img}  draggable="false" dragstart="false" 
               style={{userSelect: 'none', userDrag: 'none', 
-                      height: '100%', position: 'absolute'}} >
+                      height: '100%', position: 'absolute',   transform: 'translateX(-50%)'}} >
         </img>
 
         <img className="book-img" src={book_img_2}  draggable="false" dragstart="false" 
               style={{userSelect: 'none', userDrag: 'none', 
-                      height: '100%', position: 'absolute',
+                      height: '100%', position: 'absolute', transform: 'translateX(-50%)',
                       opacity: opacity}} >
         </img>
 
         <img className="book-img" src={bookHand_img}  draggable="false" dragstart="false" 
               style={{userSelect: 'none', userDrag: 'none', 
-                      height: '100%', position: 'absolute'}} >
+                      height: '100%', position: 'absolute', transform: 'translateX(-50%)'}} >
         </img>
 
       </div>
 
-      <div style={{position:'absolute', zIndex: 1}}>
+      <div style={{position:'absolute', zIndex: 1, width:'100%', height: '100%', left: '0%'}}>
+
+
 
         <div className="page" ref ={pageLeft} style={{position:'absolute', 
-        /*  height: '5vh', */ width: '16vw', left: '22.5vw', top:'15.5vh',
+        /*  height: '5vh', */ width: '35vh',left: '40.5vw', top:'22vh', 
          /* transform: 'skew(0deg, 10deg)', */
          fontSize: '2vh'
             }}>
         </div>
 
         <div className="page" ref = {pageRight} style={{position:'absolute',
-        /*  height: '5vh', */ width: '18vw', left: '40.5vw', top:'16vh',
+        /*  height: '5vh', */ width: '35vh', left: '40.5vw', top:'16vh',
         /*  transform: 'skew(0deg, -10deg)', */
          fontSize: '2vh'
-
             }}>
         </div>
+
+
 
         {/* the page numbers */}
 
         <div className="page" style={{position:'absolute',
-         left: '20.25vw', top:'53.75vh',
-         transform: 'skew(0deg, 8deg)',
+         left: '40.5vw', top: isMobile ? '55vh' : '53.75vh', width:'5vh',
+         transform: 'skew(0deg, 8deg) translateX(-890%) translateY(220%)',
          fontSize: '2vh'
             }}>
 
@@ -352,8 +281,8 @@ const Book = () => {
         </div>
 
         <div className="page" style={{position:'absolute',
-         left: '59.25vw', top:'52.75vh',
-         transform: 'skew(0deg, -5deg)',
+         left: '40.5vw', top: isMobile ? '54vh' : '52.75vh', width: '5vh',
+         transform: 'skew(0deg, -5deg) translateX(740%) translateY(120%)',
          fontSize: '2vh'
             }}>
 

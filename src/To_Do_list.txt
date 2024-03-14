@@ -24,11 +24,11 @@ What are we doing:
         Resolved :DDD But new issue have spawned. Just around repositioning elements.
 
   - Fak repositioning is going to fuk on different screens, cus the buttons are vw, and the sim is px
-      - Dealt with this a little, but potentially there is quite a lot more to do to deal with completely.
+      - Dealt with this a little, but potentially there is quite a lot more to do to deal with completely. -- Pretty much done now 14/03/2024
 
   - The white space at the bottom, somat to do with salt sim  -- Dealt Withhhh
 
-  - Salt sim crashes if you set the main slider to 0.
+  - Salt sim crashes if you set the main slider to 0. -- dealt with
 
   - Neural Mouse hover connection highlight dies on salt run. due to rerendering connections (i think)
 
@@ -87,6 +87,9 @@ What are we doing:
 
     -- THe extended / urls don't work.  (which is big bolox) --- Dealt with -- Error file in kinsta set to index.html
 
+
+
+
     -- Recording the chapter/editing the chapter/is this even the right chapter.
 
     -- Maybe the welcome in network.js is the source of the lag.
@@ -125,3 +128,18 @@ What are we doing:
 
 
 
+-----------
+
+--- I think we're into the home straights now (maybe 06/03/2024)
+
+
+  --  Book page resize for screens  -- Done TICK TICK
+
+      -- Could be some arrows on the book page on mobile to demonstrate you need to click left or right.
+        And you do conveniently have some arrows preloaded and a mobile trigger on that page now.
+
+  ---  AUdio page resize for mobile
+
+  -- About page stuff
+
+  -- neuron controls
