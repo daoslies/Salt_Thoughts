@@ -10,6 +10,9 @@ import book_img from './Salt_Pics/Sweet_v2_2.png';
 import book_img_2 from './Salt_Pics/Sweet_v2_3.png';
 import bookHand_img from './Salt_Pics/Book_Hand_CutOut.png';
 
+import cursorLeft from './Salt_Pics/Cursor_left.png';
+import cursorRight from './Salt_Pics/Cursor_Right.png';
+
 
 const Book = () => {                                                                                                                
 
@@ -245,6 +248,18 @@ const Book = () => {
               style={{userSelect: 'none', userDrag: 'none', 
                       height: '100%', position: 'absolute', transform: 'translateX(-50%)'}} >
         </img>
+
+        {isMobile && <img className='mobile-page-turn-arrows' 
+                          src = {cursorRight}
+                          style = {{position: 'absolute', zIndex : '10',
+                                    bottom: '2.5vh', left: '30vh',
+                                    height: '15vh'}} />}
+
+        {isMobile && <img className='mobile-page-turn-arrows' 
+                                  src = {cursorLeft}
+                                  style = {{position: 'absolute', zIndex : '10',
+                                            bottom: '2.5vh', right: '30vh',
+                                            height: '15vh'}} />}
 
       </div>
 

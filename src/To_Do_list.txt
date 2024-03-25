@@ -137,9 +137,37 @@ What are we doing:
 
       -- Could be some arrows on the book page on mobile to demonstrate you need to click left or right.
         And you do conveniently have some arrows preloaded and a mobile trigger on that page now.
+          -- Tick Tick
 
-  ---  AUdio page resize for mobile
+  ---  AUdio page resize for mobile  - Sort of kinda mostly done
 
-  -- About page stuff
+      -- Touching the controls currently moves the wire on mobile. should deal with that.
+        - Dealt with that.
 
   -- neuron controls
+
+      -- Control panel should be right of the nested div (or one of the divs that is the right size anyway) -- THink dealt
+
+
+
+
+
+-- Yo or, ya know, Could just add some more fukkin features -- 20/03/2024
+
+  -- Maybe do an accessability page.
+  
+  -- About page stuff
+
+  -- Flippin Illium's note.
+
+  -- ANNNNDdd we're back to salt sim
+
+    -- The weights/bias graphs.
+
+        - This is nice as a feature and really is mostly done, just needs some positioning stuff.
+    
+    -- On salt load they are messy. MESSSY. Mess.
+
+    -- The highlighting of output neurons on accuracy plot have weird buggyness when adding fresh neurons.
+
+          -- Tick, but there's still some mild stuff with mobile screen size.

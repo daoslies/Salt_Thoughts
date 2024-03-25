@@ -1,0 +1,46 @@
+.scroll-container {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  
+  .scroll-container p {
+    display: inline-block;
+    padding-left: 100%;
+    color: rgb(129, 129, 255);
+    font-family: monospace;
+  }
+
+  .book-scroll .scrolling-text {
+    animation: scroll-text 33s linear infinite;
+  }
+  
+  .audio-scroll .scrolling-text {
+    animation: scroll-text 28s linear infinite;
+  }
+  
+  .flower-scroll .scrolling-text {
+    animation: scroll-text 38s linear infinite;
+  }
+
+  .scrolling-text::before {
+    content: attr(data-text);
+    display: inline-block;
+    white-space: nowrap;
+    padding-right: 20%;
+  }
+
+  .scrolling-text::after {
+    content: attr(data-text);
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 20%;
+  }
+  
+  @keyframes scroll-text {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-130%);
+    }
+  }

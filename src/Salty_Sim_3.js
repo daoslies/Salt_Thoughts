@@ -1050,40 +1050,43 @@ function updateVerSliders() {
       }}>
 
       <button
-  style={{
-    position: 'absolute',
-    bottom: '5%',
-    right: '-10%',
-    padding: 0,
-    margin: 0,
-    border: 'none', // Remove any unwanted borders
-    backgroundColor: 'transparent', // Make it transparent if needed
-  }}
->
-      <img
-        style={{position: 'relative', pointerEvents: 'auto', 
-                height: '30%',
-                width: '30%',
-                transform: `
-                            ${controlPanelImageHovered ? 'rotate(25deg)' : ''}  
-                            ${controlPanelImageMouseDown ? 'scale(0.9)' : ''}
-                          `}}
+        style={{
+          position: 'absolute',
+          bottom: '7.5%',
+          right: '1%',
+          height: '20vh',
+          width: '20vh',
+          padding: 0,
+          margin: 0,
+          border: 'none', // Remove any unwanted borders
+          backgroundColor: 'transparent', // Make it transparent if needed
+        }}
+      >
+        <img
+          style={{pointerEvents: 'auto', 
+                  height: '100%',
+                  width: '100%',
+                  transform: `
+                              ${controlPanelImageHovered ? 'rotate(25deg)' : ''}  
+                              ${controlPanelImageMouseDown ? 'scale(0.9)' : ''}
+                            `}}
 
-        onClick={() => setNetworkMenuOpen(!networkMenuOpen)}
+          onClick={() => setNetworkMenuOpen(!networkMenuOpen)}
 
-        onTouchStart={() => {setNetworkMenuOpen(!networkMenuOpen)
-                              setControlPanelImageMouseDown(true)}}
-        onTouchEnd={() => setControlPanelImageMouseDown(false)}
+          onTouchStart={() => {setNetworkMenuOpen(!networkMenuOpen)
+                                setControlPanelImageMouseDown(true)}}
+          onTouchEnd={() => setControlPanelImageMouseDown(false)}
 
-        onMouseEnter={() => setControlPanelImageHovered(true)}
-        onMouseLeave={() => setControlPanelImageHovered(false)}
-        onMouseDown={() => setControlPanelImageMouseDown(true)}
-        onMouseUp={() => setControlPanelImageMouseDown(false)}
+          onMouseEnter={() => setControlPanelImageHovered(true)}
+          onMouseLeave={() => setControlPanelImageHovered(false)}
+          onMouseDown={() => setControlPanelImageMouseDown(true)}
+          onMouseUp={() => setControlPanelImageMouseDown(false)}
 
-        src={control_panel_images[controlPanelImageIndex]} 
-      ></img>
+          src={control_panel_images[controlPanelImageIndex]} 
+          alt="Control Panel"
+        />
 
-</button>
+      </button>
       
       <Network_Menu
         networkMenuOpen={networkMenuOpen}

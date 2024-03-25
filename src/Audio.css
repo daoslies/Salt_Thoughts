@@ -18,14 +18,18 @@
 .image-container
 { 
   position: absolute;
-  left: calc(40vw - 40vh);
   border: 2px solid rgba(30, 255, 0, 0);
+  width: 100%;
+  height: 100%;
 }
 
 .image-container .radio-main      
 {
-  width: 80vh;  /*80*/
-  height: 80vh;                         
+  /*width: 80vh; */ /*80*/
+  left: 50%/*calc(40vw - 40vh) not sure if replacing is useful, but the calc vw-vh feels weird*/;
+
+  height: 100%;  
+  transform: translateX(-50%);                       
   position: absolute;
   display: block;
 
@@ -38,34 +42,52 @@
   -ms-user-select: none;
   pointer-events: none;
   
+  
 }
 
-.image-container .knob-vol
+.slider-container-audio
+{
+  position: absolute;
+  width: 80vh;
+  height: 80vh;
+  left: 50%;
+
+  transform: translateX(-50%)
+
+}
+
+.slider-container-audio .knob-vol
 {  
-  width: 5vh;
-  height: 25vh;
+  width: 1%;
+  height: 30%;
+  left: 17%;
+  top: 60%;
+
   
   position: absolute;
   z-index: 2;
-  transform: scale(1) translateY(50vh) translateX(11vh) rotate(-2deg);
-
+  transform: /*scale(1)  translateX(20%)   translateY(80%) */  rotate(-2deg);
+  transform-origin: center;
 }
 
 .knob-vol .MuiSlider-thumb {
   
-  transform: scale(1);
-  height: 20%;
+  height: 50px;
+
 
 }
 
-.image-container .knob-playback-speed
+.slider-container-audio .knob-playback-speed
 {  
-  width: 22vh;
-  height: 5vh;
+  width: 30%;
+  height: 7.5%;
+  top: 68%;
+  left: 47.5%;
   
   position: absolute;
   z-index: 2;
-  transform: scale(1) translateY(56vh) translateX(40vh) rotate(-10deg);
+  transform: /*scale(1) translateY(56vh) translateX(20vh) */ rotate(-10deg);
+  transform-origin: center;
 
 
 
@@ -73,26 +95,29 @@
 
 .knob-playback-speed .MuiSlider-thumb {
   
-  transform: scale(1);
-  height: 20%;
+  height: 100px;
 
 }
 
-.image-container .knob-playback-timer {  
-
-  width: 22vh;
-  height: 5vh;
+.slider-container-audio .knob-playback-timer {  
+ 
+ 
+  width: 30%;
+  height: 7.5%;
+  /*width: 22vh;
+  height: 5vh; */
+  top: 53%;
+  left: 47.5%;
   
   position: absolute;
   z-index: 2;
-  transform: scale(1) translateY(43vh) translateX(40vh) rotate(-10deg);
-
+  transform: /*scale(1) translateY(43vh) translateX(20vh) */ rotate(-10deg);
+  transform-origin: center;
 }
 
 .knob-playback-timer .MuiSlider-thumb {
   
-  transform: scale(1);
-  height: 20%;
+  height: 100px;
 
 }
 

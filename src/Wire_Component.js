@@ -70,8 +70,8 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
 
   var vhInPixels = (window.innerHeight * 0.5) - 50 ;
   
-  var wire_start_pos_x = vwInPixels;
-  var wire_start_pos_y = vhInPixels * 5; //325 - 85 - 60;
+  var wire_start_pos_x = vwInPixels * 0.9;
+  var wire_start_pos_y = (vhInPixels * 2); //325 - 85 - 60;
   
   
   const [wireBodies_Audio, setwireBodies_Audio] = useState([]);
@@ -94,8 +94,8 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
     vwInPixels = (vw / 100) * width;
     vhInPixels = (window.innerHeight * 0.5);
     
-    wire_start_pos_x = vwInPixels * 1.1;
-    wire_start_pos_y = vhInPixels * 2; //325 - 85 - 60;
+    wire_start_pos_x = vwInPixels * 0.9;
+    wire_start_pos_y = (vhInPixels * 2); //325 - 85 - 60;
 
     const points = wireBodies.map(b => b.position);
 
@@ -115,10 +115,12 @@ export function Wire({wireStaysPluggedCusOfHoverRef, setPlugged}) {
       .style('stroke-width', (d,i) => 7 + Math.sin(((Date.now() / 250) + ((points.length - i)/(points.length/10)) * Math.PI * 100) +  Math.sin((Date.now() / 200) + ((points.length - i)/(points.length))) * 2) )     // Set stroke width
       .style('opacity', 1)
       .style('zIndex', 50)
-      .attr('x1', (d, i) => i === 0 ? wire_start_pos_x  - 125 : points[i - 1].x - 125)
-      .attr('y1', (d, i) => i === 0 ? wire_start_pos_y  - 90 : points[i - 1].y - 90)
-      .attr('x2', (d,i) => points[i].x - 125) 
-      .attr('y2', (d,i) => points[i].y+1 - 90);   
+      .attr('x1', (d, i) => i === 0 ? wire_start_pos_x  - 125 : points[i - 1].x)
+      .attr('y1', (d, i) => i === 0 ? wire_start_pos_y  - 90 : points[i - 1].y)
+      .attr('x2', (d,i) => points[i].x) 
+      .attr('y2', (d,i) => points[i].y+1)
+      ;
+      
 
      
     svg.selectAll('.jack-image').remove(); 
@@ -316,6 +318,8 @@ function initialiseWire() {
         var Y_down = event.clientY
       }
 
+      if (!wireStaysPluggedCusOfHoverRef.current) {
+
       if (!mouse_rect) {
       mouse_rect = Matter.Bodies.rectangle(X_down, Y_down, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
       
@@ -331,7 +335,7 @@ function initialiseWire() {
 
         Matter.World.add(world, mouseCon); }
       
-      }}
+      }}}
 
 
       const mouseupevent = (event) => {
@@ -412,22 +416,25 @@ function initialiseWire() {
 
         
           width = window.innerWidth;
+          var height = window.innerHeight;
+
           var scaledWidth = width/1707;
+          var scaledHeight = height / 559
 
           // Calculate orientation angle
           let angle = Math.atan2(portY - lastPoint.y, portX - lastPoint.x) * (180 / Math.PI);
 
 
 
-          let posx = lastPoint.x - (100 * scaledWidth);
-          let posy = lastPoint.y - (150 * scaledWidth);
+          let posx = lastPoint.x - (75 * scaledHeight);
+          let posy = lastPoint.y - (100 * scaledHeight);
 
           let rot_origx = lastPoint.x;
           let rot_origy = lastPoint.y;
           
           if (isPluggedRef_Audio.current) {
-            posx = portX-(100 * scaledWidth);
-            posy = portY-(150 * scaledWidth);
+            posx = portX-(75 * scaledHeight);
+            posy = portY-(112 * scaledHeight);
             if (dist < 30) {angle = 210;}
           }
 
@@ -438,9 +445,9 @@ function initialiseWire() {
           .attr('href', jackImageArray[imgRef.current])  //[jackImageIndex])
           .attr('x', posx) 
           .attr('y', posy)
-          .attr('transform',  `translate(-120,-75)rotate(${angle + 90} ${rot_origx} ${rot_origy})`)
-          .attr('width', 200 * scaledWidth)
-          .attr('height', 200 * scaledWidth) 
+          .attr('transform',  `rotate(${angle + 90} ${rot_origx} ${rot_origy})`) //translate(-120,-75)
+          .attr('width', 150 * scaledHeight)
+          .attr('height', 150 * scaledHeight) 
           .attr('class', 'jack-image')
           .style('zIndex', 15)
 
@@ -464,10 +471,24 @@ function initialiseWire() {
             const audioBookPos = getPosition(document.querySelector('.audioBook-port'));
             const musicPos = getPosition(document.querySelector('.music-port'));
 
+            // Offset by the blue negative space outside the image
+
+            var imageWidth = document.getElementById('radio-img').offsetWidth;
+
+            var nestedWidth = document.getElementById('audiocheck').offsetWidth;
+
+            //var nestedWidth = window.innerWidth;
+
+            var negativeSpaceOffset = (nestedWidth - imageWidth) / 2
+
 
             var ports = {
-              port_1: {port: 1, portX: audioBookPos.left + (65 * audioBookPos.width/237), portY: audioBookPos.top + (65 * audioBookPos.width/237)}, 
-              port_2: {port: 2, portX: musicPos.left + (65 * musicPos.width/237), portY: musicPos.top + (65 * musicPos.width/237) },
+              //port_1: {port: 1, portX: audioBookPos.left + (65 * audioBookPos.width/237), portY: audioBookPos.top + (65 * audioBookPos.width/237)}, 
+              //port_2: {port: 2, portX: musicPos.left + (65 * musicPos.width/237), portY: musicPos.top + (65 * musicPos.width/237) },
+              port_1: {port: 1, portX: audioBookPos.left + negativeSpaceOffset, portY: audioBookPos.top}, 
+              port_2: {port: 2, portX: musicPos.left + negativeSpaceOffset, portY: musicPos.top},
+            
+            
             };
 
             // Wassup with book pos being in the audio one?     
@@ -661,8 +682,8 @@ function initialiseWire() {
 
   // Create a ref 
   const positionsRef = useRef({
-    audioBook: {left: '100', top: '100'},
-    music: {left: '100', top: '100'},
+    audioBook: {left: '0', top: '0'},
+    music: {left: '0', top: '0'},
   }); 
 
   useEffect(() => {
@@ -687,15 +708,19 @@ function initialiseWire() {
 <div className="port-container">
 
   <div className='audioBook-port' style={{
-    left:'64vw',
-    top:'60vh',
-    width: '5vw'
+    left:'28.5vh',
+    top:'58.5vh',
+    width: '5vh',
+    border: 'none',
+    position: 'absolute'
   }}></div>
 
   <div className='music-port'style={{
-    left:'40.5vw',
-    top:'65.5vh',
-    width: '5vw'
+    left:'76vh',
+    top:'52vh',
+    width: '10vh',
+    border: 'none',
+    position: 'absolute'
   }}></div> 
 
 

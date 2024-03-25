@@ -1,7 +1,11 @@
 import { useState, useReducer, useCallback } from 'react'; 
 
+
 import Wire from './Wire';
 import EmbeddingRep from './Embedding_Representation'
+
+import { tab } from '@testing-library/user-event/dist/tab';
+
 
 
 
@@ -63,6 +67,8 @@ function spawnParticle( state, dots ) {
 
 
 
+
+
 const Dyanmic_Menu_Elements = () => {
 
   const [renderEmbeddingRep, setRenderEmbeddingRep] = useState(false);
@@ -73,6 +79,9 @@ const Dyanmic_Menu_Elements = () => {
   }, [spawnParticleDispatcher])
 
   //the memo and callback above are attempts at optimisations that may be unnecessary 
+  
+
+
   
 
   return (
@@ -86,6 +95,8 @@ const Dyanmic_Menu_Elements = () => {
         {  !renderEmbeddingRep && <EmbeddingRep
                                     particles={particles} 
                                     spawnParticleDispatcher={spawnParticleDispatcherCallback}/>}
+
+
 
     </div>
 

@@ -5,6 +5,8 @@ let svg = null;
 export function createD3Visualization(network, connections, nodes, links, graphTime) {
 
 //svg_check prevents an issue where it wasn't rendering connections if you navigated away from and back to the sim.
+//Thankyou for this note past oli. Cus wtf, y is that the case, and I would otherwise have deffo removed it 25/03/2024
+
 let svg_check = document.querySelector("#connections-svg"); 
 
 
@@ -24,20 +26,6 @@ var height = parentDiv.getBoundingClientRect().height;
       //.style("transform", 'scale(0.75)')
       //.style("transformOrigin", 'top left')
     }
-
-  /*
-  // Create the force simulation
-  const simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id(d => d.id))
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(width/2, height/2))//.force("center", d3.forceCenter(500, 500));
-  
-  // Add the links and nodes to the simulation
-  //const nodesCopy = [...nodes];
-  //console.log(nodesCopy)
-  simulation.nodes(nodes).on("tick", ticked);
-
-  */
   
 let linkGroup = svg.select("g.links");
 if(linkGroup.empty()) {
@@ -48,18 +36,9 @@ if(linkGroup.empty()) {
 const link = linkGroup.selectAll("line")
     .data(connections);
 
-//const link = svg.select(".links").selectAll("line")
-//  .data(validConnections);
-
 
 link.exit().remove();
 
-//console.log('SVG2: ', svg)
-//link.exit();//.remove();
-//svg.remove()
-//console.log('Link: ', link)
-
-//const sigmoid = x => 1 / (1 + Math.exp(-x));
 
 const y_correction = 25;
 
@@ -119,6 +98,8 @@ network.neural_welcome_list.forEach(neuron => {
       nodeGroup = svg.append("g")
         .attr("class", "nodes");
     }
+
+    console.log('NODES ', nodes)
     
     const node = nodeGroup.selectAll("circle")
         .data(nodes);
@@ -126,46 +107,64 @@ network.neural_welcome_list.forEach(neuron => {
 
   node.exit().remove();
 
-  console.log('nodes: ', nodes)
+  nodes.forEach(node => {console.log(node.neuron_id, node.neuron_type)})
+
+  
 
   // colouringg based on the graph
 
   if (graphTime) {
 
-  const classLabels = ['setosa', 'versicolor', 'virginica'];
-  const outputNeuronIds = ['11-0', '11-1', '11-2'];
-  const colorScale = d3.scaleOrdinal()
-    .domain(classLabels)
-    .range(['#FF1F9F', '#39FFFF', '#FF8900']); 
-  
-  node.enter().append("circle")
-  .style("pointer-events", "all")
-  .attr("r", 33)
-  .attr("fill", d => {
-    if (d.neuron_type === 'input') {
-      return '#fbb4ae';
-    } else if (d.neuron_type === 'output') {
-      const neuronIdParts = d.neuron_id.split('-');
-      const outputLayerIndex = parseInt(neuronIdParts[0]) - 1;
-      const outputNeuronIndex = parseInt(neuronIdParts[1]);
-      const correspondingClassLabel = classLabels[outputNeuronIndex];
-      return colorScale(correspondingClassLabel);
-    } else {
-      return '#000000';
-    }})
-    .attr("opacity", d => {
-      if (d.neuron_type === "output" && outputNeuronIds.includes(d.neuron_id)) {
-        return 1;
-      } else {
-        return 0;
-      }
-    })
-    .merge(node)
-    .attr("cx", d => d.position.x - 2)
-    .attr("cy", d => d.position.y + y_correction - 2);  // Mild correction of 25 may need to be propogated elsewhere
+    //Scaling
 
-    node.append("title")
-    .text(d => d.id);
+    const parentDiv = document.querySelector("#nested-div");
+    const width = parentDiv.getBoundingClientRect().width;
+    const height = parentDiv.getBoundingClientRect().height;
+
+    const widthScalingFactor = width * 0.00081433224;
+    const heightScalingFactor = height * 0.00177762292;
+
+    const radius = 33 * heightScalingFactor; // Adjust the divisor as needed
+    //End scaling
+
+    const classLabels = ['setosa', 'versicolor', 'virginica'];
+    const outputNeuronIds = ['11-0', '11-1', '11-2'];
+    const colorScale = d3.scaleOrdinal()
+      .domain(classLabels)
+      .range(['#FF1F9F', '#39FFFF', '#FF8900']); 
+    
+    node.enter().append("circle")
+    .style("pointer-events", "all")
+    .attr("r", radius)
+    .merge(node)
+    .attr("fill", d => {
+      if (d.neuron_type === 'input') {
+        return '#fbb4ae';
+      } else if (d.neuron_type === 'output') {
+        const neuronIdParts = d.neuron_id.split('-');
+        const outputLayerIndex = parseInt(neuronIdParts[0]) - 1;
+        const outputNeuronIndex = parseInt(neuronIdParts[1]);
+        const correspondingClassLabel = classLabels[outputNeuronIndex];
+        return colorScale(correspondingClassLabel);
+      } else {
+        return '#000000';
+      }})
+      .attr("opacity", d => {
+
+        
+        if (d.neuron_type === "output" && outputNeuronIds.includes(d.neuron_id)) {
+          console.log('Neurons for colouring, ', d)
+          return 1;
+        } else {
+          return 0;
+        }
+      })
+      .merge(node)
+      .attr("cx", d => d.position.x  + 40 - (51 * widthScalingFactor ))
+      .attr("cy", d => d.position.y + y_correction - 2 + 10 - (10 * heightScalingFactor));  // Mild correction of 25 may need to be propogated elsewhere
+
+      node.append("title")
+      .text(d => d.id);
 
   }
   /*
@@ -237,11 +236,37 @@ function ticked() {
     d.fy = null;
   }
   */
-}
 
+
+
+  function resizeCircles() {
 
     
+    const parentDiv = document.querySelector("#nested-div");
+    const width = parentDiv.getBoundingClientRect().width;
+    const height = parentDiv.getBoundingClientRect().height;
+
+    const widthScalingFactor = width * 0.00081433224;
+    const heightScalingFactor = height * 0.00177762292;
+
+    //svg.attr("width", width * 2).attr("height", height * 1.5);
+
+    const radius = 33 * heightScalingFactor; // Adjust the divisor as needed
+
+    node.attr("r", radius)
+      .attr("cx", d => d.position.x + 40 - (51 * widthScalingFactor ))   //* (width / 100) - 10)
+      .attr("cy", d => d.position.y + y_correction - 2 + 10 - (10 * heightScalingFactor) ); //* (height / 100) + y_correction - 2);
+  }
+
+  // Call the resizeCircles function initially and on window 
+  window.removeEventListener("resize", resizeCircles);
+  resizeCircles();
+  window.addEventListener("resize", resizeCircles);
+
       
+        
+
+}
 
 export function generateVisualizationData(network) {
   const connections = [];
@@ -406,7 +431,7 @@ export function generateVisualizationData(network) {
  
     //console.log('Valid Connections: ', validConnections);
 
-  
+    
 
     // Make sure we have the input and output nodes.
     network.neural_welcome_list.slice(0, network.inputLayers)

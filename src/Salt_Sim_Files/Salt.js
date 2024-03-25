@@ -35,7 +35,7 @@ class Salt {
       this.output_x = output_x;
   
       this.htmlID = this.name + 'ID'
-      var num = Math.floor( Math.random() * 5);
+      var num = Math.floor(Math.random() * 5);
       this.img = ImageArray[num];
   
       this.saltStyle = {
@@ -62,7 +62,7 @@ class Salt {
       Matter.Body.scale(this.wire, (0.17781 * window.innerHeight * 0.8/ 100), (0.17781 * window.innerHeight * 0.8/ 100))
       //this.wire.mass = 2.394 // 2.394
       Matter.Body.set(this.wire, 'mass', 5)
-      console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
+      //console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
 
       this.wire.salt = true;
       
