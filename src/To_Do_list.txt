@@ -171,3 +171,6 @@ What are we doing:
     -- The highlighting of output neurons on accuracy plot have weird buggyness when adding fresh neurons.
 
           -- Tick, but there's still some mild stuff with mobile screen size.
+
+
+  -- A video Demo.

@@ -1134,7 +1134,10 @@ function updateVerSliders() {
 
           {freezeButtons}
 
-          <div style={{ pointerEvents: 'none', position: 'absolute', top: '-20vh', left: '-5vw', transform: 'scale(0.7)' }}>
+          <div style={{ classname: 'neuronWBGraphContainer',
+                        position: 'absolute', bottom: '-5vh', left: '1vw', 
+                        transform: 'scale(' + windowSize.height * 0.00135 +  ')',
+                        transformOrigin: 'bottom left' }}>
 
             {neuronGraph}
 

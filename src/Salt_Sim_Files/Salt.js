@@ -37,17 +37,18 @@ class Salt {
       this.htmlID = this.name + 'ID'
       var num = Math.floor(Math.random() * 5);
       this.img = ImageArray[num];
-  
+
+      console.log('saltcheck', parseFloat(initialNeuron.state.imgStyle.top.replace('%', '')) + 5 + '%')
+
       this.saltStyle = {
         position: "absolute",
-        height: '4.4%',  /*20px*/
+        height: '3.3vh',  /*20px*/
         aspectRatio: 1,
         width: 'auto',
-        left: this.position_x * 0.1+ "%",
-        top: this.position_y * 0.18 + "%",
-  
+        left: (-window.innerHeight/500) + "%",
+        top: (parseFloat(initialNeuron.state.imgStyle.top.replace('%', '')) + 5 * (559/ window.innerHeight) ) + '%',
       };
-
+ 
       this.wire_size_in_px = 10 // 2.2
 
       //alert('SIZE' + this.wire_size_in_px)

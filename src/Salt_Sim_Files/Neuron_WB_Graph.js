@@ -1,8 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-function NeuronGraph({ weight, bias, neuronID }) {
+function NeuronGraph({ weight, bias, target, neuronID, engine }) {
+
   const svgRef = useRef(null);
+
+
+  useEffect(() => {
 
   const margin = { top: 20, right: 20, bottom: 30, left: 45 };
   const width = 300 - margin.left - margin.right;
@@ -13,7 +17,7 @@ function NeuronGraph({ weight, bias, neuronID }) {
     .range([0, width]);
 
   const yScale = d3.scaleLinear()
-    .domain([0, 1])
+    .domain([-0.01, 1])
     .range([height, 0]);
 
   const sigmoid = x => (1 / (1 + Math.exp(-x)));
@@ -84,8 +88,42 @@ console.log(colour)
   svg.append("g")
     .call(d3.axisLeft(yScale));
 
+  }, [weight, bias, neuronID]); // Add relevant dependencies
+
+  useEffect(() => {
+    return () => {
+      // Cleanup the SVG when the component unmounts
+      const svg = d3.select(svgRef.current);
+      svg.selectAll('*').remove();
+    };
+  }, []);
+
   return (
-    <svg ref={svgRef}></svg>
+    <div className="wb-graph-container" style={{
+      'backgroundColor': 'rgb(0, 10, 57)',
+      'border': '2px solid #333',
+      'borderRadius': '8px',
+      'padding': '10px',
+      'display': 'inline-block'
+    }}
+    onClick={() => {engine.neuronGraph = null}}
+    onTouchStart={() => {engine.neuronGraph = null}}
+    >
+
+      <div style ={{'backgroundColor': 'rgb(100 100, 100)',
+      'border': '2px solid #333',
+      position: 'absolute', top: '5%', right: '5%', width: '5%'}}>X</div>
+
+      <div style ={{'backgroundColor': 'rgb(0 10, 30)',
+      'border': '2px solid #333', colour: 'white',
+      position: 'relative', top: '5%', left: '5%', width: '50%'}}>
+      
+      {neuronID.replace('i-', 'In-')} --&gt; {target.replace('11-', 'Out-')}
+
+      </div>
+
+      <svg style = {{ top: '15px', right: '10px'}} ref={svgRef}></svg>
+    </div>
   );
 }
 
