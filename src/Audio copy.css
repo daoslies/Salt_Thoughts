@@ -1,0 +1,101 @@
+
+  .audio {
+    position: relative;
+    background-color: rgb(0, 13, 80);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    text-align: center;
+    font-size: calc(10px + 2vmin);
+    color: var(--color-gainsboro-100);
+    font-family: var(--desktop-menu);
+    
+  }
+
+
+
+.image-container
+{ 
+  position: absolute;
+  left: calc(40vw - 40vh);
+  border: 2px solid rgba(30, 255, 0, 0);
+}
+
+.image-container .radio-main      
+{
+  width: 80vh;  /*80*/
+  height: 80vh;                         
+  position: absolute;
+  display: block;
+
+  z-index: 1;
+
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none;
+  
+}
+
+.image-container .knob-vol
+{  
+  width: 5vh;
+  height: 25vh;
+  
+  position: absolute;
+  z-index: 2;
+  transform: scale(1) translateY(50vh) translateX(11vh) rotate(-2deg);
+
+}
+
+.knob-vol .MuiSlider-thumb {
+  
+  transform: scale(1);
+  height: 20%;
+
+}
+
+.image-container .knob-playback-speed
+{  
+  width: 22vh;
+  height: 5vh;
+  
+  position: absolute;
+  z-index: 2;
+  transform: scale(1) translateY(56vh) translateX(40vh) rotate(-10deg);
+
+
+
+}
+
+.knob-playback-speed .MuiSlider-thumb {
+  
+  transform: scale(1);
+  height: 20%;
+
+}
+
+.image-container .knob-playback-timer {  
+
+  width: 22vh;
+  height: 5vh;
+  
+  position: absolute;
+  z-index: 2;
+  transform: scale(1) translateY(43vh) translateX(40vh) rotate(-10deg);
+
+}
+
+.knob-playback-timer .MuiSlider-thumb {
+  
+  transform: scale(1);
+  height: 20%;
+
+}
+
+audio {
+  display: none;
+}

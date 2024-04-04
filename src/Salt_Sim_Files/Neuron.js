@@ -34,7 +34,7 @@ class Neuron {
 
       this.canvasWidth = window.innerWidth;
       this.canvasHeight = window.innerHeight;
-      this.prevCanvasHeight = this.canvasHeight
+      this.prevCanvasHeight = this.canvasHeight;
 
       this.SFH = (this.canvasHeight / this.prevCanvasHeight)
 
@@ -82,25 +82,51 @@ class Neuron {
     Welcome({self}) {
       
       function neur_click() {
-        
+
+
         //alert(self.id + self.type + self.wire.neuron_type);
 
         console.log(self)
         // Filter out connection objects with sourceNeuronId
-        const targetConnections = self.connections.filter(connection => connection.targetNeuronId);
+        var targetConnections = self.connections.filter(connection => connection.targetNeuronId);
         const sourceConnections = self.connections.filter(connection => connection.sourceNeuronId);
+
+        //Filter out invalid connections
+        const connectedConnections = self.vizData.validConnections.filter(con => con.source.id === self.wire.id || con.target.id === self.wire.id);
+        console.log('TARGETS 1', targetConnections)
+        targetConnections = targetConnections.filter(targetConnection =>
+          connectedConnections.some(connectedConnection =>
+            connectedConnection.source.id === self.wire.id &&
+            connectedConnection.target.neuron_id === targetConnection.targetNeuronId
+          )
+        );
+        console.log('Targets2', targetConnections)
+        console.log('connected', connectedConnections)
+
 
         // Extract weight and bias arrays from filtered connections
         //const weights = sourceConnections.map(connection => connection.weight);
         const weights = targetConnections.map(connection => connection.weight);
         const biases = targetConnections.map(connection => connection.bias);
+        const targets = targetConnections.map(connection => connection.targetNeuronId);
 
-        // Draw graph using d3
-        //self.engine.neuronGraph = <NeuronGraph weights={weights[0]} biases={biases[0]} />
-        self.engine.neuronGraph = <NeuronGraph weight={weights[self.clickCount]} bias={biases[self.clickCount]} neuronID = {self.id} />;
+        
+        
         self.clickCount +=1;
 
-        if (self.clickCount > targetConnections.length) {self.clickCount=0}
+        if (self.clickCount >= targetConnections.length) {
+
+          self.clickCount=0 
+          neur_over()
+
+        }
+
+
+
+        self.engine.neuronGraph = <NeuronGraph  weight={weights[self.clickCount]} bias={biases[self.clickCount]} target = {targets[self.clickCount]} 
+                                                neuronID = {self.id} engine = {self.engine} />;
+        
+
 
 
         console.log(self.id, 'Clicked :  ',  'W: ', weights, '   B:  ', biases)
@@ -123,7 +149,7 @@ class Neuron {
         });
         connection
           .style('stroke', 'yellow') // Set the desired highlight color (e.g., red)
-          //.style('stroke-width', 5); // Set the desired highlight stroke width (e.g., 3 pixels)
+          .style('stroke-width', d => Math.max(Math.min(d.width * 5,7),0.7)); // Set the desired highlight stroke width (e.g., 3 pixels)
         }
 
 
@@ -138,9 +164,9 @@ class Neuron {
         .style("stroke", "black");
 
         // Get all the connections that are linked to this node
-        console.log('Valid Connections: ', self.vizData.validConnections)
-        console.log('do t + S match the id? ', self.wire.id)
-        console.log('self: ', self)
+        //console.log('Valid Connections: ', self.vizData.validConnections)
+        //console.log('do t + S match the id? ', self.wire.id)
+        //console.log('self: ', self)
 
         const connectedConnections = self.vizData.validConnections.filter(con => con.source.id === self.wire.id || con.target.id === self.wire.id);
         
@@ -171,7 +197,7 @@ class Neuron {
 
             if (self.isHolding === true){self.engine.neuronGraph = null; console.log('Graph Cleared');}
             
-          }, 1000); // Set the duration for holding (in milliseconds)
+          }, 2500); // Set the duration for holding (in milliseconds)
         };
 
         const handleMouseUp = () => {
@@ -197,6 +223,7 @@ class Neuron {
           alt="Neuron"
           style={self.state.imgStyle}
           onClick={neur_click}
+          onTouchStart={neur_click}
           onMouseOver={neur_over}
           onMouseOut={neur_away}
           onMouseDown={handleMouseDown}

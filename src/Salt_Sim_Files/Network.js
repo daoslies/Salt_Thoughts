@@ -702,11 +702,11 @@ class Network {
   updateBasedOnScreenSize() {
     
     for (let i = 0; i < this.neural_welcome_list.length; i++) {
-      console.log('1 - welcome list: ', this.neural_welcome_list[i].props.neuron.wire.position)
-      console.log(this.neural_welcome_list[i].props.neuron.id)
-      console.log('final layer index check', this.finalLayerIndex)
+      //console.log('1 - welcome list: ', this.neural_welcome_list[i].props.neuron.wire.position)
+      //console.log(this.neural_welcome_list[i].props.neuron.id)
+      //console.log('final layer index check', this.finalLayerIndex)
       this.neural_welcome_list[i].props.neuron.updateWireFromScreenSize(this.currentFinalLayerIndex)
-      console.log('2: ', this.neural_welcome_list[i].props.neuron.wire.position)
+      //console.log('2: ', this.neural_welcome_list[i].props.neuron.wire.position)
     }
 
     /*

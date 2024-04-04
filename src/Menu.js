@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import Dyanmic_Menu_Elements from "./Dynamic_Menu_Elements";
 import About_Menu from "./AboutMenu";
+import Scrolling_Port_labels from "./ScrollingPortLabels";
 
 import The_Desk from './Salt_Pics/The_Desk.png';
 
@@ -38,13 +39,12 @@ const Menu = () => {
         }}></img>
 
 
-     
+      <Scrolling_Port_labels/>
 
-
-      
       </div>
 
       <About_Menu isAboutMenu={isAboutMenu} setIsAboutMenu={setIsAboutMenu} />
+
 
 
 

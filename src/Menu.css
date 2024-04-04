@@ -61,35 +61,6 @@
     top: 28.2vw   
   } 
 
-  {/*   .book-port,
-  .audio-port,
-  .flower-port {
-    position: absolute;
-    margin: 0 !important;
-    top: 9.81rem;
-    left: 20vw;
-    background-color: var(--color-mediumslateblue);
-    width: 15vw;
-    height: 13.5vh;
-    
-  }
-  
-  .book-port {
-    left: 20vw;
-  }
-
-  .audio-port {
-    left: 80vw;
-    
-  }
-
-  .flower-port {
-    width: 500xp;
-    top: 32rem;   
-    left: 50vw;
-  
-  } */}
-
   .port-div {
     position: absolute;
     display: flex;

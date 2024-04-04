@@ -35,19 +35,20 @@ class Salt {
       this.output_x = output_x;
   
       this.htmlID = this.name + 'ID'
-      var num = Math.floor( Math.random() * 5);
+      var num = Math.floor(Math.random() * 5);
       this.img = ImageArray[num];
-  
+
+      console.log('saltcheck', parseFloat(initialNeuron.state.imgStyle.top.replace('%', '')) + 5 + '%')
+
       this.saltStyle = {
         position: "absolute",
-        height: '4.4%',  /*20px*/
+        height: '3.3vh',  /*20px*/
         aspectRatio: 1,
         width: 'auto',
-        left: this.position_x * 0.1+ "%",
-        top: this.position_y * 0.18 + "%",
-  
+        left: (-window.innerHeight/500) + "%",
+        top: (parseFloat(initialNeuron.state.imgStyle.top.replace('%', '')) + 5 * (559/ window.innerHeight) ) + '%',
       };
-
+ 
       this.wire_size_in_px = 10 // 2.2
 
       //alert('SIZE' + this.wire_size_in_px)
@@ -62,7 +63,7 @@ class Salt {
       Matter.Body.scale(this.wire, (0.17781 * window.innerHeight * 0.8/ 100), (0.17781 * window.innerHeight * 0.8/ 100))
       //this.wire.mass = 2.394 // 2.394
       Matter.Body.set(this.wire, 'mass', 5)
-      console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
+      //console.log('Wire MASS - post scale - ', this.wire.mass, this.wire.id)
 
       this.wire.salt = true;
       
