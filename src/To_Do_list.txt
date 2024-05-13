@@ -159,6 +159,8 @@ What are we doing:
   -- About page stuff
 
   -- Flippin Illium's note.
+      -- Kinda mostly done?
+      -- Paper texture
 
   -- ANNNNDdd we're back to salt sim
 

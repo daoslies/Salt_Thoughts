@@ -38,7 +38,7 @@ const EmbeddingRep = (props) => {
   //const [particles, setParticles] = useState([]);
 
 
-  const svg = d3.select('#svg-container');
+  const svg = d3.select('#svg-container-embedding-rep');
 
 
   const deskAspectRatio = (737/1920) * 0.52

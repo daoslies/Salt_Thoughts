@@ -88,7 +88,7 @@
     display: flex;
     align-items: center;
     height: 2rem;
-    color: rgb(102, 115, 255);
+    color: white;
     cursor: pointer;
     
 
@@ -99,7 +99,39 @@
     position: relative;
     height: 2.31rem;
     right: 0px;
-    z-index: 150;
+    z-index: 43;
+  }
+
+  .aboutmenu p {
+    color: rgb(102, 115, 255);
+    text-transform: none;
+    letter-spacing: 0.1vw;
+    font-size: calc(5px + 1.5vmin);
+  }
+
+  .aboutmenu header {
+    color: white;
+  }
+
+  .about-menu-drop-down-wrapper {
+    color: rgb(102, 115, 255);
+    text-align: right;
+    text-transform: none;
+    letter-spacing: 0.1vw;
+    font-size: calc(5px + 1.5vmin);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+  }
+  
+  .about-menu-drop-down-wrapper.open {
+    max-height: 1000px; /* Set a large enough value to accommodate the content */
+    transition: max-height 0.5s ease-out;
+  }
+  
+  .about-menu-drop-down-wrapper.closing {
+    max-height: 0;
+    transition: max-height 0.5s ease-out;
   }
 
   
