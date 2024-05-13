@@ -1,0 +1,149 @@
+.envelope {
+  cursor: pointer;
+  z-index: 100;
+}
+
+.envelope-enter {
+  transform: translate(-70vw, 20vh) rotate(45deg);
+}
+
+.envelope-enter-active {
+  transform: translate(0%, 0%) rotate(0deg);
+  transition: all 2500ms ease-in 300ms;
+}
+
+
+.envelope-exit {
+  transform: translate(0%, 0%) rotate(0deg);
+}
+
+.envelope-exit-active {
+  transform: translate(-70vw, 20vh) rotate(45deg);
+  transition: all 2500ms ease-in 300ms;
+}
+.envelope-exit-done {
+  transform: translate(-70vw, 20vh) rotate(45deg);
+}
+
+
+.closedflap {
+  transform-origin: top;
+}
+
+.openflap {
+  transform-origin: bottom;
+  transform: scaleY(0);
+}
+
+.envelope-enter .closedflap {
+  transform: scaleY(0);
+  transition: transform 500ms ease-in 2500ms;
+}
+
+.envelope-enter-active .closedflap {
+  transform: scaleY(1);
+}
+
+.envelope-exit .closedflap {
+  transform: scaleY(1);
+  
+}
+
+.envelope-exit-active .closedflap {
+  transition: transform 500ms ease-out;
+  transform: scaleY(0);
+}
+
+.envelope-enter .openflap {
+  transform: scaleY(1);
+}
+
+.envelope-enter-active .openflap {
+  transform: scaleY(0);
+  transition: transform 500ms ease-out 2000ms;
+}
+
+.envelope-exit .openflap {
+  transform: scaleY(0);
+  transition: transform 500ms ease-in 500ms;
+}
+
+.envelope-exit-active .openflap {
+  transform: scaleY(1);
+}
+
+.illiums-note-text {
+  cursor: auto;
+  transform: scaleX(0.7) scaleY(0.4) ;
+  font-size: 0.3vw;
+  color: white;
+  padding: 0.7vw;
+  background-image: url("\\Salt_Pics\\textre2_Blue_2.jpg");
+  background-size: cover;
+  background-attachment: local;
+}
+.illiums-note-text p {
+  overflow: hidden
+}
+
+
+.envelope-enter .illiums-note-text.illiums-note-text {
+  animation: illiums-note-enter 2500ms ease-out;
+}
+
+@keyframes illiums-note-enter {
+  0% {
+    transform: translate(40vw, -50vh) rotate(-45deg) scale(3.5);
+    z-index: 200
+  }
+  50% {
+    transform: translate(0vw, -40vh) rotate(0deg) scale(1);
+  }
+  100% {
+    transform: translate(0vw, -7.5vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+  }
+}
+
+.envelope-exit .illiums-note-text.illiums-note-text {
+  animation: illiums-note-exit 3000ms ease-in;
+}
+
+@keyframes illiums-note-exit {
+  0% {
+    transform: translate(0vw, -7.5vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+  }
+
+  15% {
+    transform: translate(0vw, -8vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+  }
+
+  25% {
+    transform: translate(0vw, -25vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+  }
+
+  70% {
+    transform: translate(30vw, -40vh) rotate(-45deg) scaleX(0.7) scaleY(0.4);
+    z-index: 200
+  }
+  100% {
+    transform: translate(40vw, -50vh) rotate(-45deg) scale(3.5);
+    z-index: 200
+  }
+}
+
+.envelope-exit-active .illiums-note-text {
+  transform: translate(40vw, -50vh) rotate(-45deg) scale(3.5);
+}
+
+.envelope-exit-done .illiums-note-text {
+  transform: translate(40vw, -50vh) rotate(-45deg) scale(3.5);
+  z-index: 200
+}
+
+.envelope-enter-done .illiums-note-text {
+  transform: translate(0vw, -7.5vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+}
+
+.envelope-enter-active .illiums-note-text {
+  transform: translate(0vw, -7.5vh) rotate(0deg) scaleX(0.7) scaleY(0.4);
+}

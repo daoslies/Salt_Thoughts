@@ -257,6 +257,8 @@ function Wire({ setRenderEmbeddingRep }) {
   function onAnimationFrame_MatterEvents() {
 
     if (!routeTime)  {
+
+
       
     width = window.innerWidth;
     scaledWidth = width/1707;
@@ -272,7 +274,9 @@ function Wire({ setRenderEmbeddingRep }) {
     points[0].y = wire_start_pos_y-(90 * scaledWidth * 0.85);
 
     const svg = d3.select('#svg-container');
-
+    const svgLowZ = d3.select('#svg-container-low-z');
+    svg.selectAll("*").remove();
+    svgLowZ.selectAll("*").remove();
  
 
     svg.selectAll(null) 
@@ -332,7 +336,7 @@ function Wire({ setRenderEmbeddingRep }) {
       if (blue_light_counter >= 100) {
 
         
-        svg.append('image')
+        svgLowZ.append('image')
         .attr('href', blue_light_img)  //[jackImageIndex])
         .attr('x', pluggedPortRef.current.portX+(66 * scaledWidth))
         .attr('y', pluggedPortRef.current.portY-(28 * scaledWidth))
@@ -801,7 +805,7 @@ useEffect(() => {
          onMouseLeave={() => portButtonHoverRef.current = false}
 
          style={{
-          zIndex: 50,
+          zIndex: 42,
           position: 'absolute',
           left: left,
           top: top,

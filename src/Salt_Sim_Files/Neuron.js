@@ -121,13 +121,13 @@ class Neuron {
 
         }
 
-
+        // output neurons have no weights or biases so no point graphing.
+        if (self.type != 'output') {
 
         self.engine.neuronGraph = <NeuronGraph  weight={weights[self.clickCount]} bias={biases[self.clickCount]} target = {targets[self.clickCount]} 
                                                 neuronID = {self.id} engine = {self.engine} />;
         
-
-
+        }
 
         console.log(self.id, 'Clicked :  ',  'W: ', weights, '   B:  ', biases)
 
