@@ -35,7 +35,7 @@ And all I ask is that when you make your way to the Alabaster Institute (and wel
 I’m sure I’ll be hanging around somewhere in the Plato space playing tennis or sipping on juice or doing literally everything, because that’s how infinity works.
 <p/>
 <p>
-And if not. And everything that I am lives inside the salt that the heart in my brain pumps around my head, then that’s cool too.
+<b>And</b> if not. <b>And</b> every<b>thing</b> that I <b>am</b> lives in<b>side</b> the <b>salt</b> that the <b>heart</b> in my <b>brain</b> pumps a<b>round</b> my head, then that’s cool too.
 <p/>
 <p>
 I wasn’t really going anywhere and I’m kind of done trying.
