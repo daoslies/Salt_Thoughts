@@ -484,10 +484,60 @@ useEffect(() => {
 // Mouse Events
 
 
+function handleMouseInPort(X,Y) {
+
+      const portClasses = ['book-port', 'audio-port', 'flower-port'];
+      hoveredPort = null;
+
+      // you wanted to use event listeners for this (as that should be a straightforward way to
+      // check to see if the mouse is within a port) but z index messed with this, so the below is instead
+
+      portClasses.forEach((portClass) => {
+        const portElements = document.getElementsByClassName(portClass);
+
+        for (let i = 0; i < portElements.length; i++) {
+          const portElement = portElements[i];
+          const rect = portElement.getBoundingClientRect();
+
+          if (
+            X >= rect.left &&
+            X <= rect.right &&
+            Y >= rect.top &&
+            Y <= rect.bottom
+          ) {
+            hoveredPort = portElement;
+
+            var port_aim_X = rect.left + 10
+            var port_aim_Y = rect.top + 10
+
+            if (mouse_rect) {
+              mouse_rect.position.x = port_aim_X
+              mouse_rect.position.y = port_aim_Y
+            }
+
+            return [port_aim_X, port_aim_Y, 'Port'];
+          }
+        } 
+      })
+      return [X,Y, 'Not Port']
+
+}
+
+
+
+    /// Current state of play 09/09/2024:
+    // Trying to get the wire to plug into the port when it's close enough.
+    // Prints are showing that handlemouseinport is not correctly identifying
+    // when the mouse is in the port
+    // but visual inspection indicates that it actually does know it's in the port
+    // initially on mouse wiggle
+    // potentially it's returning twice or something very odd?
 
     // Add mouse contraint
     let mouse_rect = null;
     let mouseCon = null;
+
+    var hoveredPort = null;
 
     const mousedownevent = (event) => {
 
@@ -497,14 +547,19 @@ useEffect(() => {
       }
       else {
         var X_down = event.clientX
-        var Y_down = event.clientY
+        var Y_down = event.clientY    
       }
-      
+
+      let XY = handleMouseInPort(X_down, Y_down)
+      X_down = XY[0]
+      Y_down = XY[1]
+      console.log('XY: ', XY)
+
       if (!pluggedPortRef.current || !portButtonHoverRef.current) {
 
       if (!mouse_rect) {
       mouse_rect = Matter.Bodies.rectangle(X_down, Y_down, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
-      
+      console.log('Mouse Rect position: ', mouse_rect.position.x, mouse_rect.position.y)
       Matter.World.add(world, mouse_rect); 
       
       if (wireBodies.length > 0) {
@@ -534,15 +589,22 @@ useEffect(() => {
     let isMouseMoving = false;
     
     const handleMouseMove = (event) => {
-      
+
+      let X_move, Y_move;
+
       if (isMobile) {
-        var X_move = event.changedTouches[0].pageX
-        var Y_move = event.changedTouches[0].pageY
+        X_move = event.changedTouches[0].pageX;
+        Y_move = event.changedTouches[0].pageY;
+      } else {
+        X_move = event.clientX;
+        Y_move = event.clientY;
       }
-      else {
-        var X_move = event.clientX
-        var Y_move = event.clientY
-      }
+
+      let XY = handleMouseInPort(X_move, Y_move)
+      X_move = XY[0]
+      Y_move = XY[1]
+      console.log('XY: ', XY)
+      
 
       if (!isMouseMoving) {
         isMouseMoving = true;
@@ -551,6 +613,8 @@ useEffect(() => {
           if (mouse_rect) {
             mouse_rect.position.x = X_move;
             mouse_rect.position.y = Y_move;
+            console.log('Mouse Rect position: ', mouse_rect.position.x, mouse_rect.position.y)
+
           }
           
         });
@@ -589,7 +653,8 @@ useEffect(() => {
 
       };
     }, []); 
-    
+
+
         
         
 
