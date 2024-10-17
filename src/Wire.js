@@ -492,11 +492,10 @@ function handleMouseInPort(X,Y) {
       // you wanted to use event listeners for this (as that should be a straightforward way to
       // check to see if the mouse is within a port) but z index messed with this, so the below is instead
 
-      portClasses.forEach((portClass) => {
-        const portElements = document.getElementsByClassName(portClass);
+      for (let portClass of portClasses) {
+          const portElements = document.getElementsByClassName(portClass);
 
-        for (let i = 0; i < portElements.length; i++) {
-          const portElement = portElements[i];
+          const portElement = portElements[0];
           const rect = portElement.getBoundingClientRect();
 
           if (
@@ -505,10 +504,11 @@ function handleMouseInPort(X,Y) {
             Y >= rect.top &&
             Y <= rect.bottom
           ) {
+
             hoveredPort = portElement;
 
-            var port_aim_X = rect.left + 10
-            var port_aim_Y = rect.top + 10
+            var port_aim_X = rect.left + (65 * rect.width/237)
+            var port_aim_Y = rect.top + (65 * rect.height/237)
 
             if (mouse_rect) {
               mouse_rect.position.x = port_aim_X
@@ -517,21 +517,12 @@ function handleMouseInPort(X,Y) {
 
             return [port_aim_X, port_aim_Y, 'Port'];
           }
-        } 
-      })
+        
+      }
       return [X,Y, 'Not Port']
 
 }
 
-
-
-    /// Current state of play 09/09/2024:
-    // Trying to get the wire to plug into the port when it's close enough.
-    // Prints are showing that handlemouseinport is not correctly identifying
-    // when the mouse is in the port
-    // but visual inspection indicates that it actually does know it's in the port
-    // initially on mouse wiggle
-    // potentially it's returning twice or something very odd?
 
     // Add mouse contraint
     let mouse_rect = null;
@@ -539,21 +530,25 @@ function handleMouseInPort(X,Y) {
 
     var hoveredPort = null;
 
+    var X_mouse_offset = 0;
+    var Y_mouse_offset = -50;
+
     const mousedownevent = (event) => {
 
+
+
       if (isMobile) {
-        var X_down = event.changedTouches[0].pageX
-        var Y_down = event.changedTouches[0].pageY
+        var X_down = event.changedTouches[0].pageX + X_mouse_offset
+        var Y_down = event.changedTouches[0].pageY + Y_mouse_offset
       }
       else {
-        var X_down = event.clientX
-        var Y_down = event.clientY    
+        var X_down = event.clientX + X_mouse_offset
+        var Y_down = event.clientY + Y_mouse_offset
       }
 
-      let XY = handleMouseInPort(X_down, Y_down)
-      X_down = XY[0]
-      Y_down = XY[1]
-      console.log('XY: ', XY)
+      let XY = handleMouseInPort(X_down - X_mouse_offset, Y_down - Y_mouse_offset) // The offset is needed for the ports
+      X_down = XY[0] + X_mouse_offset
+      Y_down = XY[1] + Y_mouse_offset // but is needed out here for the mouse rect
 
       if (!pluggedPortRef.current || !portButtonHoverRef.current) {
 
@@ -593,17 +588,16 @@ function handleMouseInPort(X,Y) {
       let X_move, Y_move;
 
       if (isMobile) {
-        X_move = event.changedTouches[0].pageX;
-        Y_move = event.changedTouches[0].pageY;
+        X_move = event.changedTouches[0].pageX + X_mouse_offset;
+        Y_move = event.changedTouches[0].pageY + Y_mouse_offset;
       } else {
-        X_move = event.clientX;
-        Y_move = event.clientY;
+        X_move = event.clientX + X_mouse_offset;
+        Y_move = event.clientY + Y_mouse_offset;
       }
 
-      let XY = handleMouseInPort(X_move, Y_move)
-      X_move = XY[0]
-      Y_move = XY[1]
-      console.log('XY: ', XY)
+      let XY = handleMouseInPort(X_move - X_mouse_offset, Y_move - Y_mouse_offset) // notes above on offset
+      X_move = XY[0] + X_mouse_offset
+      Y_move = XY[1] + Y_mouse_offset
       
 
       if (!isMouseMoving) {
