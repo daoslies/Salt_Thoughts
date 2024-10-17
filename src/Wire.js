@@ -484,27 +484,77 @@ useEffect(() => {
 // Mouse Events
 
 
+function handleMouseInPort(X,Y) {
+
+      const portClasses = ['book-port', 'audio-port', 'flower-port'];
+      hoveredPort = null;
+
+      // you wanted to use event listeners for this (as that should be a straightforward way to
+      // check to see if the mouse is within a port) but z index messed with this, so the below is instead
+
+      for (let portClass of portClasses) {
+          const portElements = document.getElementsByClassName(portClass);
+
+          const portElement = portElements[0];
+          const rect = portElement.getBoundingClientRect();
+
+          if (
+            X >= rect.left &&
+            X <= rect.right &&
+            Y >= rect.top &&
+            Y <= rect.bottom
+          ) {
+
+            hoveredPort = portElement;
+
+            var port_aim_X = rect.left + (65 * rect.width/237)
+            var port_aim_Y = rect.top + (65 * rect.height/237)
+
+            if (mouse_rect) {
+              mouse_rect.position.x = port_aim_X
+              mouse_rect.position.y = port_aim_Y
+            }
+
+            return [port_aim_X, port_aim_Y, 'Port'];
+          }
+        
+      }
+      return [X,Y, 'Not Port']
+
+}
+
 
     // Add mouse contraint
     let mouse_rect = null;
     let mouseCon = null;
 
+    var hoveredPort = null;
+
+    var X_mouse_offset = 0;
+    var Y_mouse_offset = -50;
+
     const mousedownevent = (event) => {
 
+
+
       if (isMobile) {
-        var X_down = event.changedTouches[0].pageX
-        var Y_down = event.changedTouches[0].pageY
+        var X_down = event.changedTouches[0].pageX + X_mouse_offset
+        var Y_down = event.changedTouches[0].pageY + Y_mouse_offset
       }
       else {
-        var X_down = event.clientX
-        var Y_down = event.clientY
+        var X_down = event.clientX + X_mouse_offset
+        var Y_down = event.clientY + Y_mouse_offset
       }
-      
+
+      let XY = handleMouseInPort(X_down - X_mouse_offset, Y_down - Y_mouse_offset) // The offset is needed for the ports
+      X_down = XY[0] + X_mouse_offset
+      Y_down = XY[1] + Y_mouse_offset // but is needed out here for the mouse rect
+
       if (!pluggedPortRef.current || !portButtonHoverRef.current) {
 
       if (!mouse_rect) {
       mouse_rect = Matter.Bodies.rectangle(X_down, Y_down, 10, 10, { isStatic: true }); //event.clientX, event.clientY,
-      
+      console.log('Mouse Rect position: ', mouse_rect.position.x, mouse_rect.position.y)
       Matter.World.add(world, mouse_rect); 
       
       if (wireBodies.length > 0) {
@@ -534,15 +584,21 @@ useEffect(() => {
     let isMouseMoving = false;
     
     const handleMouseMove = (event) => {
-      
+
+      let X_move, Y_move;
+
       if (isMobile) {
-        var X_move = event.changedTouches[0].pageX
-        var Y_move = event.changedTouches[0].pageY
+        X_move = event.changedTouches[0].pageX + X_mouse_offset;
+        Y_move = event.changedTouches[0].pageY + Y_mouse_offset;
+      } else {
+        X_move = event.clientX + X_mouse_offset;
+        Y_move = event.clientY + Y_mouse_offset;
       }
-      else {
-        var X_move = event.clientX
-        var Y_move = event.clientY
-      }
+
+      let XY = handleMouseInPort(X_move - X_mouse_offset, Y_move - Y_mouse_offset) // notes above on offset
+      X_move = XY[0] + X_mouse_offset
+      Y_move = XY[1] + Y_mouse_offset
+      
 
       if (!isMouseMoving) {
         isMouseMoving = true;
@@ -551,6 +607,8 @@ useEffect(() => {
           if (mouse_rect) {
             mouse_rect.position.x = X_move;
             mouse_rect.position.y = Y_move;
+            console.log('Mouse Rect position: ', mouse_rect.position.x, mouse_rect.position.y)
+
           }
           
         });
@@ -589,7 +647,8 @@ useEffect(() => {
 
       };
     }, []); 
-    
+
+
         
         
 
