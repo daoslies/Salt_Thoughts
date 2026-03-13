@@ -65,6 +65,24 @@ const Menu = () => {
 
       <div className="footer">
         <div className="about-container" style={{pointerEvents: 'none'}}>
+        <a 
+          href="/game/index.html"
+          className="about"
+          style={{
+            display: 'inline-block',
+            marginBottom: '3vh',
+            left: '1vw',
+            right: 'auto',
+            animation: 'pulse-glow 2s ease-in-out infinite',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            pointerEvents: 'auto',
+            fontSize: 'calc(40px + 1.5vmin)',
+            fontWeight: '700',
+          }}
+        >
+          <span style={{color: 'white', margin: '1vw', fontSize: 'calc(40px + 1.5vmin)'}}>Play ClickBrain</span>
+        </a>
           <b className="about" 
             style={{pointerEvents: 'auto', bottom: '5%'}}
             onClick={() =>  setIsAboutMenu(!isAboutMenu)}
